@@ -1,0 +1,18 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022", // Target modern ECMAScript for compilation
+    "module": "commonjs", // Use CommonJS module system for Node.js
+    "outDir": "./dist", // Output compiled JavaScript files to 'dist' directory
+    "rootDir": "./src", // Source TypeScript files are in 'src' directory
+    "strict": true, // Enable all strict type-checking options for robust code
+    "esModuleInterop": true, // Allow default imports from modules with no default export
+    "skipLibCheck": true, // Skip type checking of all declaration files (*.d.ts) for faster compilation
+    "forceConsistentCasingInFileNames": true, // Ensure consistent casing in file names
+    "resolveJsonModule": true, // Allow importing .json files
+    "emitDecoratorMetadata": true, // Needed for decorators (e.g., if using TypeORM, Class-validator)
+    "experimentalDecorators": true // Enable experimental support for decorators
+  },
+  "include": ["src/**/*.ts"], // Include all .ts files in the src directory
+  "exclude": ["node_modules"] // Exclude node_modules from compilation
+}
