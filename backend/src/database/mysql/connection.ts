@@ -97,11 +97,12 @@ const disconnect = async () => {
 // Graceful shutdown
 process.on('SIGINT', async () => {
     await disconnect();
+    process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
     await disconnect();
+    process.exit(0);
 });
 
-export { connect, getPool, executeQuery, disconnect };
-export default { connect };
+export default { connect, getPool, executeQuery, disconnect };
