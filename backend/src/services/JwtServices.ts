@@ -130,19 +130,6 @@ class JwtService implements IJwtService {
         }
     }
 
-    // public async refreshAccessToken(refreshToken: string): Promise<string> {
-    //     try {
-    //         const { userId } = await this.verifyRefreshToken(refreshToken);
-
-    //         // TODO: Fetch user data from database using userId
-    //         // For now, we'll indicate this needs database integration
-    //         throw new Error('Refresh token implementation requires database integration - will implement in next step');
-
-    //     } catch (error) {
-    //         throw new Error(`Token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    //     }
-    // }
-
 }
 
 export default new JwtService();
