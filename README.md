@@ -29,6 +29,7 @@ A modern, full-stack library management system built with Next.js and Express.js
 The Smart Library Platform is a comprehensive digital solution designed to modernize library management systems. It provides librarians and patrons with intuitive tools for book management, user administration, and seamless library operations.
 
 ### Key Objectives
+
 - Digitize library catalog and inventory management
 - Streamline book borrowing and return processes
 - Provide real-time availability tracking
@@ -38,6 +39,7 @@ The Smart Library Platform is a comprehensive digital solution designed to moder
 ## ✨ Features
 
 ### For Librarians
+
 - 📚 **Catalog Management** - Add, edit, and organize book collections
 - 👥 **User Administration** - Manage patron accounts and permissions
 - 📊 **Analytics Dashboard** - Track borrowing patterns and inventory metrics
@@ -45,6 +47,7 @@ The Smart Library Platform is a comprehensive digital solution designed to moder
 - 📋 **Reports Generation** - Automated reporting for library operations
 
 ### For Patrons
+
 - 🔍 **Book Discovery** - Intuitive search and browse functionality
 - 📱 **Account Management** - View borrowing history and account status
 - 🔔 **Notifications** - Due date reminders and availability alerts
@@ -63,6 +66,7 @@ The Smart Library Platform is a comprehensive digital solution designed to moder
 ### Technology Stack
 
 **Frontend:**
+
 - Next.js 15.4.5 (React Framework)
 - React 19.1.0
 - TypeScript 5.x
@@ -70,15 +74,18 @@ The Smart Library Platform is a comprehensive digital solution designed to moder
 - ESLint & Prettier
 
 **Backend:**
+
 - Node.js
 - Express.js 4.x
 - TypeScript 5.5.3
 
 **Databases:**
-- **MongoDB** 
-- **MySQL** 
+
+- **MongoDB**
+- **MySQL**
 
 **DevOps & Tools:**
+
 - Git & GitHub
 - ESLint & Prettier
 - Nodemon (Development)
@@ -92,17 +99,19 @@ Before you begin, ensure you have the following installed:
 - **Node.js** (v18.0.0 or higher)
 - **pnpm** (v8.0.0 or higher)
 - **Git** (v2.0.0 or higher)
-- **MongoDB** (v6.0 or higher) or MongoDB Atlas account
-- **MySQL** (v8.0 or higher) or MySQL cloud service
+- **Docker** (v20.0.0 or higher) and **Docker Compose**
+- **MongoDB** (v6.0 or higher) or MongoDB Atlas account _(for MongoDB, Docker not required)_
 
 ```bash
 # Verify installations
 node --version
 pnpm --version
 git --version
-mongod --version
-mysql --version
+docker --version
+docker-compose --version
 ```
+
+**Note:** MySQL is provided via Docker container, so no local MySQL installation is required.
 
 ## 🚀 Installation
 
@@ -113,10 +122,30 @@ git clone https://github.com/YOUR_USERNAME/Smart-Library-Platform.git
 cd Smart-Library-Platform
 ```
 
-### 2. Install Dependencies
+### 2. Start Docker Services (Database)
+
+First, start the Docker services for the databases:
 
 ```bash
-# Install backend dependencies
+# Navigate to backend directory
+cd backend
+
+# Start Docker services (MySQL with Flyway migrations)
+docker-compose up -d
+
+# Verify containers are running
+docker-compose ps
+```
+
+This will start:
+
+- **MySQL Server** on port `6446` (mapped from container port 3306)
+- **Flyway Migration Service** to set up the database schema automatically
+
+### 3. Install Dependencies
+
+```bash
+# Install backend dependencies (if not already in backend directory)
 cd backend
 pnpm install
 
@@ -125,7 +154,7 @@ cd ../frontend
 pnpm install
 ```
 
-### 3. Environment Configuration
+### 4. Environment Configuration
 
 Copy the sample environment file and configure your settings:
 
@@ -151,11 +180,11 @@ APP_VERSION=1.0.0
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 # Or local: mongodb://localhost:27017/library-platform
 
-# MySQL Configuration (with Connection Pool)
+# MySQL Configuration (Dockerized Database)
 MYSQL_HOST=localhost
-MYSQL_PORT=3306
+MYSQL_PORT=6446
 MYSQL_USER=root
-MYSQL_PASSWORD=your_password
+MYSQL_PASSWORD=ftech2005
 MYSQL_DATABASE=library_platform
 
 # JWT Configuration
@@ -168,41 +197,60 @@ CORS_ORIGIN=http://localhost:3000,http://localhost:3001
 CORS_CREDENTIALS=true
 ```
 
-### 4. Database Setup
+### 5. Database Setup
 
 #### MongoDB Setup
-```bash
-# Start MongoDB locally (if using local installation)
-mongod
 
-# Or use MongoDB Atlas cloud service
-# Update MONGODB_URI with your Atlas connection string
+```bash
+# For development, you can use MongoDB Atlas (recommended)
+# Update MONGODB_URI in your .env file with your Atlas connection string
+
+# Or start MongoDB locally (if using local installation)
+mongod
 ```
 
-#### MySQL Setup
-```bash
-# Start MySQL service
-sudo systemctl start mysql  # Linux
-brew services start mysql   # macOS
-net start mysql            # Windows
+#### MySQL Setup (Dockerized)
 
-# The application will automatically create the database
-# Or create manually:
-mysql -u root -p
-CREATE DATABASE library_platform;
+The MySQL database is already running in Docker from step 2. The Docker setup includes:
+
+- **MySQL Server**: Running on port `6446`
+- **Database**: `library_platform` (auto-created)
+- **User**: `root` with password `ftech2005`
+- **Flyway Migrations**: Automatically applied on startup
+
+To verify the database is working:
+
+```bash
+# Connect to the dockerized MySQL database
+mysql -h localhost -P 6446 -u root -pftech2005 library_platform
+
+# Or check tables
+mysql -h localhost -P 6446 -u root -pftech2005 -e "SHOW TABLES;" library_platform
 ```
 
 ## 🎮 Usage
 
 ### Development Mode
 
-Run both frontend and backend concurrently:
+**Step 1: Ensure Docker services are running**
 
 ```bash
-# Terminal 1: Backend
+cd backend
+docker-compose ps  # Check if containers are running
+# If not running: docker-compose up -d
+```
+
+**Step 2: Start the backend server**
+
+```bash
+# Terminal 1: Backend (make sure you're in backend directory)
 cd backend
 pnpm dev
+```
 
+**Step 3: Start the frontend**
+
+```bash
 # Terminal 2: Frontend (in a new terminal)
 cd frontend
 pnpm dev
@@ -213,10 +261,12 @@ pnpm dev
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:5000
 - **API Health Check:** http://localhost:5000/
+- **MySQL Database:** localhost:6446 (user: root, password: ftech2005)
 
 ### Expected Output
 
 When starting the backend, you should see:
+
 ```
 🚀 Starting Smart Library Platform Backend...
 ✅ Connected to MongoDB successfully!
@@ -225,9 +275,32 @@ When starting the backend, you should see:
 🎉 Server running at http://localhost:5000
 ```
 
+### Docker Management
+
+**Useful Docker commands:**
+
+```bash
+# Check container status
+docker-compose ps
+
+# View container logs
+docker-compose logs db
+docker-compose logs flyway
+
+# Stop all services
+docker-compose down
+
+# Restart services
+docker-compose restart
+
+# Stop and remove containers with volumes (⚠️ This will delete data)
+docker-compose down -v
+```
+
 ### Scripts Available
 
 **Backend:**
+
 ```bash
 pnpm dev          # Start development server with nodemon
 pnpm build        # Build TypeScript to JavaScript
@@ -237,6 +310,7 @@ pnpm lint:fix     # Fix ESLint issues
 ```
 
 **Frontend:**
+
 ```bash
 pnpm dev          # Start development server (port 3000)
 pnpm build        # Build for production
@@ -248,6 +322,7 @@ pnpm lint:fix     # Fix linting issues
 ## 📖 API Documentation
 
 ### Base URL
+
 ```
 http://localhost:5000/api/v1
 ```
@@ -286,7 +361,7 @@ DELETE /users/:id      # Delete user
 GET    /reviews        # Get book reviews
 POST   /reviews        # Create review
 GET    /analytics      # Get library analytics
-POST   /logs           # Create activity log 
+POST   /logs           # Create activity log
 ``` -->
 
 ## 📁 Project Structure
@@ -319,6 +394,10 @@ Smart-Library-Platform/
 │   │       │   └── connection.ts
 │   │       └── mysql/         # MySQL connection with pooling
 │   │           └── connection.ts
+│   ├── compose.yaml           # Docker Compose for MySQL & Flyway
+│   ├── flyway/                # Database migration files
+│   │   ├── flyway.toml        # Flyway configuration
+│   │   └── migrations/        # SQL migration scripts
 │   ├── package.json           # Backend dependencies
 │   ├── tsconfig.json          # TypeScript configuration
 │   └── .env                   # Environment variables
@@ -334,6 +413,7 @@ Smart-Library-Platform/
 ### Connection Pooling Configuration
 
 **MongoDB Connection Pool:**
+
 - Max Pool Size: 10 connections
 - Min Pool Size: 2 connections
 - Max Idle Time: 30 seconds
@@ -342,6 +422,7 @@ Smart-Library-Platform/
 - Buffer Commands: Disabled
 
 **MySQL Connection Pool:**
+
 - Connection Limit: 10 connections
 - Max Idle: 10 connections
 - Idle Timeout: 60 seconds
@@ -352,6 +433,7 @@ Smart-Library-Platform/
 ### Data Distribution Strategy
 
 **MySQL (Relational Data):**
+
 - User accounts and authentication
 - Book catalog and metadata
 - Borrowing transactions and history
@@ -359,6 +441,7 @@ Smart-Library-Platform/
 - Staff and administrative data
 
 **MongoDB (Flexible/Analytics Data):**
+
 - User activity logs and sessions
 - Book reviews and ratings
 - Search analytics and recommendations
@@ -386,10 +469,24 @@ mongo library-platform         # Access MongoDB shell
 use library-platform          # Switch to database
 db.users.find()               # Query collections
 
-# MySQL operations
-mysql -u root -p library_platform
+# MySQL operations (Dockerized)
+mysql -h localhost -P 6446 -u root -pftech2005 library_platform
 SHOW TABLES;
 SELECT * FROM users;
+```
+
+### Troubleshooting
+
+#### Docker Issues
+
+```bash
+docker-compose down -v
+docker-compose up -d
+
+# Check if ports are already in use
+lsof -i :6446  # Check MySQL port
+lsof -i :5000  # Check backend port
+lsof -i :3000  # Check frontend port
 ```
 
 ### Code Style
@@ -477,7 +574,7 @@ CORS_ORIGIN=https://yourdomain.com
 
 - **Frontend:** Vercel, Netlify
 - **Backend:** Railway, Render, Heroku, DigitalOcean
-- **Databases:** 
+- **Databases:**
   - **MongoDB:** MongoDB Atlas
   - **MySQL:** PlanetScale, AWS RDS, Google Cloud SQL
 
@@ -511,4 +608,4 @@ This project is actively maintained. For feature requests and bug reports, pleas
 
 **Made with ❤️ by [Your Name/Team]**
 
-*Last updated: July 31, 2025*
+_Last updated: July 31, 2025_
