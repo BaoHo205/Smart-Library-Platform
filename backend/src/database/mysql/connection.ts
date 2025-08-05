@@ -34,7 +34,7 @@ const createDatabaseIfNotExists = async () => {
             `CREATE DATABASE IF NOT EXISTS \`${MySQL_CONFIG.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
         );
         
-        console.log(`✅ Database '${MySQL_CONFIG.database}' created/verified`);
+        console.log(`✅ Database '${MySQL_CONFIG.database}' created`);
         await tempConnection.end();
         
     } catch (error) {
@@ -53,7 +53,12 @@ const connect = async () => {
         
         // Test the connection
         const connection = await pool.getConnection();
-        console.log('✅ Connected to MySQL successfully!');
+        if (!connection) {
+            throw new Error('Failed to get a connection from the pool');
+        }
+        else {
+            console.log('✅ Connected to MySQL successfully!');
+        }
         // console.log(`📍 Database: ${MySQL_CONFIG.database}`);
         // console.log(`🔗 Host: ${MySQL_CONFIG.host}:${MySQL_CONFIG.port}`);
         // console.log(`🏊 Pool: ${MySQL_CONFIG.connectionLimit} connections`);
