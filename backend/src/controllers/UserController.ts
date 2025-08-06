@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import BookService from '../services/BookService';
+import UserService from '../services/UserService';
 
 const addReview = async (req: Request, res: Response) => {
     try {
@@ -12,7 +12,7 @@ const addReview = async (req: Request, res: Response) => {
         }
         console.log('Adding review:', req.body);
 
-        const result = await BookService.addReview(reviewData);
+        const result = await UserService.addReview(reviewData);
         if (result) {
             res.status(201).json({
                 success: true,
@@ -30,7 +30,7 @@ const addReview = async (req: Request, res: Response) => {
             success: false,
             message: `${error instanceof Error ? error.message : 'Unknown error'}`
         });
-        console.error('Error adding review:', error);
+
     }
 }
 
@@ -42,7 +42,6 @@ const updateReview = async (req: Request, res: Response) => {
                 success: false,
                 message: 'Review ID is required'
             });
-            console.error('Review ID is required');
         }
 
         const updateData = req.body;
@@ -51,12 +50,11 @@ const updateReview = async (req: Request, res: Response) => {
                 success: false,
                 message: 'Update data is required'
             });
-            console.error('Update data is required');
         }
 
         console.log('Update review with ID:', reviewId, 'Data:', updateData);
 
-        const result = await BookService.updateReview(reviewId, updateData);
+        const result = await UserService.updateReview(reviewId, updateData);
         if (result) {
             res.status(201).json({
                 success: true,
@@ -74,9 +72,10 @@ const updateReview = async (req: Request, res: Response) => {
             success: false,
             message: `${error instanceof Error ? error.message : 'Unknown error'}`
         });
-        console.error('Error updating review:', error);
     }
 }
+
+
 export default {
     addReview,
     updateReview

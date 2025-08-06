@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import mongoDBConnection from './database/mongodb/connection';
 import mysqlConnection from './database/mysql/connection'; 
 import authRouter from './routes/authRoutes';
-import bookRouter from './routes/bookRoutes';
 import authMiddleware from './middleware/authMiddleware'; 
 import cookieParser from 'cookie-parser';
+import apiRouter from './routes/apiRoutes';
 
 dotenv.config(); 
 
@@ -22,9 +22,11 @@ app.use(cookieParser());
 app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
 });
+
 app.use('/auth', authRouter);
 app.use(authMiddleware.verifyJWT);
-app.use('/books/', bookRouter)
+
+app.use('api/v1', apiRouter);
 
 const run = async () => {
   try {

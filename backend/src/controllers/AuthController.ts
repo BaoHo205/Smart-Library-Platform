@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import authService from '../services/AuthService';
 
-
 const register = async (req: Request, res: Response) => {
     try {
         const registrationData = req.body;

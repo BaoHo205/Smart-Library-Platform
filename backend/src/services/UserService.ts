@@ -102,7 +102,7 @@ const updateReview = async (reviewId: string, updateData: IUpdateReviewData) => 
             updateData.rating,
             updateData.comment,
             updated_at,
-            reviewId, 
+            reviewId,
             updateData.userId
         ]
         const res = await executeQuery(query, params);
@@ -111,7 +111,11 @@ const updateReview = async (reviewId: string, updateData: IUpdateReviewData) => 
         throw new Error(`Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
+
+
+
+
 export default {
     addReview,
-    updateReview
+    updateReview,
 };
