@@ -11,7 +11,7 @@ const MySQL_CONFIG = {
     database: process.env.MYSQL_DATABASE || 'library_platform',
     waitForConnections: true,
     connectionLimit: 10,
-    maxIdle: 10, 
+    maxIdle: 10,
     idleTimeout: 60000,
     queueLimit: 0,
     enableKeepAlive: true,
@@ -20,53 +20,33 @@ const MySQL_CONFIG = {
 
 let pool: mysql.Pool;
 
-const createDatabaseIfNotExists = async () => {
-    try {
-        // Create connection without database selection for creating DB
-        const tempConnection = await mysql.createConnection({
-            host: MySQL_CONFIG.host,
-            port: MySQL_CONFIG.port,
-            user: MySQL_CONFIG.user,
-            password: MySQL_CONFIG.password
-        });
-        
-        await tempConnection.execute(
-            `CREATE DATABASE IF NOT EXISTS \`${MySQL_CONFIG.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-        );
-        
-        console.log(`✅ Database '${MySQL_CONFIG.database}' created`);
-        await tempConnection.end();
-        
-    } catch (error) {
-        console.error('❌ Error creating database:', error);
-        throw error;
-    }
-};
-
 const connect = async () => {
     try {
-        // Create database first
-        await createDatabaseIfNotExists();
-        
-        // Create connection pool
-        pool = mysql.createPool(MySQL_CONFIG);
-        
-        // Test the connection
-        const connection = await pool.getConnection();
-        if (!connection) {
-            throw new Error('Failed to get a connection from the pool');
+        // Add retry logic for Docker startup
+        let retries = 5;
+        while (retries > 0) {
+            try {
+                // Create connection pool
+                pool = mysql.createPool(MySQL_CONFIG);
+
+                // Test the connection
+                const connection = await pool.getConnection();
+                console.log('Connected to MySQL successfully!');
+                // console.log(`Database: ${MySQL_CONFIG.database}`);
+                // console.log(`Host: ${MySQL_CONFIG.host}:${MySQL_CONFIG.port}`);
+
+                connection.release();
+                break;
+            } catch (error) {
+                retries--;
+                if (retries === 0) throw error;
+                console.log(`Waiting for database... (${5 - retries}/5)`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
         }
-        else {
-            console.log('✅ Connected to MySQL successfully!');
-        }
-        // console.log(`📍 Database: ${MySQL_CONFIG.database}`);
-        // console.log(`🔗 Host: ${MySQL_CONFIG.host}:${MySQL_CONFIG.port}`);
-        // console.log(`🏊 Pool: ${MySQL_CONFIG.connectionLimit} connections`);
-        
-        connection.release();
-        
+
     } catch (error) {
-        console.error('❌ Error connecting to MySQL:', error);
+        console.error('Error connecting to MySQL:', error);
         throw error;
     }
 };
@@ -83,7 +63,7 @@ const executeQuery = async (query: string, params?: any[]) => {
         const [results] = await pool.execute(query, params);
         return results;
     } catch (error) {
-        console.error('❌ Error executing query:', error);
+        console.error('Error executing query:', error);
         throw error;
     }
 };
@@ -92,21 +72,22 @@ const disconnect = async () => {
     try {
         if (pool) {
             await pool.end();
-            console.log('👋 MySQL pool closed');
+            console.log('MySQL pool closed');
         }
     } catch (error) {
-        console.error('❌ Error closing MySQL pool:', error);
+        console.error('Error closing MySQL pool:', error);
     }
 };
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
     await disconnect();
+    process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
     await disconnect();
+    process.exit(0);
 });
 
-export { connect, getPool, executeQuery, disconnect };
-export default { connect };
+export default { connect, getPool, executeQuery, disconnect };
