@@ -141,12 +141,14 @@ logs
 *.temp
 
 # Package manager lock files (choose one)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Local development
 .local
 
 # Vercel
 .vercel
+
+

@@ -1,13 +1,13 @@
 export interface IUser {
-  id: string;           
-  username: string;     
-  password: string;     
-  first_name: string;   
-  last_name: string;      
-  email: string;        
-  role: UserRole;       
-  created_at: Date;     
-  updated_at: Date;     
+  id: string;
+  username: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: UserRole;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface IRegistrationData {
@@ -16,11 +16,11 @@ export interface IRegistrationData {
   first_name?: string;
   last_name?: string;
   email?: string;
-  role?: UserRole;      
+  role?: UserRole;
 }
 
 // export interface IUserUpdate {
-//   username?: string;    
+//   username?: string;
 //   first_name?: string;
 //   last_name?: string;
 //   email?: string;
@@ -30,13 +30,13 @@ export interface IRegistrationData {
 // export interface IUserResponse extends Omit<IUser, 'password'> {}
 
 export enum UserRole {
-  ADMIN = 'admin',       
-  USER = 'user',         
+  STAFF = 'staff',
+  USER = 'user',
 }
 
 export interface ILoginData {
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 }
 
 // export interface IJWTPayload {
@@ -54,10 +54,10 @@ export interface ILoginData {
 // }
 
 // export interface IPagination {
-//   page: number;          
-//   limit: number;         
-//   total: number;         
-//   totalPages: number;    
+//   page: number;
+//   limit: number;
+//   total: number;
+//   totalPages: number;
 // }
 
 // export interface IChangePassword {

@@ -1,126 +1,137 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import { IRegistrationData, ILoginData, UserRole, IUser } from '../types/index';
-import { executeQuery } from '../database/mysql/connection';
+import mysql from '../database/mysql/connection';
 import jwtService from './JwtServices';
 
-
 const register = async (registrationData: IRegistrationData) => {
-    try {
+  try {
+    if (!registrationData.username) {
+      throw new Error('Username are required');
+    } else if (!registrationData.password) {
+      throw new Error('Password is required');
+    }
 
-        if (!registrationData.username) {
-            throw new Error('Username are required');
-        } else if (!registrationData.password) {
-            throw new Error('Password is required');
-        }
+    const existingUser = (await mysql.executeQuery(
+      'SELECT * FROM users WHERE username = ? OR email = ?',
+      [registrationData.username, registrationData.email]
+    )) as Array<IUser>;
 
-        const existingUser = await executeQuery(
-            'SELECT * FROM users WHERE username = ? OR email = ?',
-            [registrationData.username, registrationData.email]
-        ) as Array<IUser>;
+    if (existingUser && existingUser.length > 0) {
+      throw new Error('Username or email already exists');
+    }
 
-        if (existingUser && existingUser.length > 0) {
-            throw new Error('Username or email already exists');
-        }
+    if (!registrationData.role) {
+      registrationData.role = UserRole.USER;
+    } else if (!Object.values(UserRole).includes(registrationData.role)) {
+      throw new Error('Invalid user role');
+    }
 
-        if (!registrationData.role) {
-            registrationData.role = UserRole.USER;
-        } else if (!Object.values(UserRole).includes(registrationData.role)) {
-            throw new Error('Invalid user role');
-        }
+    const userId = uuidv4();
+    const hashedPassword = await bcrypt.hash(registrationData.password, 12);
 
-        const userId = uuidv4();
-        const hashedPassword = await bcrypt.hash(registrationData.password, 12);
+    const createdAt = new Date();
+    const updatedAt = new Date();
 
-        const createdAt = new Date();
-        const updatedAt = new Date();
-
-        const query = `
-            INSERT INTO users (id, username, password, first_name, last_name, email, role, created_at, updated_at)
+    const query = `
+            INSERT INTO users (id, username, password, firstName, lastName, email, role, createdAt, updatedAt)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
-        const params = [
-            userId,
-            registrationData.username,
-            hashedPassword,
-            registrationData.first_name,
-            registrationData.last_name,
-            registrationData.email,
-            registrationData.role,
-            createdAt,
-            updatedAt
-        ]
+    const params = [
+      userId,
+      registrationData.username,
+      hashedPassword,
+      registrationData.first_name,
+      registrationData.last_name,
+      registrationData.email,
+      registrationData.role,
+      createdAt,
+      updatedAt,
+    ];
 
-        // Check if cannot execute 'INSERT' query later
-        const queryResult = await executeQuery(query, params);
-        return { message: 'User registered successfully', data: userId};
-    } catch (error) {
-        throw new Error(`${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-}
+    // Check if cannot execute 'INSERT' query later
+    await mysql.executeQuery(query, params);
+    return { message: 'User registered successfully', data: userId };
+  } catch (error) {
+    throw new Error(
+      `${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
 
 const login = async (loginData: ILoginData) => {
-    try {
-        if (!loginData.username) {
-            throw new Error('Username are required');
-        } else if (!loginData.password) {
-            throw new Error('Password is required');
-        }
-
-        const existingUser = await executeQuery(
-            'SELECT * FROM users WHERE username = ?',
-            [loginData.username]
-        ) as Array<{ id: string, username: string, password: string; role: UserRole }>;
-
-        if (!existingUser || existingUser.length === 0) {
-            throw new Error('User not found');
-        }
-
-        const isPasswordValid = await bcrypt.compare(loginData.password, existingUser[0].password);
-        if (!isPasswordValid) {
-            throw new Error('Invalid password');
-        }
-
-        const isRoleValid = Object.values(UserRole).includes(existingUser[0].role);
-        if (!isRoleValid) {
-            throw new Error('Invalid user role');
-        }
-
-        const payload = {
-            userId: existingUser[0].id,
-            role: existingUser[0].role
-        };
-        const accessToken = await jwtService.generateAccessToken(payload);
-        const refreshToken = await jwtService.generateRefreshToken(payload);
-        
-        return { message: 'Login successful', data: {accessToken, refreshToken} };
-    } catch (error) {
-        throw new Error(`${error instanceof Error ? error.message : 'Unknown error'}`);
+  try {
+    if (!loginData.username) {
+      throw new Error('Username are required');
+    } else if (!loginData.password) {
+      throw new Error('Password is required');
     }
-}
+
+    const existingUser = (await mysql.executeQuery(
+      'SELECT * FROM users WHERE username = ?',
+      [loginData.username]
+    )) as Array<{
+      id: string;
+      username: string;
+      password: string;
+      role: UserRole;
+    }>;
+
+    if (!existingUser || existingUser.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginData.password,
+      existingUser[0].password
+    );
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    const isRoleValid = Object.values(UserRole).includes(existingUser[0].role);
+    if (!isRoleValid) {
+      throw new Error('Invalid user role');
+    }
+
+    const payload = {
+      userId: existingUser[0].id,
+      role: existingUser[0].role,
+    };
+    const accessToken = await jwtService.generateAccessToken(payload);
+    const refreshToken = await jwtService.generateRefreshToken(payload);
+
+    return { message: 'Login successful', data: { accessToken, refreshToken } };
+  } catch (error) {
+    throw new Error(
+      `${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
 
 const generateNewAccessToken = async (refreshToken: string) => {
-    try {
-        if (!refreshToken) {
-            throw new Error('Refresh token is required');
-        }
-        const payload = await jwtService.verifyRefreshToken(refreshToken);
-        if (!payload) {
-            throw new Error('Invalid refresh token');
-        }
-        const newAccessToken = await jwtService.generateAccessToken({
-            userId: payload.userId,
-            role: payload.role
-        });
-        
-        return { message: 'Access token refreshed successfully', data: newAccessToken };
-    } catch (error) {
-        throw new Error(`Failed to refresh access token: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        
+  try {
+    if (!refreshToken) {
+      throw new Error('Refresh token is required');
     }
-}
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    if (!payload) {
+      throw new Error('Invalid refresh token');
+    }
+    const newAccessToken = await jwtService.generateAccessToken({
+      userId: payload.userId,
+      role: payload.role,
+    });
 
+    return {
+      message: 'Access token refreshed successfully',
+      data: newAccessToken,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to refresh access token: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
 
 export default { register, login, generateNewAccessToken };

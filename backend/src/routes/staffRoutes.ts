@@ -1,12 +1,23 @@
-import { Router } from "express";
-import StaffController from "../controllers/StaffController";
-import authMiddleware from "../middleware/authMiddleware";
-import { verify } from "crypto";
+import { Router } from 'express';
+import StaffController from '../controllers/StaffController';
+import authMiddleware from '../middleware/authMiddleware';
 
 const staffRouter = Router();
 
-staffRouter.get("/most-borrowed", authMiddleware.verifyAdmin, StaffController.getMostBorrowedBooks);
-staffRouter.get("/top-active-readers", authMiddleware.verifyAdmin, StaffController.getTopActiveReaders);
-staffRouter.get("/low-availability", authMiddleware.verifyAdmin, StaffController.getBooksWithLowAvailability);
+staffRouter.get(
+  '/most-borrowed-books',
+  authMiddleware.verifyStaff,
+  StaffController.getMostBorrowedBooks
+);
+staffRouter.get(
+  '/top-active-readers',
+  authMiddleware.verifyStaff,
+  StaffController.getTopActiveReaders
+);
+staffRouter.get(
+  '/low-availability',
+  authMiddleware.verifyStaff,
+  StaffController.getBooksWithLowAvailability
+);
 
 export default staffRouter;

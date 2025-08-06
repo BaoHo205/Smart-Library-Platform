@@ -4,9 +4,7 @@ import staffRouter from './staffRoutes';
 
 const apiRouter = Router();
 
-
 apiRouter.use('/usr', userRouter);
-apiRouter.use('/admin', staffRouter);
-
+apiRouter.use('/staff', staffRouter);
 
 export default apiRouter;

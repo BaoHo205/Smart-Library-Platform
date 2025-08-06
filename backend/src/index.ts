@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 import mongoDBConnection from './database/mongodb/connection';
-import mysqlConnection from './database/mysql/connection'; 
+import mysqlConnection from './database/mysql/connection';
 import authRouter from './routes/authRoutes';
-import authMiddleware from './middleware/authMiddleware'; 
+import authMiddleware from './middleware/authMiddleware';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/apiRoutes';
 
-dotenv.config(); 
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -25,8 +25,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/auth', authRouter);
 app.use(authMiddleware.verifyJWT);
-
-app.use('api/v1', apiRouter);
+app.use('/api/v1', apiRouter);
 
 const run = async () => {
   try {
@@ -43,7 +42,6 @@ const run = async () => {
       console.log(`📋 App: ${appName}`);
       console.log(`🎉 Server running at http://localhost:${port}`);
     });
-
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
@@ -52,4 +50,3 @@ const run = async () => {
 
 // Start the application
 run();
-
