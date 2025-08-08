@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Book } from '../models/book.model';
-import * as bookService from '../services/book.service';
+import { Book } from '../models/BookModel';
+import * as bookService from '../services/BookService';
 import { v4 as uuidv4 } from 'uuid';
 
 const PLACEHOLDER_STAFF_ID = 'h0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18';

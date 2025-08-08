@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import mongoDBConnection from './database/mongodb/connection';
 import mysqlConnection from './database/mysql/connection';
-import bookRoutes from './routes/book.route';
+import bookRoutes from './routes/BookRoute';
+import readingSessionRoutes from './routes/ReadingSessionRoute';
 
 dotenv.config(); // Load environment variables from a .env file
 
@@ -18,14 +19,16 @@ app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
 });
 
-app.use('/api/books', bookRoutes)
+// API Routes
+app.use('/api/books', bookRoutes);
+app.use('/api/reading', readingSessionRoutes);
 
 const run = async () => {
   try {
     console.log('🚀 Starting Smart Library Platform Backend...');
 
     // Connect to MongoDB
-    // await mongoDBConnection.connect();
+    await mongoDBConnection.connect();
 
     // Connect to MySQL
     await mysqlConnection.connect();
@@ -34,6 +37,7 @@ const run = async () => {
     app.listen(port, () => {
       console.log(`📋 App: ${appName}`);
       console.log(`🎉 Server running at http://localhost:${port}`);
+      console.log(`📚 Reading Session API: http://localhost:${port}/api/reading`);
     });
 
   } catch (error) {

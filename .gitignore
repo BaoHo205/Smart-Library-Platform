@@ -150,3 +150,8 @@ logs
 
 # Vercel
 .vercel
+
+# Package manager lock files (choose one)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

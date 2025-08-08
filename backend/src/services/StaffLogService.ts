@@ -1,6 +1,6 @@
-import { executeQuery } from "../database/mysql/connection";
+import mysqlConnection from "../database/mysql/connection";
 import { v4 as uuidv4 } from "uuid";
-import { StaffLog } from "../models/staff_log.model";
+import { StaffLog } from "../models/StaffLogModel";
 import { ResultSetHeader } from 'mysql2/promise';
 
 /**
@@ -25,7 +25,7 @@ export const createStaffLog = async (
             logData.action_details
         ];
 
-        const [results] = await executeQuery(query, params);
+        const [results] = await mysqlConnection.executeQuery(query, params);
 
         // For INSERT, results is typically an OkPacket. We check affectedRows.
         if ((results as ResultSetHeader).affectedRows === 0) {
