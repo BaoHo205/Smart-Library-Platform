@@ -11,7 +11,7 @@ import { createStaffLog } from "./StaffLogService";
 const getAllBooks = async (): Promise<Book[]> => {
     try {
         const query = 'SELECT * FROM Book';
-        const [rows] = await mysqlConnection.executeQuery(query);
+        const rows = await mysqlConnection.executeQuery(query);
         // Cast the raw query results to the IBook interface for type safety
         return rows as Book[];
     } catch (error) {
@@ -54,7 +54,7 @@ const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
             action_details: `Added new book: "${bookData.title}" (ID: ${bookData.id}, ISBN: ${bookData.isbn || 'N/A'})`
         });
 
-        const [results] = await mysqlConnection.executeQuery(query, params);
+        const results = await mysqlConnection.executeQuery(query, params);
 
         return bookData;
     } catch (error) {
@@ -77,7 +77,7 @@ const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
 const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
     try {
         const query = 'UPDATE Book SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const [results] = await mysqlConnection.executeQuery(query, [newQuantity, bookId]);
+        const results = await mysqlConnection.executeQuery(query, [newQuantity, bookId]);
 
         const updated = (results as ResultSetHeader).affectedRows > 0;
 
@@ -113,7 +113,7 @@ const updateBookStatus = async (bookId: string, newStatus: Book['status'], staff
     }
     try {
         const query = 'UPDATE Book SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const [results] = await mysqlConnection.executeQuery(query, [newStatus, bookId]);
+        const results = await mysqlConnection.executeQuery(query, [newStatus, bookId]);
 
         const updated = (results as ResultSetHeader).affectedRows > 0;
 

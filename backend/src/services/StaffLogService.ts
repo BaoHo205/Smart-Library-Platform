@@ -25,8 +25,8 @@ export const createStaffLog = async (
             logData.action_details
         ];
 
-        const [results] = await mysqlConnection.executeQuery(query, params);
-
+        const results = await mysqlConnection.executeQuery(query, params);
+         
         // For INSERT, results is typically an OkPacket. We check affectedRows.
         if ((results as ResultSetHeader).affectedRows === 0) {
             throw new Error('Failed to create staff log: No rows affected.');
@@ -49,3 +49,4 @@ export const createStaffLog = async (
         }
     }
 }
+
