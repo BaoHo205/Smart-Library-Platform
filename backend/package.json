@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js",
+    "dev": "ts-node -r tsconfig-paths/register src/index.ts",
     "lint": "eslint src --ext .mjs",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,js,json,md}'"
@@ -43,6 +43,7 @@
     "globals": "^16.3.0",
     "mongoose": "^8.16.5",
     "mysql2": "^3.14.3",
+    "tsconfig-paths": "^4.2.0",
     "typescript-eslint": "^8.39.0",
     "uuid": "^10.0.0"
   }

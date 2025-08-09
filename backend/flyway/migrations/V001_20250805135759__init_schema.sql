@@ -115,3 +115,12 @@ CREATE TABLE staff_logs (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Availability view
+CREATE OR REPLACE VIEW v_book_availability AS
+SELECT
+  b.id AS bookId,
+  GREATEST(b.quantity - COALESCE(SUM(CASE WHEN c.isReturned = 0 AND c.returnDate IS NULL THEN 1 ELSE 0 END), 0), 0) AS availableCopies
+FROM books b
+LEFT JOIN checkouts c ON c.bookId = b.id
+GROUP BY b.id;
