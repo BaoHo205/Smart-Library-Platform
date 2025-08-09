@@ -1,6 +1,6 @@
 -- Books
 CREATE INDEX idx_books_title ON books (title);
-CREATE UNIQUE INDEX idx_books_isbn ON books (isbn);
+CREATE INDEX idx_books_isbn ON books (isbn);
 
 -- Publishers / Authors / Genres
 CREATE INDEX idx_publishers_name ON publishers (name);
