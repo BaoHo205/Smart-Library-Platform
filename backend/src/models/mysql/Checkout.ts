@@ -9,4 +9,4 @@ export interface Checkout {
   isLate: boolean | false;
   createdAt: Date;
   updatedAt: Date;
- }
+}

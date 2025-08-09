@@ -1,4 +1,4 @@
-import { BookStatus } from "./enum/BookStatus";
+import { BookStatus } from './enum/BookStatus';
 
 export interface Book {
   id?: string;
