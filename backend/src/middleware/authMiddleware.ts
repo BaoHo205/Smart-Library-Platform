@@ -7,7 +7,11 @@ export interface AuthRequest extends Request {
   userRole?: UserRole;
 }
 
-const verifyJWT = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const verifyJWT = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
