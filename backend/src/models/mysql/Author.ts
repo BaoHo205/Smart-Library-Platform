@@ -4,4 +4,4 @@ export interface Author {
   lastName: string;
   createdAt: Date;
   updatedAt: Date;
- }
+}

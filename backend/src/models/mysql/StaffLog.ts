@@ -8,4 +8,4 @@ export interface StaffLog {
   actionDetails: string;
   createdAt: Date;
   updatedAt: Date;
- }
+}
