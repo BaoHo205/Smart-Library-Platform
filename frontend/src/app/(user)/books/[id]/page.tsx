@@ -81,7 +81,7 @@ const mockReviews: Review[] = [
 ]
 
 export default function BookDetailPage({ bookId = "1" }: BookDetailPageProps) {
-  const [book, setBook] = useState<BookDetailType | null>(null)
+  const [book, setBook] = useState<BookDetailType | null>(mockBook)
   const [reviews, setReviews] = useState<Review[]>(mockReviews)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

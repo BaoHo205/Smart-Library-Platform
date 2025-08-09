@@ -13,18 +13,24 @@ export interface AuthResponse {
     };
 }
 
+export interface AuthError {
+    success: boolean;
+    message: string;
+}
+
 const login = async (loginData: LoginData): Promise<AuthResponse> => {
     try {
-        const response = await axiosInstance.post('/auth/login', loginData);
+        const response = await axiosInstance.post('/auth/login', loginData) as AuthResponse;
 
         // Store access token in localStorage
-        if (response.data.data?.accessToken) {
-            localStorage.setItem('accessToken', response.data.data.accessToken);
+        if (response.data?.accessToken) {
+            localStorage.setItem('accessToken', response.data.accessToken);
         }
 
-        return response.data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Login failed');
+        return response;
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
 }
 
@@ -35,8 +41,9 @@ const logout = async (): Promise<void> => {
         const response = await axiosInstance.post('/auth/logout');
 
         return response.data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Logout failed');
+    } catch (error) {
+        console.log(error);
+        throw error;
     } finally {
       localStorage.removeItem('accessToken');
       window.location.href = '/login';

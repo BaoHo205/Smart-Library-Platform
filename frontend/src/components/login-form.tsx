@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use client'
 
 import { cn } from "@/lib/utils"
@@ -8,23 +7,16 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/api/api";
-import { AxiosError } from "axios";
-=======
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
->>>>>>> origin/dev
 
 export function LoginForm({
   className,
   ...props
-<<<<<<< HEAD
 }: React.ComponentProps<"form">) {
   const [formData, setFormData] = useState({
     username: "",
     password: ""
   })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -71,20 +63,15 @@ export function LoginForm({
       } else {
         setError(response.message || 'Login failed');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || 'An error occurred during login');
+      setError('An error occurred during login');
     } finally {
       setLoading(false);
     }
   };
   return (
     <form className={cn("flex flex-col gap-6", className)}  onSubmit={handleSubmit} {...props}>
-=======
-}: React.ComponentProps<'form'>) {
-  return (
-    <form className={cn('flex flex-col gap-6', className)} {...props}>
->>>>>>> origin/dev
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
