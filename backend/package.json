@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js",
+    "dev": "nodemon -r tsconfig-paths/register --watch src --exec ts-node src/index.ts",
     "lint": "eslint src --ext .mjs",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,js,json,md}'"
