@@ -156,34 +156,45 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
     }
 };
 
-const checkBookAvailability = async (req: Request, res: Response): Promise<void> => {
+const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { bookId } = req.params;
+        const userId = req.userId;
 
-        if (!bookId) {
-            res.status(400).json({
-                success: false,
-                message: 'Book ID is required'
-            });
+        if (!userId) {
+            res.status(401).json({ success: false, message: 'User not authenticated' });
             return;
         }
 
-        const isAvailable = await BookService.isBookAvailable(bookId);
+        if (!bookId) {
+            res.status(400).json({ success: false, message: 'Book ID is required' });
+            return;
+        }
 
-        res.status(200).json({
-            success: true,
-            data: {
-                bookId,
-                isAvailable
-            }
-        });
+        const result = await BookService.returnBook(userId, bookId);
+
+        if (result.success) {
+            res.status(200).json({
+                success: true,
+                message: result.message,
+                data: {
+                    isLate: result.isLate
+                }
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: result.message
+            });
+        }
+
     } catch (error) {
-        console.error('Error checking book availability:', error);
+        console.error('Error in returnBook controller:', error);
         res.status(500).json({
             success: false,
-            message: 'Internal server error while checking book availability'
+            message: 'Internal server error'
         });
     }
 };
 
-export default { borrowBook, getBooks, checkBookAvailability };
+export default { borrowBook, returnBook, getBooks };

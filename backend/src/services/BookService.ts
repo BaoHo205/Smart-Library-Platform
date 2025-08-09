@@ -61,14 +61,16 @@ interface CountRow extends RowDataPacket {
   total: number;
 }
 
-interface AvailabilityResult extends RowDataPacket {
-  isAvailable: number;
-}
-
 interface BorrowBookOutput extends RowDataPacket {
   checkoutId: string | null;
   success: number;
   message: string;
+}
+
+interface ReturnBookOutput extends RowDataPacket {
+  success: number;
+  message: string;
+  isLate: number;
 }
 
 type SqlParam = string | number;
@@ -84,6 +86,12 @@ export interface BorrowBookResult {
     success: boolean;
     message: string;
     checkoutId?: string;
+}
+
+export interface ReturnBookResult {
+    success: boolean;
+    message: string;
+    isLate?: boolean;
 }
 
 async function searchBooks(filters: BookSearchFilters): Promise<BookSearchResult> {
@@ -210,17 +218,32 @@ const borrowBook = async (userId: string, bookId: string, dueDate: string): Prom
     }
 };
 
-export const isBookAvailable = async (bookId: string): Promise<boolean> => {
+export const returnBook = async (userId: string, bookId: string): Promise<ReturnBookResult> => {    
     try {
-        const results = await pool.executeQuery(
-            'SELECT IsBookAvailable(?) as isAvailable',
-            [bookId]
-        ) as AvailabilityResult[];
+        // Call the stored procedure
+        await pool.executeQuery(`
+            CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
+        `, [userId, bookId]);
 
-        return Boolean(results[0]?.isAvailable);
+        // Get the output parameters
+        const outputResults = await pool.executeQuery(`
+            SELECT @p_success as success, @p_message as message, @p_isLate as isLate
+        `) as ReturnBookOutput[];
+
+        const output = outputResults[0];
+
+        return {
+            success: Boolean(output.success),
+            message: output.message,
+            isLate: Boolean(output.isLate)
+        };
+
     } catch (error) {
-        console.error('Error checking book availability:', error);
-        return false;
+        console.error('Error in borrowBook service:', error);
+        return {
+            success: false,
+            message: 'Failed to return book due to database error'
+        };
     }
 };
 
@@ -241,28 +264,9 @@ const getBookById = async (bookId: string): Promise<BookDetails | null> => {
     }
 };
 
-const getUserActiveCheckouts = async (userId: string): Promise<UserCheckout[]> => {
-    try {
-        const results = await pool.executeQuery(
-            `SELECT c.*, b.title, b.isbn 
-             FROM checkouts c 
-             JOIN books b ON c.bookId = b.id 
-             WHERE c.userId = ? AND c.isReturned = FALSE 
-             ORDER BY c.dueDate ASC`,
-            [userId]
-        ) as UserCheckout[];
-
-        return results;
-    } catch (error) {
-        console.error('Error getting user active checkouts:', error);
-        return [];
-    }
-};
-
 export default {
     searchBooks,
-    borrowBook,
-    isBookAvailable,
+  borrowBook,
+  returnBook,
     getBookById,
-    getUserActiveCheckouts
 };
