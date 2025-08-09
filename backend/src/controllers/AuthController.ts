@@ -119,7 +119,9 @@ const logout = async (req: Request, res: Response) => {
     const cookies = req.cookies;
 
     if (!cookies?.refreshToken) {
-      return res.sendStatus(204);
+      return res.status(204).json({
+        success: false,
+        message: 'No refresh token found',});
     }
 
     res.clearCookie('refreshToken', {
@@ -132,7 +134,10 @@ const logout = async (req: Request, res: Response) => {
       secure: true,
       sameSite: 'strict',
     });
-    res.sendStatus(204);
+    res.status(200).json({
+      success: true,
+      message: 'User logged out successfully',
+    });
     console.log('User logged out successfully');
   } catch (error) {
     res.status(500).json({
