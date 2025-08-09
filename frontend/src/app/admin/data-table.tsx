@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import React from "react"
+import { AddNewBookDialog } from "./AddNewBookDialog"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -99,6 +100,12 @@ export function DataTable<TData, TValue>({
                                 </TableCell>
                             </TableRow>
                         )}
+                        {/* This is the new "Add new book" row */}
+                        <TableRow className="text-center border-t">
+                            <TableCell colSpan={columns.length}>
+                                <AddNewBookDialog />
+                            </TableCell>
+                        </TableRow>
                     </TableBody>
                 </Table>
             </div>

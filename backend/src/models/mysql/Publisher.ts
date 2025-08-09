@@ -3,4 +3,4 @@ export interface Publisher {
   name: string;
   createdAt: Date;
   updatedAt: Date;
- }
+}

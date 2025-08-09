@@ -1,11 +1,11 @@
+// components/columns.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
+import { EditBookDialog } from "./EditBookDialog"
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 export type BookShow = {
     thumbnail_url: string
     id: string
@@ -58,11 +58,10 @@ export const columns: ColumnDef<BookShow>[] = [
     {
         id: "edit",
         cell: ({ row }) => {
+            const book = row.original;
             return (
-                <Button>
-                    Edit
-                </Button>
-            )
+                <EditBookDialog book={book} />
+            );
         }
     }
 ]
