@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import mongoDBConnection from './database/mongodb/connection';
 import mysqlConnection from './database/mysql/connection';
 import bookRoutes from './routes/book.route';
@@ -11,6 +12,12 @@ const port = process.env.PORT || 5000;
 const appName = process.env.APP_NAME || 'Smart Library Platform';
 
 // Middleware
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 

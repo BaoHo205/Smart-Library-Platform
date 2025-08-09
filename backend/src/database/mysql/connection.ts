@@ -12,7 +12,6 @@ const MySQL_CONFIG = {
     waitForConnections: true,
     connectionLimit: 10,
     maxIdle: 10,
-    maxIdle: 10,
     idleTimeout: 60000,
     queueLimit: 0,
     enableKeepAlive: true,
@@ -234,22 +233,26 @@ const getPool = () => {
     return pool;
 };
 
-const executeQuery = async (query: string, params?: any[]): Promise<[mysql.QueryResult, mysql.FieldPacket[]]> => {
-    if (!pool) {
-        throw new Error('MySQL pool not initialized. Call connect() first.');
-    }
-    let connection: mysql.PoolConnection | undefined; // Explicitly type connection
+export const executeQuery = async (query: string, params?: any[], existingConnection?: mysql.PoolConnection): Promise<[mysql.QueryResult, mysql.FieldPacket[]]> => {
+    const pool = getPool();
+    let connection: mysql.PoolConnection | undefined;
     try {
-        connection = await pool.getConnection();
+        if (existingConnection) {
+            connection = existingConnection;
+        } else {
+            connection = await pool.getConnection(); // Get a new connection for a single query
+        }
+
         const [rows, fields] = await connection.execute(query, params);
-        // Return both rows and fields, even if the caller only uses 'rows'
         return [rows, fields];
     } catch (error) {
-        console.error('❌ Error executing query:', error);
+        console.error('❌ Error executing query:', query, params, error);
         throw error;
     } finally {
-        if (connection) {
-            connection.release(); // Always release the connection
+        // ONLY release the connection if it was acquired by this function, 
+        // NOT if it was passed in from a service function managing a transaction.
+        if (connection && !existingConnection) {
+            connection.release();
         }
     }
 };

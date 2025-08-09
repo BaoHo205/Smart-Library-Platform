@@ -1,7 +1,8 @@
-import { executeQuery } from "../database/mysql/connection";
+import mysqlConnection from "../database/mysql/connection";
 import { Book } from "../models/book.model";
 import { ResultSetHeader } from 'mysql2/promise';
 import { createStaffLog } from "./staff_log.service";
+import * as mysql from 'mysql2/promise';
 
 /**
  * 
@@ -11,7 +12,7 @@ import { createStaffLog } from "./staff_log.service";
 const getAllBooks = async (): Promise<Book[]> => {
     try {
         const query = 'SELECT * FROM Book';
-        const [rows] = await executeQuery(query);
+        const [rows] = await mysqlConnection.executeQuery(query);
         // Cast the raw query results to the IBook interface for type safety
         return rows as Book[];
     } catch (error) {
@@ -31,7 +32,10 @@ const getAllBooks = async (): Promise<Book[]> => {
  * @returns {Promise<Book>} A promise that resolves to the created Book object.
  */
 const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
+    let connection: mysql.PoolConnection | undefined;
     try {
+        connection = await mysqlConnection.getPool().getConnection();
+        await connection.beginTransaction();
         const query = `
             INSERT INTO Book (id, title, thumbnail_url, isbn, quantity, page_count, publisher_id, description, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -48,13 +52,16 @@ const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
             bookData.description || null,
             bookData.status || 'available'
         ];
+        await mysqlConnection.executeQuery(query, params, connection);
+
         await createStaffLog({
             staff_id: staffId,
             action_type: 'add_book',
             action_details: `Added new book: "${bookData.title}" (ID: ${bookData.id}, ISBN: ${bookData.isbn || 'N/A'})`
-        });
+        }), connection;
 
-        const [results] = await executeQuery(query, params);
+        // const [results] = await mysqlConnection.executeQuery(query, params);
+        await connection.commit();
 
         return bookData;
     } catch (error) {
@@ -65,6 +72,8 @@ const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
         } else {
             throw new Error(`Could not create book: ${String(error)}`);
         }
+    } finally {
+        connection?.release();
     }
 }
 
@@ -75,10 +84,14 @@ const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
  * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
  */
 const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
+    let connection: mysql.PoolConnection | undefined;
     try {
+        connection = await mysqlConnection.getPool().getConnection();
+        await connection.beginTransaction();
         const query = 'UPDATE Book SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const [results] = await executeQuery(query, [newQuantity, bookId]);
 
+        // Update the book inventory within the transaction
+        const [results] = await mysqlConnection.executeQuery(query, [newQuantity, bookId], connection);
         const updated = (results as ResultSetHeader).affectedRows > 0;
 
         if (updated) {
@@ -87,8 +100,11 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
                 staff_id: staffId,
                 action_type: 'system_maintenance',
                 action_details: `Updated inventory for book ID ${bookId} to quantity ${newQuantity}.`
-            });
+            }, connection);
         }
+
+        // Commit the transaction if all operations succeed.
+        await connection.commit();
 
         return updated;
     } catch (error) {
@@ -98,6 +114,8 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
         } else {
             throw new Error(`Could not update book inventory: ${String(error)}`);
         }
+    } finally {
+        connection?.release();
     }
 }
 
@@ -108,13 +126,16 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
  * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
  */
 const updateBookStatus = async (bookId: string, newStatus: Book['status'], staffId: string): Promise<boolean> => {
+    let connection: mysql.PoolConnection | undefined;
     if (!newStatus) {
         throw new Error("New status cannot be null or undefined.");
     }
     try {
+        connection = await mysqlConnection.getPool().getConnection();
+        await connection.beginTransaction();
         const query = 'UPDATE Book SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const [results] = await executeQuery(query, [newStatus, bookId]);
 
+        const [results] = await mysqlConnection.executeQuery(query, [newStatus, bookId], connection);
         const updated = (results as ResultSetHeader).affectedRows > 0;
 
         if (updated) {
@@ -123,8 +144,9 @@ const updateBookStatus = async (bookId: string, newStatus: Book['status'], staff
                 staff_id: staffId,
                 action_type: 'other', // Or 'retire_book' if added to ENUM
                 action_details: `Changed status for book ID ${bookId} to '${newStatus}'. (Retirement/Maintenance action)`
-            });
+            }, connection);
         }
+        await connection.commit();
 
         return updated;
     } catch (error) {
@@ -134,6 +156,8 @@ const updateBookStatus = async (bookId: string, newStatus: Book['status'], staff
         } else {
             throw new Error(`Could not update book status: ${String(error)}`);
         }
+    } finally {
+        connection?.release();
     }
 }
 
