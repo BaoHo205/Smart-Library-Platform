@@ -24,6 +24,6 @@ filterFile = "filter.rgf"
 ignoreNewlinesInTextObjects = "off"
 
 [environments.smart-library-platform]
-url = "jdbc:mysql://localhost:3306"
+url = "jdbc:mysql://localhost:6446"
 schemas = [ "library_platform" ]
 displayName = "Smart Library Platform"

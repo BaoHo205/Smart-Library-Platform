@@ -117,3 +117,19 @@ INSERT INTO checkouts (
 ) VALUES (
     'e22408d8-7ebc-41b3-a3ba-147b007aee54', 'e5ed73c9-9e35-4a27-8d8b-cdd00019657b', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', '2025-07-15', '2025-07-29', NULL, FALSE, FALSE, '2025-08-05 16:29:31.637784', '2025-08-05 16:29:31.637784'
 );
+
+-- Update new field - available copies
+UPDATE books b
+LEFT JOIN (
+  SELECT bookId, COUNT(*) AS activeCheckouts
+  FROM checkouts
+  WHERE isReturned = FALSE
+  GROUP BY bookId
+) co ON co.bookId = b.id
+SET
+  b.availableCopies = GREATEST(0, LEAST(b.quantity, b.quantity - IFNULL(co.activeCheckouts, 0))),
+  b.status = CASE
+               WHEN GREATEST(0, LEAST(b.quantity, b.quantity - IFNULL(co.activeCheckouts, 0))) > 0
+                 THEN 'available'
+               ELSE 'unavailable'
+             END;
