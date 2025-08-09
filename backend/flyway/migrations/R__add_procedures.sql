@@ -13,7 +13,7 @@ CREATE PROCEDURE BorrowBook(
     OUT p_success BOOLEAN,
     OUT p_message VARCHAR(255)
 )
-BEGIN
+proc: BEGIN
     DECLARE v_available_copies INT DEFAULT 0;
     DECLARE v_book_status VARCHAR(20);
     DECLARE v_user_exists INT DEFAULT 0;
@@ -95,6 +95,11 @@ BEGIN
     ) VALUES (
         p_checkoutId, p_userId, p_bookId, CURDATE(), p_dueDate, FALSE, FALSE
     );
+
+    -- Set success values
+    SET p_success = TRUE;
+    SET p_message = 'Book borrowed successfully';
+    
     COMMIT;
 END//
 

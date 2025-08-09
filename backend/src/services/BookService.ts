@@ -1,4 +1,5 @@
 import pool from '@/database/mysql/connection';
+import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 
 export interface BookSearchFilters {
   q?: string;           // general keyword -> title/publisher/author/genre
@@ -25,8 +26,49 @@ export interface BookListItem {
   genres: string;
 }
 
-interface CountRow {
+export interface BookDetails {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  isbn: string;
+  quantity: number;
+  availableCopies: number;
+  pageCount: number;
+  publisherId: string;
+  description: string | null;
+  status: 'available' | 'unavailable';
+  createdAt: Date;
+  updatedAt: Date;
+  publisherName: string;
+}
+
+export interface UserCheckout {
+  id: string;
+  userId: string;
+  bookId: string;
+  checkoutDate: string;
+  dueDate: string;
+  returnDate: string | null;
+  isReturned: boolean;
+  isLate: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  isbn: string;
+}
+
+interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface AvailabilityResult extends RowDataPacket {
+  isAvailable: number;
+}
+
+interface BorrowBookOutput extends RowDataPacket {
+  checkoutId: string | null;
+  success: number;
+  message: string;
 }
 
 type SqlParam = string | number;
@@ -38,7 +80,13 @@ export interface BookSearchResult {
   total: number;
 }
 
-export async function searchBooks(filters: BookSearchFilters): Promise<BookSearchResult> {
+export interface BorrowBookResult {
+    success: boolean;
+    message: string;
+    checkoutId?: string;
+}
+
+async function searchBooks(filters: BookSearchFilters): Promise<BookSearchResult> {
   const page = Math.max(1, Number(filters.page) || 1);
   const pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
   const offset = (page - 1) * pageSize;
@@ -69,7 +117,7 @@ export async function searchBooks(filters: BookSearchFilters): Promise<BookSearc
 
   // Sort clause
   const sortCol =
-    filters.sort === 'available' ? 'availability.availableCopies' :
+    filters.sort === 'available' ? 'b.availableCopies' :
     filters.sort === 'publisher' ? 'p.name' : 'b.title';
   const order = (filters.order || 'asc').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
@@ -117,10 +165,10 @@ export async function searchBooks(filters: BookSearchFilters): Promise<BookSearc
     ${whereSql}
   `;
 
-  const countResult = await pool.executeQuery(countSql, params) as unknown as CountRow[];
+  const countResult = await pool.executeQuery(countSql, params) as CountRow[];
   const total = countResult[0]?.total ?? 0;
 
-  const rows = await pool.executeQuery(sql, params) as unknown as BookListItem[];
+  const rows = await pool.executeQuery(sql, params) as BookListItem[];
 
   return {
     data: rows,
@@ -129,3 +177,92 @@ export async function searchBooks(filters: BookSearchFilters): Promise<BookSearc
     total
   };
 }
+
+const borrowBook = async (userId: string, bookId: string, dueDate: string): Promise<BorrowBookResult> => {
+    try {
+        // Convert string to MySQL date format (YYYY-MM-DD) and add 1 day
+        const date = new Date(dueDate);
+        
+        // Call the stored procedure
+        await pool.executeQuery(
+            'CALL BorrowBook(?, ?, ?, @checkoutId, @success, @message)',
+            [userId, bookId, date]
+        );
+
+        // Get the output parameters
+        const outputResults = await pool.executeQuery(
+            'SELECT @checkoutId as checkoutId, @success as success, @message as message'
+      ) as BorrowBookOutput[];
+
+        const output = outputResults[0];
+        
+        return {
+            success: Boolean(output.success),
+            message: output.message || 'Unknown error occurred',
+            checkoutId: output.checkoutId || undefined
+        };
+    } catch (error) {
+        console.error('Error in borrowBook service:', error);
+        return {
+            success: false,
+            message: 'Failed to borrow book due to database error'
+        };
+    }
+};
+
+export const isBookAvailable = async (bookId: string): Promise<boolean> => {
+    try {
+        const results = await pool.executeQuery(
+            'SELECT IsBookAvailable(?) as isAvailable',
+            [bookId]
+        ) as AvailabilityResult[];
+
+        return Boolean(results[0]?.isAvailable);
+    } catch (error) {
+        console.error('Error checking book availability:', error);
+        return false;
+    }
+};
+
+const getBookById = async (bookId: string): Promise<BookDetails | null> => {
+    try {
+        const results = await pool.executeQuery(
+            `SELECT b.*, p.name as publisherName 
+             FROM books b 
+             LEFT JOIN publishers p ON b.publisherId = p.id 
+             WHERE b.id = ?`,
+            [bookId]
+        ) as BookDetails[];
+
+        return results[0] || null;
+    } catch (error) {
+        console.error('Error getting book by ID:', error);
+        return null;
+    }
+};
+
+const getUserActiveCheckouts = async (userId: string): Promise<UserCheckout[]> => {
+    try {
+        const results = await pool.executeQuery(
+            `SELECT c.*, b.title, b.isbn 
+             FROM checkouts c 
+             JOIN books b ON c.bookId = b.id 
+             WHERE c.userId = ? AND c.isReturned = FALSE 
+             ORDER BY c.dueDate ASC`,
+            [userId]
+        ) as UserCheckout[];
+
+        return results;
+    } catch (error) {
+        console.error('Error getting user active checkouts:', error);
+        return [];
+    }
+};
+
+export default {
+    searchBooks,
+    borrowBook,
+    isBookAvailable,
+    getBookById,
+    getUserActiveCheckouts
+};
