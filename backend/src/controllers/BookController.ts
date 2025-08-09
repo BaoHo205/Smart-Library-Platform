@@ -3,24 +3,79 @@ import { AuthRequest } from '@/middleware/authMiddleware';
 import BookService from '@/services/BookService';
 
 
-async function getBooks(req: Request, res: Response, next: NextFunction) {
-  try {
-    const result = await BookService.searchBooks({
-      q: req.query.q as string,
-      title: req.query.title as string,
-      author: req.query.author as string,
-      genre: req.query.genre as string,
-      publisher: req.query.publisher as string,
-      page: req.query.page ? Number(req.query.page) : undefined,
-      pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
-      sort: (req.query.sort as 'title' | 'publisher' | 'available'),
-      order: (req.query.order as 'asc' | 'desc')
-    });
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
-}
+const getBooks = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        // Validate pagination parameters
+        const page = req.query.page ? Number(req.query.page) : undefined;
+        const pageSize = req.query.pageSize ? Number(req.query.pageSize) : undefined;
+
+        if (page !== undefined && (isNaN(page) || page < 1)) {
+            res.status(400).json({
+                success: false,
+                message: 'Page must be a positive number'
+            });
+            return;
+        }
+
+        if (pageSize !== undefined && (isNaN(pageSize) || pageSize < 1 || pageSize > 100)) {
+            res.status(400).json({
+                success: false,
+                message: 'Page size must be a positive number between 1 and 100'
+            });
+            return;
+        }
+
+        // Validate sort parameter
+        const validSortFields = ['title', 'publisher', 'available'];
+        const sort = req.query.sort as string;
+        if (sort && !validSortFields.includes(sort)) {
+            res.status(400).json({
+                success: false,
+                message: `Invalid sort field. Must be one of: ${validSortFields.join(', ')}`
+            });
+            return;
+        }
+
+        // Validate order parameter
+        const validOrderValues = ['asc', 'desc'];
+        const order = req.query.order as string;
+        if (order && !validOrderValues.includes(order)) {
+            res.status(400).json({
+                success: false,
+                message: `Invalid order value. Must be one of: ${validOrderValues.join(', ')}`
+            });
+            return;
+        }
+
+        const result = await BookService.searchBooks({
+            q: req.query.q as string,
+            title: req.query.title as string,
+            author: req.query.author as string,
+            genre: req.query.genre as string,
+            publisher: req.query.publisher as string,
+            page,
+            pageSize,
+            sort: sort as 'title' | 'publisher' | 'available',
+            order: order as 'asc' | 'desc'
+        });
+
+        if (!result) {
+            res.status(500).json({
+                success: false,
+                message: 'Failed to retrieve books'
+            });
+            return;
+        }
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (err) {
+        console.error('Error retrieving books:', err);
+        next(err);
+    }
+};
 
 const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
