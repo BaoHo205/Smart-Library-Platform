@@ -30,8 +30,8 @@ app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
 });
 
-app.use('/auth', authRouter);
-app.use(authMiddleware.verifyJWT);
+// app.use('/auth', authRouter);
+// app.use(authMiddleware.verifyJWT);
 app.use('/api/v1', apiRouter);
 
 const run = async () => {
