@@ -125,7 +125,8 @@ const generateNewAccessToken = async (refreshToken: string) => {
 
     return {
       message: 'Access token refreshed successfully',
-      data: newAccessToken,
+      data: { newAccessToken, refreshToken },
+
     };
   } catch (error) {
     throw new Error(
