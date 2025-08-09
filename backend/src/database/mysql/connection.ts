@@ -71,7 +71,9 @@ const executeQuery = async (query: string, params?: any[] | any) => {
         query,
         params: normalizedParams,
       });
-      throw new Error(`SQL placeholder/param mismatch: expected ${placeholders}, got ${normalizedParams.length}`);
+      throw new Error(
+        `SQL placeholder/param mismatch: expected ${placeholders}, got ${normalizedParams.length}`
+      );
     }
 
     const [results] = await pool.execute(query, normalizedParams);

@@ -1,8 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import jwtService from '../services/JwtServices';
+import jwtService from '@/services/JwtServices';
 import { UserRole } from '../types';
 
-const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
+export interface AuthRequest extends Request {
+  userId?: string;
+  userRole?: UserRole;
+}
+
+const verifyJWT = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -17,8 +26,8 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
     if (!payload) {
       return res.status(401).json({ message: 'Invalid access token' });
     }
-    req.body.userId = payload.userId;
-    req.body.userRole = payload.role;
+    req.userId = payload.userId;
+    req.userRole = payload.role;
 
     next();
   } catch (err) {
