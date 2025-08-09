@@ -89,7 +89,6 @@ export async function searchBooks(filters: BookSearchFilters): Promise<BookSearc
       JOIN genres g ON g.id = bg.genreId
       GROUP BY bg.bookId
     ) AS genres ON genres.bookId = b.id
-    LEFT JOIN v_book_availability availability ON availability.bookId = b.id
   `;
 
   // Main query
@@ -101,7 +100,7 @@ export async function searchBooks(filters: BookSearchFilters): Promise<BookSearc
       b.isbn,
       b.pageCount,
       b.quantity,
-      COALESCE(availability.availableCopies, b.quantity) AS availableCopies,
+      b.availableCopies,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres
