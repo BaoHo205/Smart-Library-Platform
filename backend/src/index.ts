@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+import cors from "cors";
 import mongoDBConnection from './database/mongodb/connection';
 import mysqlConnection from './database/mysql/connection';
 import authRouter from './routes/authRoutes';
 import authMiddleware from './middleware/authMiddleware';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/apiRoutes';
-import bookRoutes from './routes/book.route';
+import bookRouter from './routes/bookRoutes';
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 // app.use('/auth', authRouter);
 // app.use(authMiddleware.verifyJWT);
 app.use('/api/v1', apiRouter);
-app.use('/api/books', bookRoutes)
+app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {

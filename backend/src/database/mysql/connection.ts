@@ -255,12 +255,6 @@ const executeQuery = async (query: string, params?: any[] | any) => {
   } catch (error) {
     console.error('❌ Error executing query:', query, params, error);
     throw error;
-  } finally {
-    // ONLY release the connection if it was acquired by this function, 
-    // NOT if it was passed in from a service function managing a transaction.
-    if (connection && !existingConnection) {
-      connection.release();
-    }
   }
 };
 

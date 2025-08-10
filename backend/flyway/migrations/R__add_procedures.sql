@@ -100,7 +100,6 @@ END//
 
 DELIMITER $$
 CREATE PROCEDURE AddNewBook(
-    IN p_id VARCHAR(36),
     IN p_title VARCHAR(500),
     IN p_thumbnailUrl TEXT,
     IN p_isbn VARCHAR(20),
@@ -110,10 +109,11 @@ CREATE PROCEDURE AddNewBook(
     IN p_publisherId VARCHAR(36),
     IN p_description TEXT,
     IN p_status ENUM('available', 'unavailable'),
-    IN p_authorIds TEXT
+    IN p_authorIds TEXT,
+    IN p_staffId VARCHAR(36)
 )
 BEGIN
-    DECLARE v_author_id VARCHAR(36);
+    DECLARE v_authorId VARCHAR(36);
     DECLARE v_pos INT DEFAULT 1;
     DECLARE v_len INT DEFAULT 0;
 
@@ -146,7 +146,7 @@ BEGIN
         description,
         status
     ) VALUES (
-        p_id,
+        UUID,
         p_title,
         p_thumbnailUrl,
         p_isbn,
@@ -177,6 +177,9 @@ BEGIN
         SET v_len = LOCATE(',', p_authorIds, v_pos); -- Move to the next comma
     END WHILE;
 
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, 'add_book', CONCAT('Added new book: "', p_title, '" (ID: ', p_id, ')'));
+
     -- Commit the transaction if all operations were successful
     COMMIT;
 END $$
@@ -184,9 +187,10 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE UpdateBookInventory(
+CREATE PROCEDURE UpdateBookInventory (
     IN p_bookId VARCHAR(36),
-    IN p_newQuantity INT
+    IN p_newQuantity INT,
+    IN p_staffId VARCHAR(36)
 )
 BEGIN
     DECLARE v_currentQuantity INT;
@@ -231,6 +235,9 @@ BEGIN
         updated_at = CURRENT_TIMESTAMP
     WHERE id = p_bookId;
 
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, 'inventory_update', CONCAT('Updated inventory for book ID ', p_bookId, ' to ', p_newQuantity));
+
     COMMIT;
 END$$
 
@@ -239,7 +246,8 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE RetireBook(
-    IN p_bookId VARCHAR(36)
+    IN p_bookId VARCHAR(36),
+    IN p_staffId VARCHAR(36)
 )
 BEGIN
     -- Error handler to rollback transaction on SQL errors
@@ -271,8 +279,25 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Book not found';
     END IF;
+
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, 'retire_book', CONCAT('Book ID ', p_bookId, ' retired'));
     
     COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE AddStaffLog(
+    IN p_staffId VARCHAR(36),
+    IN p_actionType VARCHAR(50),
+    IN p_actionDetails TEXT
+)
+BEGIN
+    INSERT INTO Staff_Logs (id, staffId, actionType, actionDetails)
+    VALUES (UUID(), p_staffId, p_actionType, p_actionDetails);
 END$$
 
 DELIMITER ;
