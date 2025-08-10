@@ -1,6 +1,8 @@
+import { NewBook } from '@/controllers/BookController';
 import pool from '@/database/mysql/connection';
 import mysqlConnection from "@/database/mysql/connection";
 import { Book } from "@/models/mysql/Book";
+import { RowDataPacket } from 'mysql2';
 
 export interface BookSearchFilters {
   q?: string;           // general keyword -> title/publisher/author/genre
@@ -132,6 +134,7 @@ const searchBooks = async (filters: BookSearchFilters): Promise<BookSearchResult
   };
 }
 
+
 /**
  * 
  * Retrieves all books from the database.
@@ -154,18 +157,21 @@ const getAllBooks = async (): Promise<Book[]> => {
   }
 }
 
+interface IdRow {
+  id: string;
+}
+
 /**
- * Creates a new book by calling the `add_a_new_book` stored procedure.
- * This procedure handles the book insertion, author linking, and logging in a single,
+ * Creates a new book by calling the `AddNewBook` stored procedure.
+ * This procedure handles the book insertion, author and genre linking, and logging in a single,
  * atomic transaction, simplifying the service function significantly.
- * @param {Book} bookData The data for the new book.
- * @param {string} authorIds A comma-separated string of author IDs.
+ * @param {NewBook} bookData The data for the new book.
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<Book>} A promise that resolves to the created Book object.
  */
-const addNewBook = async (bookData: Book, authorIds: string, staffId: string): Promise<Book> => {
+const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> => {
   try {
-    const procedure = 'CALL add_a_new_book(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const procedure = 'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
     const params = [
       bookData.title,
       bookData.thumbnailUrl || null,
@@ -176,13 +182,21 @@ const addNewBook = async (bookData: Book, authorIds: string, staffId: string): P
       bookData.publisherId || null,
       bookData.description || null,
       bookData.status || 'available',
-      authorIds,
+      bookData.authorIds,
+      bookData.genreIds,
       staffId
     ];
 
-    await mysqlConnection.executeQuery(procedure, params);
+    // Execute the stored procedure (returns OkPacket or similar)
+    await pool.executeQuery(procedure, params);
 
-    return bookData;
+    // Retrieve the OUT parameter
+    const selectRows = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow;
+
+    if (!selectRows) {
+      throw new Error('Failed to retrieve new book ID from procedure');
+    }
+    return selectRows.id;
   } catch (error) {
     console.error('Error in bookService.addNewBook:', error);
     if (error instanceof Error) {
@@ -191,7 +205,7 @@ const addNewBook = async (bookData: Book, authorIds: string, staffId: string): P
       throw new Error(`Could not create book: ${String(error)}`);
     }
   }
-}
+};
 
 /**
  * Updates the quantity and availableCopies of a specific book by calling the `UpdateBookInventory`

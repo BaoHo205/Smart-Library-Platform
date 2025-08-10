@@ -4,7 +4,7 @@ import { Book } from '@/models/mysql/Book';
 import * as bookService from '@/services/BookService';
 import { BookStatus } from '@/models/mysql/enum/BookStatus';
 
-const PLACEHOLDER_STAFF_ID = 'h0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18';
+const PLACEHOLDER_STAFF_ID = '026766aa-71e0-11f0-b7ee-4b6c3be6ce57';
 
 export const getBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -25,23 +25,44 @@ export const getBooks = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
+export interface NewBook {
+  title: string;
+  thumbnailUrl: string;
+  isbn: string;
+  quantity: number | 0;
+  pageCount: number;
+  publisherId: string;
+  description: string;
+  status: BookStatus;
+  authorIds: string,
+  genreIds: string
+}
+
 export const addNewBook = async (req: Request, res: Response): Promise<void> => {
-  const bookData: Book = req.body;
+  const bookData: NewBook = req.body;
 
   if (!bookData.title) {
     res.status(400).json({ message: 'Book title is required' });
     return;
   }
 
+  // Validate that all required fields are present
+  if (!bookData.title || !bookData.authorIds || !bookData.genreIds || !bookData.publisherId) {
+    res.status(400).json({ message: 'Book title, author IDs, genre IDs, and publisher ID are required' });
+    return;
+  }
+
   try {
-    const addedBook = await bookService.addNewBook(bookData, PLACEHOLDER_STAFF_ID, PLACEHOLDER_STAFF_ID);
+    const addedBook = await bookService.addNewBook(bookData, PLACEHOLDER_STAFF_ID);
     res.status(201).json({ message: 'Book created successfully', book: addedBook });
   } catch (error: unknown) {
-    console.error('Error in bookController.createBook:', addNewBook);
+    console.error('Error in bookController.createBook:', error);
     if (error instanceof Error) {
-      // Check for specific MySQL errors if needed, e.g., duplicate entry for unique ISBN
-      if (error.message.includes('Duplicate entry')) { // Simple string check, replace with error codes for robustness
+      // Check for specific MySQL errors like foreign key constraints or duplicates
+      if (error.message.includes('Duplicate entry')) {
         res.status(409).json({ message: 'Conflict: A book with this ID or ISBN already exists.', error: error.message });
+      } else if (error.message.includes('Foreign key constraint failed')) {
+        res.status(400).json({ message: 'Bad request: Invalid author, genre, or publisher ID.', error: error.message });
       } else {
         res.status(500).json({ message: 'Internal server error', error: error.message });
       }
@@ -92,19 +113,19 @@ export const updateBookInventory = async (req: Request, res: Response): Promise<
  */
 export const retireBook = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params; // Book ID from URL
-  const { status } = req.body; // New status from request body
+  //const { status } = req.body; // New status from request body
 
   // Basic validation for allowed status values (must match ENUM in DB)
-  const allowedStatuses: Book['status'][] = [BookStatus.AVAILABLE, BookStatus.UNAVAILABLE];
-  if (!status || !allowedStatuses.includes(status)) {
-    res.status(400).json({ message: `Invalid status provided. Allowed statuses: ${allowedStatuses.join(', ')}` });
-    return;
-  }
+  // const allowedStatuses: Book['status'][] = [BookStatus.AVAILABLE, BookStatus.UNAVAILABLE];
+  // if (!status || !allowedStatuses.includes(status)) {
+  //   res.status(400).json({ message: `Invalid status provided. Allowed statuses: ${allowedStatuses.join(', ')}` });
+  //   return;
+  // }
 
   try {
     const updated = await bookService.retireBook(id, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res.status(200).json({ message: `Book ${id} status updated successfully to '${status}'.` });
+      res.status(200).json({ message: `Book ${id} status updated successfully to 'unavailable'.` });
     } else {
       res.status(404).json({ message: `Book with ID ${id} not found.` });
     }

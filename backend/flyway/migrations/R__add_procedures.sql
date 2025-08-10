@@ -110,12 +110,16 @@ CREATE PROCEDURE AddNewBook(
     IN p_description TEXT,
     IN p_status ENUM('available', 'unavailable'),
     IN p_authorIds TEXT,
-    IN p_staffId VARCHAR(36)
+    IN p_genreIds TEXT,
+    IN p_staffId VARCHAR(36),
+    OUT p_bookId VARCHAR(36),
 )
 BEGIN
     DECLARE v_authorId VARCHAR(36);
+    DECLARE v_genreId VARCHAR(36);
     DECLARE v_pos INT DEFAULT 1;
     DECLARE v_len INT DEFAULT 0;
+    DECLARE v_bookId VARCHAR(36); 
 
     -- Error handler to rollback transaction on SQL errors
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -129,12 +133,15 @@ BEGIN
     START TRANSACTION;
     
     -- Validate required inputs
-    IF p_id IS NULL OR p_title IS NULL OR p_authorIds IS NULL OR p_authorIds = '' THEN
+    IF p_title IS NULL OR p_authorIds IS NULL OR p_authorIds = ''  OR p_genreIds IS NULL OR p_genreIds = '' OR p_publisherId IS NULL OR p_publisherId = '' THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Required fields (id, title, author_ids) cannot be null or empty';
+        SET MESSAGE_TEXT = 'Required fields (title, author_ids, p_genreIds, p_publisherId) cannot be null or empty';
     END IF;
 
-    INSERT INTO Book (
+    SET v_bookId = UUID();
+    SET p_bookId = v_bookId;
+
+    INSERT INTO books (
         id,
         title,
         thumbnailUrl,
@@ -144,9 +151,11 @@ BEGIN
         pageCount,
         publisherId,
         description,
-        status
+        status,
+        createdAt,
+        updatedAt
     ) VALUES (
-        UUID,
+        v_bookId,
         p_title,
         p_thumbnailUrl,
         p_isbn,
@@ -155,7 +164,9 @@ BEGIN
         p_pageCount,
         p_publisherId,
         p_description,
-        p_status
+        p_status,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
     );
 
     -- Append trailing comma to ensure last author ID is processed
@@ -169,16 +180,37 @@ BEGIN
         -- Check if the author ID is not empty
         IF v_authorId <> '' THEN
             -- Insert a record into the join table
-            INSERT INTO Book_Authors (bookId, authorId)
-            VALUES (p_id, v_authorId);
+            INSERT INTO book_authors (bookId, authorId, createdAt, updatedAt)
+            VALUES (v_bookId, v_authorId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
         END IF;
 
         SET v_pos = v_len + 1;
         SET v_len = LOCATE(',', p_authorIds, v_pos); -- Move to the next comma
     END WHILE;
 
+    -- Append trailing comma to ensure last genre ID is processed
+    SET v_pos = 1;
+    SET v_len = 0;
+    SET p_genreIds = CONCAT(p_genreIds, ',');
+
+    -- Loop through the comma-separated list of author IDs
+    SET v_len = LOCATE(',', p_genreIds, v_pos);
+    WHILE v_len > 0 DO
+        SET v_genreId = TRIM(SUBSTRING(p_genreIds, v_pos, v_len - v_pos));
+        
+        -- Check if the author ID is not empty
+        IF v_genreId <> '' THEN
+            -- Insert a record into the join table
+            INSERT INTO book_genres (bookId, genreId, createdAt, updatedAt)
+            VALUES (v_bookId, v_genreId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        END IF;
+
+        SET v_pos = v_len + 1;
+        SET v_len = LOCATE(',', p_genreIds, v_pos); -- Move to the next comma
+    END WHILE;
+
     -- Log the staff action
-    CALL AddStaffLog(p_staffId, 'add_book', CONCAT('Added new book: "', p_title, '" (ID: ', p_id, ')'));
+    CALL AddStaffLog(p_staffId, v_bookId, 'CREATE', CONCAT('Added new book: "', p_title, '" (ID: ', v_bookId, ')'));
 
     -- Commit the transaction if all operations were successful
     COMMIT;
@@ -215,11 +247,11 @@ BEGIN
 
     -- Lock the row and get the current quantity to ensure consistency.
     SELECT quantity INTO v_currentQuantity
-    FROM Books
+    FROM books
     WHERE id = p_bookId FOR UPDATE;
 
     -- Check if the book was found
-    IF v_quantityDiff IS NULL THEN
+    IF v_currentQuantity IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Book not found';
     END IF;
@@ -228,15 +260,15 @@ BEGIN
     SET v_quantityDiff = p_newQuantity - v_currentQuantity;
 
     -- Update both quantity and availableCopies
-    UPDATE Books
+    UPDATE books
     SET 
         quantity = p_newQuantity,
-        availableCopies = availableCopies + v_quantity_diff,
-        updated_at = CURRENT_TIMESTAMP
+        availableCopies = availableCopies + v_quantityDiff,
+        updatedAt = CURRENT_TIMESTAMP
     WHERE id = p_bookId;
 
     -- Log the staff action
-    CALL AddStaffLog(p_staffId, 'inventory_update', CONCAT('Updated inventory for book ID ', p_bookId, ' to ', p_newQuantity));
+    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Updated inventory for book ID ', p_bookId, ' to ', p_newQuantity));
 
     COMMIT;
 END$$
@@ -268,10 +300,10 @@ BEGIN
     END IF;
 
     -- Update the book's status to 'unavailable'
-    UPDATE Book
+    UPDATE books
     SET
         status = 'unavailable',
-        updated_at = CURRENT_TIMESTAMP
+        updatedAt = CURRENT_TIMESTAMP
     WHERE id = p_bookId;
 
     -- Check if a row was affected
@@ -281,7 +313,7 @@ BEGIN
     END IF;
 
     -- Log the staff action
-    CALL AddStaffLog(p_staffId, 'retire_book', CONCAT('Book ID ', p_bookId, ' retired'));
+    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Book ID ', p_bookId, ' retired'));
     
     COMMIT;
 END$$
@@ -289,15 +321,44 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-
+-- This procedure adds a log entry for staff actions, handling foreign key constraints.
 CREATE PROCEDURE AddStaffLog(
     IN p_staffId VARCHAR(36),
+    IN p_bookId VARCHAR(36),
     IN p_actionType VARCHAR(50),
     IN p_actionDetails TEXT
 )
 BEGIN
-    INSERT INTO Staff_Logs (id, staffId, actionType, actionDetails)
-    VALUES (UUID(), p_staffId, p_actionType, p_actionDetails);
-END$$
+    -- Generate a unique ID for the new log entry
+    DECLARE v_logId VARCHAR(36);
+
+    -- This handler catches foreign key constraint errors and provides a specific message
+    DECLARE EXIT HANDLER FOR 1452 -- MySQL error code for 'Cannot add or update a child row: a foreign key constraint fails'
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Foreign key constraint failed in Staff_Logs. Check if staffId or bookId are valid.';
+    END;
+
+    SET v_logId = UUID();
+    -- Insert the new log entry into the Staff_Logs table with current timestamps
+    INSERT INTO staff_logs (
+        id,
+        userId,
+        bookId,
+        actionType,
+        actionDetails,
+        createdAt,
+        updatedAt
+    ) VALUES (
+        v_logId,
+        p_staffId,
+        p_bookId,
+        p_actionType,
+        p_actionDetails,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    );
+END $$
 
 DELIMITER ;
