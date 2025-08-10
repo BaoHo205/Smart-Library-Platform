@@ -329,7 +329,7 @@ interface IdRow {
  * atomic transaction, simplifying the service function significantly.
  * @param {NewBook} bookData The data for the new book.
  * @param {string} staffId The ID of the staff user performing the action.
- * @returns {Promise<Book>} A promise that resolves to the created Book object.
+ * @returns {Promise<String>} A promise that resolves to the created Book object id.
  */
 const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> => {
   try {
