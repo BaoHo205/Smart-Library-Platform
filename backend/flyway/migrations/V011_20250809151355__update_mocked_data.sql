@@ -13,3 +13,22 @@ SET
                  THEN 'available'
                ELSE 'unavailable'
              END;
+
+-- Fix pageCount = 0 -> set to > 100
+UPDATE books
+SET pageCount = 120
+WHERE pageCount = 0;
+
+-- Fill empty ISBNs with unique 13-digit numbers derived from the book UUID
+-- Format: 979 + 10 digits (numeric) derived from the UUID to ensure uniqueness
+UPDATE books
+SET isbn = CONCAT(
+  '979',
+  RIGHT(LPAD(CONV(SUBSTRING(REPLACE(id, '-', ''), 1, 16), 16, 10), 10, '0'), 10)
+)
+WHERE isbn IS NULL OR TRIM(isbn) = '';
+
+-- Fill empty descriptions based on title
+UPDATE books
+SET description = CONCAT('An engaging read: ', title, '. Placeholder description for development data.')
+WHERE description IS NULL OR TRIM(description) = '';

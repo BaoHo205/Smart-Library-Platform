@@ -233,18 +233,25 @@ const getPool = () => {
   return pool;
 };
 
-export const executeQuery = async (query: string, params?: any[], existingConnection?: mysql.PoolConnection): Promise<[mysql.QueryResult, mysql.FieldPacket[]]> => {
-  const pool = getPool();
-  let connection: mysql.PoolConnection | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const executeQuery = async (query: string, params?: any[] | any) => {
   try {
-    if (existingConnection) {
-      connection = existingConnection;
-    } else {
-      connection = await pool.getConnection(); // Get a new connection for a single query
+    const normalizedParams: unknown[] =
+      params === undefined ? [] : Array.isArray(params) ? params : [params];
+
+    const placeholders = (query.match(/\?/g) || []).length;
+    if (placeholders !== normalizedParams.length) {
+      console.error('[SQL PARAM MISMATCH]', {
+        placeholders,
+        paramsLength: normalizedParams.length,
+        query,
+        params: normalizedParams,
+      });
+      throw new Error(`SQL placeholder/param mismatch: expected ${placeholders}, got ${normalizedParams.length}`);
     }
 
-    const [rows, fields] = await connection.execute(query, params);
-    return [rows, fields];
+    const [results] = await pool.execute(query, normalizedParams);
+    return results;
   } catch (error) {
     console.error('❌ Error executing query:', query, params, error);
     throw error;
