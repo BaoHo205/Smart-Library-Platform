@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node -r tsconfig-paths/register dist/index.js",
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts",
+    "dev": "nodemon -r tsconfig-paths/register --watch src --exec ts-node src/index.ts",
     "lint": "eslint src --ext .mjs",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,js,json,md}'"

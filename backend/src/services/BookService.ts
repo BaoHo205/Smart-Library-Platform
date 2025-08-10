@@ -1,11 +1,12 @@
 import { NewBook } from '@/controllers/BookController';
 import pool from '@/database/mysql/connection';
+import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 import mysqlConnection from "@/database/mysql/connection";
 import { Book } from "@/models/mysql/Book";
-import { RowDataPacket } from 'mysql2';
+// import { RowDataPacket } from 'mysql2';
 
 export interface BookSearchFilters {
-  q?: string;           // general keyword -> title/publisher/author/genre
+  q?: string; // general keyword -> title/publisher/author/genre
   title?: string;
   author?: string;
   genre?: string;
@@ -29,8 +30,51 @@ export interface BookListItem {
   genres: string;
 }
 
-interface CountRow {
+export interface BookDetails {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  isbn: string;
+  quantity: number;
+  availableCopies: number;
+  pageCount: number;
+  publisherId: string;
+  description: string | null;
+  status: 'available' | 'unavailable';
+  createdAt: Date;
+  updatedAt: Date;
+  publisherName: string;
+}
+
+export interface UserCheckout {
+  id: string;
+  userId: string;
+  bookId: string;
+  checkoutDate: string;
+  dueDate: string;
+  returnDate: string | null;
+  isReturned: boolean;
+  isLate: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  isbn: string;
+}
+
+interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface BorrowBookOutput extends RowDataPacket {
+  checkoutId: string | null;
+  success: number;
+  message: string;
+}
+
+interface ReturnBookOutput extends RowDataPacket {
+  success: number;
+  message: string;
+  isLate: number;
 }
 
 type SqlParam = string | number;
@@ -42,7 +86,21 @@ export interface BookSearchResult {
   total: number;
 }
 
-const searchBooks = async (filters: BookSearchFilters): Promise<BookSearchResult> => {
+export interface BorrowBookResult {
+  success: boolean;
+  message: string;
+  checkoutId?: string;
+}
+
+export interface ReturnBookResult {
+  success: boolean;
+  message: string;
+  isLate?: boolean;
+}
+
+async function searchBooks(
+  filters: BookSearchFilters
+): Promise<BookSearchResult> {
   const page = Math.max(1, Number(filters.page) || 1);
   const pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
   const offset = (page - 1) * pageSize;
@@ -52,19 +110,33 @@ const searchBooks = async (filters: BookSearchFilters): Promise<BookSearchResult
   const params: SqlParam[] = [];
 
   // Using COALESCE to avoid NULL in LIKE comparisons
-  const titleLike = (val: string) => { where.push('b.title LIKE ?'); params.push(`%${val}%`); };
-  const pubLike = (val: string) => { where.push('p.name LIKE ?'); params.push(`%${val}%`); };
-  const authorLike = (val: string) => { where.push("COALESCE(authors.authors, '') LIKE ?"); params.push(`%${val}%`); };
-  const genreLike = (val: string) => { where.push("COALESCE(genres.genres, '') LIKE ?"); params.push(`%${val}%`); };
+  const titleLike = (val: string) => {
+    where.push('b.title LIKE ?');
+    params.push(`%${val}%`);
+  };
+  const pubLike = (val: string) => {
+    where.push('p.name LIKE ?');
+    params.push(`%${val}%`);
+  };
+  const authorLike = (val: string) => {
+    where.push("COALESCE(authors.authors, '') LIKE ?");
+    params.push(`%${val}%`);
+  };
+  const genreLike = (val: string) => {
+    where.push("COALESCE(genres.genres, '') LIKE ?");
+    params.push(`%${val}%`);
+  };
 
-  // Filter logic 
+  // Filter logic
   if (filters.title) titleLike(filters.title);
   if (filters.publisher) pubLike(filters.publisher);
   if (filters.author) authorLike(filters.author);
   if (filters.genre) genreLike(filters.genre);
   if (filters.q) {
     const q = `%${filters.q}%`;
-    where.push("(b.title LIKE ? OR p.name LIKE ? OR COALESCE(authors.authors, '') LIKE ? OR COALESCE(genres.genres, '') LIKE ?)");
+    where.push(
+      "(b.title LIKE ? OR p.name LIKE ? OR COALESCE(authors.authors, '') LIKE ? OR COALESCE(genres.genres, '') LIKE ?)"
+    );
     params.push(q, q, q, q);
   }
 
@@ -73,9 +145,13 @@ const searchBooks = async (filters: BookSearchFilters): Promise<BookSearchResult
 
   // Sort clause
   const sortCol =
-    filters.sort === 'available' ? 'availability.availableCopies' :
-      filters.sort === 'publisher' ? 'p.name' : 'b.title';
-  const order = (filters.order || 'asc').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    filters.sort === 'available'
+      ? 'b.availableCopies'
+      : filters.sort === 'publisher'
+        ? 'p.name'
+        : 'b.title';
+  const order =
+    (filters.order || 'asc').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
   // Base FROM clause
   const baseFrom = `
@@ -121,19 +197,105 @@ const searchBooks = async (filters: BookSearchFilters): Promise<BookSearchResult
     ${whereSql}
   `;
 
-  const countResult = await pool.executeQuery(countSql, params) as unknown as CountRow[];
+  const countResult = (await pool.executeQuery(countSql, params)) as CountRow[];
   const total = countResult[0]?.total ?? 0;
 
-  const rows = await pool.executeQuery(sql, params) as unknown as BookListItem[];
+  const rows = (await pool.executeQuery(sql, params)) as BookListItem[];
 
   return {
     data: rows,
     page,
     pageSize,
-    total
+    total,
   };
 }
 
+const borrowBook = async (
+  userId: string,
+  bookId: string,
+  dueDate: string
+): Promise<BorrowBookResult> => {
+  try {
+    // Convert string to MySQL date format (YYYY-MM-DD) and add 1 day
+    const date = new Date(dueDate);
+
+    // Call the stored procedure
+    await pool.executeQuery(
+      'CALL BorrowBook(?, ?, ?, @checkoutId, @success, @message)',
+      [userId, bookId, date]
+    );
+
+    // Get the output parameters
+    const outputResults = (await pool.executeQuery(
+      'SELECT @checkoutId as checkoutId, @success as success, @message as message'
+    )) as BorrowBookOutput[];
+
+    const output = outputResults[0];
+
+    return {
+      success: Boolean(output.success),
+      message: output.message || 'Unknown error occurred',
+      checkoutId: output.checkoutId || undefined,
+    };
+  } catch (error) {
+    console.error('Error in borrowBook service:', error);
+    return {
+      success: false,
+      message: 'Failed to borrow book due to database error',
+    };
+  }
+};
+
+const returnBook = async (
+  userId: string,
+  bookId: string
+): Promise<ReturnBookResult> => {
+  try {
+    // Call the stored procedure
+    await pool.executeQuery(
+      `
+            CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
+        `,
+      [userId, bookId]
+    );
+
+    // Get the output parameters
+    const outputResults = (await pool.executeQuery(`
+            SELECT @p_success as success, @p_message as message, @p_isLate as isLate
+        `)) as ReturnBookOutput[];
+
+    const output = outputResults[0];
+
+    return {
+      success: Boolean(output.success),
+      message: output.message,
+      isLate: Boolean(output.isLate),
+    };
+  } catch (error) {
+    console.error('Error in borrowBook service:', error);
+    return {
+      success: false,
+      message: 'Failed to return book due to database error',
+    };
+  }
+};
+
+const getBookById = async (bookId: string): Promise<BookDetails | null> => {
+  try {
+    const results = (await pool.executeQuery(
+      `SELECT b.*, p.name as publisherName 
+             FROM books b 
+             LEFT JOIN publishers p ON b.publisherId = p.id 
+             WHERE b.id = ?`,
+      [bookId]
+    )) as BookDetails[];
+
+    return results[0] || null;
+  } catch (error) {
+    console.error('Error getting book by ID:', error);
+    return null;
+  }
+};
 
 /**
  * 
@@ -262,3 +424,13 @@ const retireBook = async (bookId: string, staffId: string): Promise<boolean> => 
 }
 
 export { searchBooks, getAllBooks, addNewBook, updateBookInventory, retireBook }
+
+export default {
+  searchBooks,
+  borrowBook,
+  returnBook,
+  getBookById,
+  addNewBook,
+  updateBookInventory,
+  retireBook
+};

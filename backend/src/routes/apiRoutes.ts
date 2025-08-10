@@ -9,5 +9,4 @@ apiRouter.use('/user', userRouter);
 apiRouter.use('/staff', staffRouter);
 apiRouter.use('/books', bookRouter);
 
-  
 export default apiRouter;

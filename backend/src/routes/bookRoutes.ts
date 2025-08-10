@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { getBooks, addNewBook, retireBook, updateBookInventory } from '@/controllers/BookController';
-// import { addNewBook, retireBook, updateBookInventory } from "../controllers/book.controller";
+import bookController from '@/controllers/BookController';
 
 const bookRouter = Router();
 
 // Search books by params
-bookRouter.get('/', getBooks);
-bookRouter.post('/add', addNewBook);
-bookRouter.put('/:id/inventory', updateBookInventory);
-bookRouter.put('/:id/retired', retireBook);
+bookRouter.get('/', bookController.getBooks);
+bookRouter.post('/borrow/:bookId', bookController.borrowBook);
+bookRouter.put('/return/:bookId', bookController.returnBook);
+bookRouter.post('/add', bookController.addNewBook);
+bookRouter.put('/inventory/:id', bookController.updateBookInventory);
+bookRouter.put('/retired/:id', bookController.retireBook);
 
 export default bookRouter;
