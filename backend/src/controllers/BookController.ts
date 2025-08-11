@@ -1,12 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from '@/middleware/authMiddleware';
-import BookService from '@/services/BookService';
+import { AuthRequest } from '../middleware/authMiddleware';
+import BookService from '../services/BookService';
 
 const getBooks = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Get books'
+  // #swagger.description = 'Search and retrieve books based on query parameters such as title, author, and genre.'
   try {
     // Validate pagination parameters
     const page = req.query.page ? Number(req.query.page) : undefined;
@@ -86,6 +89,10 @@ const getBooks = async (
 };
 
 const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Borrow a book'
+  // #swagger.description = 'Borrow a specific book by its ID. Requires user authentication.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to borrow', type: 'string' }
   try {
     const { bookId } = req.params;
     const { dueDate } = req.body;
@@ -165,6 +172,10 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
 };
 
 const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Return a book'
+  // #swagger.description = 'Return a borrowed book by its ID. Requires user authentication.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to return', type: 'string' }
   try {
     const { bookId } = req.params;
     const userId = req.userId;
