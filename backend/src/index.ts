@@ -36,7 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(authMiddleware.verifyJWT);
+app.use(authMiddleware.verifyJWT); // require jwt for all routes below 
 app.use('/api/v1', apiRouter);
 
 
@@ -54,7 +54,7 @@ const run = async () => {
     app.listen(port, () => {
       console.log(`📋 App: ${appName}`);
       console.log(`🎉 Server running at http://localhost:${port}`);
-      console.log(`📚 Reading Session API: http://localhost:${port}/api/reading`);
+      console.log(`API Docs: http://localhost:${port}/api-docs`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
