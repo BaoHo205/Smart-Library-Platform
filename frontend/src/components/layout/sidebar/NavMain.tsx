@@ -1,7 +1,20 @@
-import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible";
-import { BookOpen, ChevronDown, FileText, Search, User } from "lucide-react";
-import Link from "next/link";
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '@radix-ui/react-collapsible';
+import { BookOpen, ChevronDown, FileText, Search, User } from 'lucide-react';
+import Link from 'next/link';
 
 // Sidebar items
 const data = {
