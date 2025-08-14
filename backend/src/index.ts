@@ -7,10 +7,10 @@ import authRouter from './routes/authRoutes';
 import authMiddleware from './middleware/authMiddleware';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/apiRoutes';
-import cors from 'cors';
+
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger-output.json';
-import bookRouter from './routes/bookRoutes';
+
 
 dotenv.config();
 
@@ -46,7 +46,6 @@ app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(authMiddleware.verifyJWT); // require jwt for all routes below 
 app.use('/api/v1', apiRouter);
-app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {
