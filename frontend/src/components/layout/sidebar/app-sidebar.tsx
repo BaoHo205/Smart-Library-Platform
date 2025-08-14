@@ -1,7 +1,14 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Search, User, BookOpen, FileText, LogOut, ChevronDown } from "lucide-react"
+import * as React from 'react';
+import {
+  Search,
+  User,
+  BookOpen,
+  FileText,
+  LogOut,
+  ChevronDown,
+} from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -15,59 +22,59 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import Image from "next/image"
+} from '@/components/ui/collapsible';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Image from 'next/image';
 
 // Sidebar items
 const data = {
   navigation: [
     {
-      title: "Book Browsing",
+      title: 'Book Browsing',
       icon: Search,
-      url: "/",
+      url: '/',
     },
     {
-      title: "Personal Details",
+      title: 'Personal Details',
       icon: User,
-      url: "/me",
+      url: '/me',
       items: [
         {
-          title: "My Loans",
-          url: "/loans",
+          title: 'My Loans',
+          url: '/loans',
         },
         {
-          title: "Reading Analytics",
-          url: "/analytics",
+          title: 'Reading Analytics',
+          url: '/analytics',
         },
       ],
     },
     {
-      title: "My Inventory",
+      title: 'My Inventory',
       icon: BookOpen,
-      url: "/inventory",
+      url: '/inventory',
     },
     {
-      title: "My Report",
+      title: 'My Report',
       icon: FileText,
-      url: "/reports",
+      url: '/reports',
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props} collapsible="icon">
       <SidebarHeader>
-        <Card className="flex items-center justify-center bg-muted p-2 rounded-md group-data-[collapsible=icon]:p-1">
-          <Link href={"/"}>
+        <Card className="bg-muted flex items-center justify-center rounded-md p-2 group-data-[collapsible=icon]:p-1">
+          <Link href={'/'}>
             <div className="flex group-data-[collapsible=icon]:hidden">
               <div>
                 <Image
@@ -78,11 +85,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="max-w-48"
                 />
               </div>
-              <div className="flex flex-col justify-center max-w-48">
-                <p className="text-sm font-semibold leading-none">
+              <div className="flex max-w-48 flex-col justify-center">
+                <p className="text-sm leading-none font-semibold">
                   Online Library
                 </p>
-                <p className="text-sm text-muted-foreground leading-none">
+                <p className="text-muted-foreground text-sm leading-none">
                   Team FTech
                 </p>
               </div>
@@ -97,13 +104,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </Link>
         </Card>
       </SidebarHeader>
-      
+
       {/* Sidebar content with navigation items */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navigation.map((item) => (
+              {data.navigation.map(item => (
                 <SidebarMenuItem key={item.title}>
                   {item.items ? (
                     <Collapsible>
@@ -116,7 +123,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items.map((subItem) => (
+                          {item.items.map(subItem => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton asChild>
                                 <Link href={subItem.url}>
@@ -142,15 +149,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
+
       {/* Sidebar footer with logout button */}
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
-              asChild 
-              className="w-full"
-            >
+            <SidebarMenuButton asChild className="w-full">
               <Button>
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -160,5 +164,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
