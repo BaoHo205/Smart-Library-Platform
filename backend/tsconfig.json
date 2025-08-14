@@ -11,7 +11,11 @@
     "forceConsistentCasingInFileNames": true, // Ensure consistent casing in file names
     "resolveJsonModule": true, // Allow importing .json files
     "emitDecoratorMetadata": true, // Needed for decorators (e.g., if using TypeORM, Class-validator)
-    "experimentalDecorators": true // Enable experimental support for decorators
+    "experimentalDecorators": true, // Enable experimental support for decorators
+    "baseUrl": "./", // Base directory to resolve non-relative module names
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts"], // Include all .ts files in the src directory
   "exclude": ["node_modules"] // Exclude node_modules from compilation

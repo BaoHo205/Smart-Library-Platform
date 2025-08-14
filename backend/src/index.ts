@@ -1,21 +1,51 @@
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv'; // Recommended for environment variables
+import dotenv from 'dotenv';
+import cors from "cors";
 import mongoDBConnection from './database/mongodb/connection';
-import mysqlConnection from './database/mysql/connection'; // Import MySQL connection
+import mysqlConnection from './database/mysql/connection';
+import authRouter from './routes/authRoutes';
+import authMiddleware from './middleware/authMiddleware';
+import cookieParser from 'cookie-parser';
+import apiRouter from './routes/apiRoutes';
 
-dotenv.config(); // Load environment variables from a .env file
+import * as swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger-output.json';
+
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 const appName = process.env.APP_NAME || 'Smart Library Platform';
 
-// Middleware
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 
 app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
 });
+
+app.use('/auth', authRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(authMiddleware.verifyJWT); // require jwt for all routes below 
+app.use('/api/v1', apiRouter);
 
 const run = async () => {
   try {
@@ -31,8 +61,8 @@ const run = async () => {
     app.listen(port, () => {
       console.log(`📋 App: ${appName}`);
       console.log(`🎉 Server running at http://localhost:${port}`);
+      console.log(`API Docs: http://localhost:${port}/api-docs`);
     });
-
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

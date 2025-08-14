@@ -1,0 +1,143 @@
+Database Applications – Group Project –
+2025B
+Background
+
+Your team is tasked with developing the backend database system for a Smart Library
+Platform used by both physical libraries and online reading portals. The system manages
+book checkouts, digital reading, user reviews, and tracks user interaction with content. It
+also provides library staff with insights into resource usage and reading behaviors.
+
+The project includes both a relational component (for structured data and transactional
+needs) and a NoSQL component (for storing and analyzing large volumes of ﬂexible, semi-
+structured reading activity data).
+
+Functional Requirements
+
+Book Search
+
+Users (readers or staff) can search for books using various ﬁlters such as title, author
+name, genre, or publisher. Results should include key metadata: title, author(s), publisher,
+and the number of available copies.
+
+Borrow a Book
+
+Users can borrow a book if it is available. The system must record a new checkout with
+timestamps and update the book’s availability.
+
+Return a Book
+
+Users can return a book they have borrowed. The system must update the checkout record
+and indicate whether the return was late.
+
+Review a Book
+
+Users can leave a review for a book they have borrowed, consisting of a rating (1-5) and a
+short comment.
+
+Admin Features (for staff)
+
+Staff members can
+
+•  Add new books
+•  Update inventory
+
+
+•  Retire books
+
+All these actions must be logged in the system.
+
+Report (for staff)
+
+Staff can generate reports:
+
+•  Most borrowed books within a speciﬁc time range
+•  Top active readers by number of checkouts
+•  Books with low availability
+
+Reading Analytics (use NoSQL for this)
+
+Capture and analyze how users read eBooks through session logs stored in MongoDB. Each
+reading session should include User ID, Book ID, start/end time, device, pages read,
+highlights.
+
+Reports to generate:
+
+•  Average session time per user
+•  Most highlighted books
+•  Top 10 books by total reading time
+
+Technical Requirements
+
+Database Design
+
+•  users (readers, staff)
+•  books (basic metadata)
+•  authors (many-to-many with books)
+•  checkouts (records of borrowed/returned books)
+•
+reviews (text reviews and ratings)
+•  staff_logs (logs of admin activities)
+•
+
+reading_sessions (stored in MongoDB)
+
+Optimization
+
+Apply indexes and/or partitioning to improve performance for the following operations:
+
+•  Book Search
+•  Report
+
+You must provide evidence (e.g., query plans, execution time) to demonstrate performance
+improvements.
+
+
+Functions
+
+Develop functions to perform the following tasks:
+
+•  Check if a book is available
+•  Check if a book is returned on time
+•  Calculate the number of books borrowed in a given time range
+
+Stored Procedures
+
+Create stored procedures to handle:
+
+•  Borrow a Book
+•  Return a Book
+•  Review a Book
+•  Add a Book
+•  Update Inventory
+•  Retire a Book
+
+Triggers
+
+Implement triggers to automate:
+
+•  When a book is borrowed and returned, book metadata should be updated
+
+automatically
+
+•  When a book gets a new review, the rating of the book should be updated
+
+automatically
+
+Transaction and Concurrency Management
+
+Use transaction and concurrency management in the following processes:
+
+•  Borrow a Book (for example, two or more readers borrow the last book at the same
+
+time, etc.)
+
+•  Logging of Admin Features
+
+Aggregation Pipeline
+
+•  Develop aggregation pipelines for reading analytics to generate the required insights
+
+Web Application
+
+Develop a simple web application that supports all functional requirements. The user
+interface should be simple, user-friendly, and focused on functionality.

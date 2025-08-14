@@ -1,0 +1,29 @@
+databaseType = "MySql"
+id = "e342a26b-167c-4224-bcce-9abbb8aa5609"
+name = "Smart_Library_Platform"
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+enableMigrations = false
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.mysql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.smart-library-platform]
+url = "jdbc:mysql://localhost:6446"
+schemas = [ "library_platform" ]
+displayName = "Smart Library Platform"
