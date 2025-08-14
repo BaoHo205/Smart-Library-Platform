@@ -15,8 +15,7 @@ const mockData: BookCardProps[] = [
 export default function Home() {
   return (
     <div className="flex">
-      <div className="w-[20%]">For navbar</div>
-      <div className="w-[80%] flex flex-col justify-center gap-6 p-6">
+      <div className="w-full flex flex-col justify-center gap-6 p-6">
         <Header />
         <Image src="/default-image.png" alt="Banner Image" width={100} height={100} className="h-full w-full" />
         <BookCardList genre="Health" books={mockData} />
