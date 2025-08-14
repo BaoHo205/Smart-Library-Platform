@@ -7,7 +7,10 @@ import authRouter from './routes/authRoutes';
 import authMiddleware from './middleware/authMiddleware';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/apiRoutes';
-import bookRouter from './routes/bookRoutes';
+
+import * as swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger-output.json';
+
 
 dotenv.config();
 
@@ -27,22 +30,29 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 
 app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
 });
 
 app.use('/auth', authRouter);
-app.use(authMiddleware.verifyJWT);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(authMiddleware.verifyJWT); // require jwt for all routes below 
 app.use('/api/v1', apiRouter);
-app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {
     console.log('🚀 Starting Smart Library Platform Backend...');
 
     // Connect to MongoDB
-    // await mongoDBConnection.connect();
+    await mongoDBConnection.connect();
 
     // Connect to MySQL
     await mysqlConnection.connect();
@@ -51,6 +61,7 @@ const run = async () => {
     app.listen(port, () => {
       console.log(`📋 App: ${appName}`);
       console.log(`🎉 Server running at http://localhost:${port}`);
+      console.log(`API Docs: http://localhost:${port}/api-docs`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

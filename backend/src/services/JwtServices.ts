@@ -70,7 +70,7 @@ class JwtService implements IJwtService {
           type: 'access',
         },
         this.accessTokenSecret,
-        { expiresIn: '30m' }
+        { expiresIn: '1h' }
       );
 
       return accessToken;
