@@ -1,123 +1,209 @@
-import { Request, Response } from 'express';
-import { Book } from '../models/BookModel';
-import * as bookService from '../services/BookService';
-import { v4 as uuidv4 } from 'uuid';
+import { Request, Response, NextFunction } from 'express';
+import { AuthRequest } from '@/middleware/authMiddleware';
+import BookService from '@/services/BookService';
 
-const PLACEHOLDER_STAFF_ID = 'h0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18';
+const getBooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Validate pagination parameters
+    const page = req.query.page ? Number(req.query.page) : undefined;
+    const pageSize = req.query.pageSize
+      ? Number(req.query.pageSize)
+      : undefined;
 
-/**
- * Handles GET /api/books requests to retrieve all books.
- * @param {Request} req The Express request object.
- * @param {Response} res The Express response object.
- */
-export const getAllBooks = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const books: Book[] = await bookService.getAllBooks();
-        res.status(200).json(books);
-    } catch (error: unknown) {
-        console.error('Error in bookController.getAllBooks:', error);
-
-        // Safely check if 'error' is an instance of Error
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Internal server error', error: error.message });
-        } else {
-            // Handle cases where 'error' might be a string, number, or other type
-            res.status(500).json({ message: 'Internal server error', error: String(error) });
-        }
-    }
-}
-
-export const addNewBook = async (req: Request, res: Response): Promise<void> => {
-    const newBookId = uuidv4();
-
-    const bookData: Book = { ...req.body, id: newBookId };
-
-    if (!bookData.title) {
-        res.status(400).json({ message: 'Book title is required' });
-        return;
+    if (page !== undefined && (isNaN(page) || page < 1)) {
+      res.status(400).json({
+        success: false,
+        message: 'Page must be a positive number',
+      });
+      return;
     }
 
-    try {
-        const addedBook = await bookService.addNewBook(bookData, PLACEHOLDER_STAFF_ID);
-        res.status(201).json({ message: 'Book created successfully', book: addedBook });
-    } catch (error: unknown) {
-        console.error('Error in bookController.createBook:', addNewBook);
-        if (error instanceof Error) {
-            // Check for specific MySQL errors if needed, e.g., duplicate entry for unique ISBN
-            if (error.message.includes('Duplicate entry')) { // Simple string check, replace with error codes for robustness
-                res.status(409).json({ message: 'Conflict: A book with this ID or ISBN already exists.', error: error.message });
-            } else {
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
-        } else {
-            res.status(500).json({ message: 'Internal server error', error: String(error) });
-        }
-    }
-}
-
-/**
- * Handles PUT /api/books/:id/inventory requests to update book quantity.
- * Expected body: { "quantity": number }
- * @param {Request} req The Express request object.
- * @param {Response} res The Express response object.
- */
-export const updateBookInventory = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params; // Book ID from URL
-    const { quantity } = req.body; // New quantity from request body
-
-    // Basic validation
-    if (typeof quantity !== 'number' || quantity < 0) {
-        res.status(400).json({ message: 'Invalid quantity provided. Quantity must be a non-negative number.' });
-        return;
+    if (
+      pageSize !== undefined &&
+      (isNaN(pageSize) || pageSize < 1 || pageSize > 100)
+    ) {
+      res.status(400).json({
+        success: false,
+        message: 'Page size must be a positive number between 1 and 100',
+      });
+      return;
     }
 
-    try {
-        const updated = await bookService.updateBookInventory(id, quantity, PLACEHOLDER_STAFF_ID);
-        if (updated) {
-            res.status(200).json({ message: `Book ${id} inventory updated successfully to ${quantity}.` });
-        } else {
-            res.status(404).json({ message: `Book with ID ${id} not found.` });
-        }
-    } catch (error: unknown) {
-        console.error(`Error in bookController.updateBookInventoryController for ID ${id}:`, error);
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Internal server error', error: error.message });
-        } else {
-            res.status(500).json({ message: 'Internal server error', error: String(error) });
-        }
-    }
-}
-
-/**
- * Handles PUT /api/books/:id/status requests to retire/change book status.
- * Expected body: { "status": "lost" | "damaged" | "maintenance" | "available" | "borrowed" }
- * @param {Request} req The Express request object.
- * @param {Response} res The Express response object.
- */
-export const retireBook = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params; // Book ID from URL
-    const { status } = req.body; // New status from request body
-
-    // Basic validation for allowed status values (must match ENUM in DB)
-    const allowedStatuses: Book['status'][] = ['available', 'borrowed', 'lost', 'damaged', 'maintenance'];
-    if (!status || !allowedStatuses.includes(status)) {
-        res.status(400).json({ message: `Invalid status provided. Allowed statuses: ${allowedStatuses.join(', ')}` });
-        return;
+    // Validate sort parameter
+    const validSortFields = ['title', 'publisher', 'available'];
+    const sort = req.query.sort as string;
+    if (sort && !validSortFields.includes(sort)) {
+      res.status(400).json({
+        success: false,
+        message: `Invalid sort field. Must be one of: ${validSortFields.join(', ')}`,
+      });
+      return;
     }
 
-    try {
-        const updated = await bookService.updateBookStatus(id, status, PLACEHOLDER_STAFF_ID);
-        if (updated) {
-            res.status(200).json({ message: `Book ${id} status updated successfully to '${status}'.` });
-        } else {
-            res.status(404).json({ message: `Book with ID ${id} not found.` });
-        }
-    } catch (error: unknown) {
-        console.error(`Error in bookController.retireBookController for ID ${id}:`, error);
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Internal server error', error: error.message });
-        } else {
-            res.status(500).json({ message: 'Internal server error', error: String(error) });
-        }
+    // Validate order parameter
+    const validOrderValues = ['asc', 'desc'];
+    const order = req.query.order as string;
+    if (order && !validOrderValues.includes(order)) {
+      res.status(400).json({
+        success: false,
+        message: `Invalid order value. Must be one of: ${validOrderValues.join(', ')}`,
+      });
+      return;
     }
-}
+
+    const result = await BookService.searchBooks({
+      q: req.query.q as string,
+      title: req.query.title as string,
+      author: req.query.author as string,
+      genre: req.query.genre as string,
+      publisher: req.query.publisher as string,
+      page,
+      pageSize,
+      sort: sort as 'title' | 'publisher' | 'available',
+      order: order as 'asc' | 'desc',
+    });
+
+    if (!result) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve books',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    console.error('Error retrieving books:', err);
+    next(err);
+  }
+};
+
+const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+    const { dueDate } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated',
+      });
+      return;
+    }
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    if (!dueDate) {
+      res.status(400).json({
+        success: false,
+        message: 'Due date is required',
+      });
+      return;
+    }
+
+    // Validate due date format and ensure it's in the future
+    const dueDateObj = new Date(dueDate);
+    const today = new Date();
+
+    if (isNaN(dueDateObj.getTime())) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid due date format',
+      });
+      return;
+    }
+
+    if (dueDateObj <= today) {
+      res.status(400).json({
+        success: false,
+        message: 'Due date must be in the future',
+      });
+      return;
+    }
+
+    const result = await BookService.borrowBook(userId, bookId, dueDate);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          checkoutId: result.checkoutId,
+          userId,
+          bookId,
+          dueDate,
+          checkoutDate: new Date().toISOString().split('T')[0],
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Error borrowing book:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while borrowing book',
+    });
+  }
+};
+
+const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      res
+        .status(401)
+        .json({ success: false, message: 'User not authenticated' });
+      return;
+    }
+
+    if (!bookId) {
+      res.status(400).json({ success: false, message: 'Book ID is required' });
+      return;
+    }
+
+    const result = await BookService.returnBook(userId, bookId);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          isLate: result.isLate,
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Error in returnBook controller:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+export default { borrowBook, returnBook, getBooks };

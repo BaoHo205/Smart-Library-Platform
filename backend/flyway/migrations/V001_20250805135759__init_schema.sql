@@ -54,6 +54,7 @@ CREATE TABLE books (
     thumbnailUrl TEXT,
     isbn VARCHAR(20) NOT NULL,
     quantity INT NOT NULL DEFAULT 0,
+    availableCopies INT NOT NULL DEFAULT 0,
     pageCount INT NOT NULL,
     publisherId VARCHAR(36) NOT NULL,
     description TEXT,

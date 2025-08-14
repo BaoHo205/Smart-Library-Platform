@@ -1,140 +1,301 @@
-import { Book } from '../models/BookModel';
-import mysqlConnection from '../database/mysql/connection';
-import { ResultSetHeader } from 'mysql2/promise';
-import { createStaffLog } from "./StaffLogService";
+import pool from '@/database/mysql/connection';
+import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 
-/**
- * 
- * Retrieves all books from the database.
- * @returns {Promise<Book[]>} A promise that resolves to an array of Book objects.
- */
-const getAllBooks = async (): Promise<Book[]> => {
-    try {
-        const query = 'SELECT * FROM Book';
-        const rows = await mysqlConnection.executeQuery(query);
-        // Cast the raw query results to the IBook interface for type safety
-        return rows as Book[];
-    } catch (error) {
-        console.error('Error in bookService.getAllBooks:', error);
-        // Ensure error message is handled safely (as 'unknown' type)
-        if (error instanceof Error) {
-            throw new Error(`Could not create book: ${error.message}`);
-        } else {
-            throw new Error(`Could not create book: ${String(error)}`);
-        }
-    }
+export interface BookSearchFilters {
+  q?: string; // general keyword -> title/publisher/author/genre
+  title?: string;
+  author?: string;
+  genre?: string;
+  publisher?: string;
+  page?: number;
+  pageSize?: number;
+  sort?: 'title' | 'available' | 'publisher';
+  order?: 'asc' | 'desc';
 }
 
-/**
- * Creates a new book record in the database.
- * @param {Book} bookData The data for the new book.
- * @returns {Promise<Book>} A promise that resolves to the created Book object.
- */
-const addNewBook = async (bookData: Book, staffId: string): Promise<Book> => {
-    try {
-        const query = `
-            INSERT INTO Book (id, title, thumbnail_url, isbn, quantity, page_count, publisher_id, description, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        const params = [
-            bookData.id,
-            bookData.title,
-            bookData.thumbnail_url || null,
-            bookData.isbn || null,
-            bookData.quantity || null,
-            bookData.page_count || null,
-            bookData.publisher_id || null,
-            bookData.description || null,
-            bookData.status || 'available'
-        ];
-        await createStaffLog({
-            staff_id: staffId,
-            action_type: 'add_book',
-            action_details: `Added new book: "${bookData.title}" (ID: ${bookData.id}, ISBN: ${bookData.isbn || 'N/A'})`
-        });
-
-        const results = await mysqlConnection.executeQuery(query, params);
-
-        return bookData;
-    } catch (error) {
-        console.error('Error in bookService.addNewBook:', error);
-        // Ensure error message is handled safely (as 'unknown' type)
-        if (error instanceof Error) {
-            throw new Error(`Could not create book: ${error.message}`);
-        } else {
-            throw new Error(`Could not create book: ${String(error)}`);
-        }
-    }
+export interface BookListItem {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  isbn: string | null;
+  pageCount: number | null;
+  quantity: number;
+  availableCopies: number;
+  publisherName: string;
+  authors: string;
+  genres: string;
 }
 
-/**
- * Updates the quantity of a specific book.
- * @param {string} bookId The ID of the book to update.
- * @param {number} newQuantity The new quantity for the book.
- * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
- */
-const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
-    try {
-        const query = 'UPDATE Book SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const results = await mysqlConnection.executeQuery(query, [newQuantity, bookId]);
-
-        const updated = (results as ResultSetHeader).affectedRows > 0;
-
-        if (updated) {
-            // Log the action after successful update
-            await createStaffLog({
-                staff_id: staffId,
-                action_type: 'system_maintenance',
-                action_details: `Updated inventory for book ID ${bookId} to quantity ${newQuantity}.`
-            });
-        }
-
-        return updated;
-    } catch (error) {
-        console.error(`Error in bookService.updateBookInventory for ID ${bookId}:`, error);
-        if (error instanceof Error) {
-            throw new Error(`Could not update book inventory: ${error.message}`);
-        } else {
-            throw new Error(`Could not update book inventory: ${String(error)}`);
-        }
-    }
+export interface BookDetails {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  isbn: string;
+  quantity: number;
+  availableCopies: number;
+  pageCount: number;
+  publisherId: string;
+  description: string | null;
+  status: 'available' | 'unavailable';
+  createdAt: Date;
+  updatedAt: Date;
+  publisherName: string;
 }
 
-/**
- * Updates the status of a specific book (e.g., to 'lost', 'damaged', 'maintenance', 'retired').
- * @param {string} bookId The ID of the book to update.
- * @param {'available' | 'borrowed' | 'lost' | 'damaged' | 'maintenance'} newStatus The new status for the book.
- * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
- */
-const updateBookStatus = async (bookId: string, newStatus: Book['status'], staffId: string): Promise<boolean> => {
-    if (!newStatus) {
-        throw new Error("New status cannot be null or undefined.");
-    }
-    try {
-        const query = 'UPDATE Book SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-        const results = await mysqlConnection.executeQuery(query, [newStatus, bookId]);
-
-        const updated = (results as ResultSetHeader).affectedRows > 0;
-
-        if (updated) {
-            // Log the action after successful update
-            await createStaffLog({
-                staff_id: staffId,
-                action_type: 'other', // Or 'retire_book' if added to ENUM
-                action_details: `Changed status for book ID ${bookId} to '${newStatus}'. (Retirement/Maintenance action)`
-            });
-        }
-
-        return updated;
-    } catch (error) {
-        console.error(`Error in bookService.updateBookStatus for ID ${bookId}:`, error);
-        if (error instanceof Error) {
-            throw new Error(`Could not update book status: ${error.message}`);
-        } else {
-            throw new Error(`Could not update book status: ${String(error)}`);
-        }
-    }
+export interface UserCheckout {
+  id: string;
+  userId: string;
+  bookId: string;
+  checkoutDate: string;
+  dueDate: string;
+  returnDate: string | null;
+  isReturned: boolean;
+  isLate: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  isbn: string;
 }
 
-export { getAllBooks, addNewBook, updateBookInventory, updateBookStatus }
+interface CountRow extends RowDataPacket {
+  total: number;
+}
+
+interface BorrowBookOutput extends RowDataPacket {
+  checkoutId: string | null;
+  success: number;
+  message: string;
+}
+
+interface ReturnBookOutput extends RowDataPacket {
+  success: number;
+  message: string;
+  isLate: number;
+}
+
+type SqlParam = string | number;
+
+export interface BookSearchResult {
+  data: BookListItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
+export interface BorrowBookResult {
+  success: boolean;
+  message: string;
+  checkoutId?: string;
+}
+
+export interface ReturnBookResult {
+  success: boolean;
+  message: string;
+  isLate?: boolean;
+}
+
+async function searchBooks(
+  filters: BookSearchFilters
+): Promise<BookSearchResult> {
+  const page = Math.max(1, Number(filters.page) || 1);
+  const pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
+  const offset = (page - 1) * pageSize;
+
+  // Define clause
+  const where: string[] = [];
+  const params: SqlParam[] = [];
+
+  // Using COALESCE to avoid NULL in LIKE comparisons
+  const titleLike = (val: string) => {
+    where.push('b.title LIKE ?');
+    params.push(`%${val}%`);
+  };
+  const pubLike = (val: string) => {
+    where.push('p.name LIKE ?');
+    params.push(`%${val}%`);
+  };
+  const authorLike = (val: string) => {
+    where.push("COALESCE(authors.authors, '') LIKE ?");
+    params.push(`%${val}%`);
+  };
+  const genreLike = (val: string) => {
+    where.push("COALESCE(genres.genres, '') LIKE ?");
+    params.push(`%${val}%`);
+  };
+
+  // Filter logic
+  if (filters.title) titleLike(filters.title);
+  if (filters.publisher) pubLike(filters.publisher);
+  if (filters.author) authorLike(filters.author);
+  if (filters.genre) genreLike(filters.genre);
+  if (filters.q) {
+    const q = `%${filters.q}%`;
+    where.push(
+      "(b.title LIKE ? OR p.name LIKE ? OR COALESCE(authors.authors, '') LIKE ? OR COALESCE(genres.genres, '') LIKE ?)"
+    );
+    params.push(q, q, q, q);
+  }
+
+  // Where clause
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+  // Sort clause
+  const sortCol =
+    filters.sort === 'available'
+      ? 'b.availableCopies'
+      : filters.sort === 'publisher'
+        ? 'p.name'
+        : 'b.title';
+  const order =
+    (filters.order || 'asc').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+  // Base FROM clause
+  const baseFrom = `
+    FROM books b
+    JOIN publishers p ON p.id = b.publisherId
+    LEFT JOIN (
+      SELECT ba.bookId, GROUP_CONCAT(CONCAT(a.firstName, ' ', a.lastName) ORDER BY a.lastName SEPARATOR ', ') AS authors
+      FROM book_authors ba
+      JOIN authors a ON a.id = ba.authorId
+      GROUP BY ba.bookId
+    ) AS authors ON authors.bookId = b.id
+    LEFT JOIN (
+      SELECT bg.bookId, GROUP_CONCAT(g.name ORDER BY g.name SEPARATOR ', ') AS genres
+      FROM book_genres bg
+      JOIN genres g ON g.id = bg.genreId
+      GROUP BY bg.bookId
+    ) AS genres ON genres.bookId = b.id
+  `;
+
+  // Main query
+  const sql = `
+    SELECT
+      b.id,
+      b.title,
+      b.thumbnailUrl,
+      b.isbn,
+      b.pageCount,
+      b.quantity,
+      b.availableCopies,
+      p.name AS publisherName,
+      COALESCE(authors.authors, '') AS authors,
+      COALESCE(genres.genres, '') AS genres
+    ${baseFrom}
+    ${whereSql}
+    ORDER BY ${sortCol} ${order}
+    LIMIT ${pageSize} OFFSET ${offset}
+  `;
+
+  // Count query
+  const countSql = `
+    SELECT COUNT(DISTINCT b.id) AS total
+    ${baseFrom}
+    ${whereSql}
+  `;
+
+  const countResult = (await pool.executeQuery(countSql, params)) as CountRow[];
+  const total = countResult[0]?.total ?? 0;
+
+  const rows = (await pool.executeQuery(sql, params)) as BookListItem[];
+
+  return {
+    data: rows,
+    page,
+    pageSize,
+    total,
+  };
+}
+
+const borrowBook = async (
+  userId: string,
+  bookId: string,
+  dueDate: string
+): Promise<BorrowBookResult> => {
+  try {
+    // Convert string to MySQL date format (YYYY-MM-DD) and add 1 day
+    const date = new Date(dueDate);
+
+    // Call the stored procedure
+    await pool.executeQuery(
+      'CALL BorrowBook(?, ?, ?, @checkoutId, @success, @message)',
+      [userId, bookId, date]
+    );
+
+    // Get the output parameters
+    const outputResults = (await pool.executeQuery(
+      'SELECT @checkoutId as checkoutId, @success as success, @message as message'
+    )) as BorrowBookOutput[];
+
+    const output = outputResults[0];
+
+    return {
+      success: Boolean(output.success),
+      message: output.message || 'Unknown error occurred',
+      checkoutId: output.checkoutId || undefined,
+    };
+  } catch (error) {
+    console.error('Error in borrowBook service:', error);
+    return {
+      success: false,
+      message: 'Failed to borrow book due to database error',
+    };
+  }
+};
+
+export const returnBook = async (
+  userId: string,
+  bookId: string
+): Promise<ReturnBookResult> => {
+  try {
+    // Call the stored procedure
+    await pool.executeQuery(
+      `
+            CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
+        `,
+      [userId, bookId]
+    );
+
+    // Get the output parameters
+    const outputResults = (await pool.executeQuery(`
+            SELECT @p_success as success, @p_message as message, @p_isLate as isLate
+        `)) as ReturnBookOutput[];
+
+    const output = outputResults[0];
+
+    return {
+      success: Boolean(output.success),
+      message: output.message,
+      isLate: Boolean(output.isLate),
+    };
+  } catch (error) {
+    console.error('Error in borrowBook service:', error);
+    return {
+      success: false,
+      message: 'Failed to return book due to database error',
+    };
+  }
+};
+
+const getBookById = async (bookId: string): Promise<BookDetails | null> => {
+  try {
+    const results = (await pool.executeQuery(
+      `SELECT b.*, p.name as publisherName 
+             FROM books b 
+             LEFT JOIN publishers p ON b.publisherId = p.id 
+             WHERE b.id = ?`,
+      [bookId]
+    )) as BookDetails[];
+
+    return results[0] || null;
+  } catch (error) {
+    console.error('Error getting book by ID:', error);
+    return null;
+  }
+};
+
+export default {
+  searchBooks,
+  borrowBook,
+  returnBook,
+  getBookById,
+};

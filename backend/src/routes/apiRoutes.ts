@@ -6,7 +6,7 @@ import readingSessionRouter from './ReadingSessionRoute';
 
 const apiRouter = Router();
 
-apiRouter.use('/usr', userRouter);
+apiRouter.use('/user', userRouter);
 apiRouter.use('/staff', staffRouter);
 apiRouter.use('/books', bookRouter);
 apiRouter.use('/reading-sessions', readingSessionRouter);

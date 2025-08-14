@@ -233,9 +233,25 @@ const getPool = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const executeQuery = async (query: string, params?: any[]) => {
+const executeQuery = async (query: string, params?: any[] | any) => {
   try {
-    const [results] = await pool.execute(query, params);
+    const normalizedParams: unknown[] =
+      params === undefined ? [] : Array.isArray(params) ? params : [params];
+
+    const placeholders = (query.match(/\?/g) || []).length;
+    if (placeholders !== normalizedParams.length) {
+      console.error('[SQL PARAM MISMATCH]', {
+        placeholders,
+        paramsLength: normalizedParams.length,
+        query,
+        params: normalizedParams,
+      });
+      throw new Error(
+        `SQL placeholder/param mismatch: expected ${placeholders}, got ${normalizedParams.length}`
+      );
+    }
+
+    const [results] = await pool.execute(query, normalizedParams);
     return results;
   } catch (error) {
     console.error('Error executing query:', error);
