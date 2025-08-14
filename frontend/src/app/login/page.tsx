@@ -22,8 +22,8 @@ export default function LoginPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <img
-          src="/placeholder.svg"
-          alt="Image"
+          src="/DB_cover_image.png"
+          alt="5aesiunhan cam sach"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
