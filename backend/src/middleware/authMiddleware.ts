@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwtService from '@/services/JwtServices';
+import jwtService from '../services/JwtServices';
 import { UserRole } from '../types';
 
 export interface AuthRequest extends Request {

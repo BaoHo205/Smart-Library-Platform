@@ -1,4 +1,4 @@
-import pool from '@/database/mysql/connection';
+import pool from '../database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 
 export interface BookSearchFilters {
