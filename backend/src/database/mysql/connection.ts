@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 
 dotenv.config();
 
@@ -219,8 +220,9 @@ const connect = async () => {
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
     }
+
   } catch (error) {
-    console.error('Error connecting to MySQL:', error);
+    console.error('❌ Error connecting to MySQL:', error);
     throw error;
   }
 };
@@ -254,7 +256,7 @@ const executeQuery = async (query: string, params?: any[] | any) => {
     const [results] = await pool.execute(query, normalizedParams);
     return results;
   } catch (error) {
-    console.error('Error executing query:', error);
+    console.error('❌ Error executing query:', query, params, error);
     throw error;
   }
 };
