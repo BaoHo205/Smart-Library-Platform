@@ -1,20 +1,27 @@
 import { Router } from 'express';
-import { ReadingSessionController } from '../controllers/ReadingSessionController';
+import {
+    startReadingSession,
+    endReadingSession,
+    addPagesRead,
+    addHighlight,
+    getAverageSessionTime,
+    getMostHighlightedBooks,
+    getTopBooksByReadTime
+} from '../controllers/ReadingSessionController';
 
 const router = Router();
-const readingSessionController = new ReadingSessionController();
 
 // management (route nhe )
-router.post('/start', readingSessionController.startReadingSession);
-router.post('/end/:sessionId', readingSessionController.endReadingSession);
+router.post('/start', startReadingSession);
+router.post('/end/:sessionId', endReadingSession);
 
 // data 
-router.post('/:sessionId/pages', readingSessionController.addPagesRead);
-router.post('/:sessionId/highlights', readingSessionController.addHighlight);
+router.post('/:sessionId/pages', addPagesRead);
+router.post('/:sessionId/highlights', addHighlight);
 
 // reporting 
-router.get('/avg-time', readingSessionController.getAverageSessionTime);
-router.get('/most-highlighted', readingSessionController.getMostHighlightedBooks);
-router.get('/top-books-time', readingSessionController.getTopBooksByReadTime);
+router.get('/avg-time', getAverageSessionTime);
+router.get('/most-highlighted', getMostHighlightedBooks);
+router.get('/top-books-time', getTopBooksByReadTime);
 
 export default router; 
