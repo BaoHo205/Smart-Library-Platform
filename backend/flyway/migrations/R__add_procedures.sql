@@ -2,6 +2,9 @@
 
 DROP PROCEDURE IF EXISTS BorrowBook;
 DROP PROCEDURE IF EXISTS ReturnBook;
+DROP PROCEDURE IF EXISTS AddNewBook;
+DROP PROCEDURE IF EXISTS UpdateBookInventory;
+DROP PROCEDURE IF EXISTS RetireBook;
 
 -- Create stored procedure for borrowing a book
 DELIMITER //
@@ -115,6 +118,269 @@ proc: BEGIN
     
     COMMIT;
 END//
+
+DELIMITER $$
+CREATE PROCEDURE AddNewBook(
+    IN p_title VARCHAR(500),
+    IN p_thumbnailUrl TEXT,
+    IN p_isbn VARCHAR(20),
+    IN p_quantity INT,
+    IN p_availableCopies INT,
+    IN p_pageCount INT,
+    IN p_publisherId VARCHAR(36),
+    IN p_description TEXT,
+    IN p_status ENUM('available', 'unavailable'),
+    IN p_authorIds TEXT,
+    IN p_genreIds TEXT,
+    IN p_staffId VARCHAR(36),
+    OUT p_bookId VARCHAR(36)
+)
+BEGIN
+    DECLARE v_authorId VARCHAR(36);
+    DECLARE v_genreId VARCHAR(36);
+    DECLARE v_pos INT DEFAULT 1;
+    DECLARE v_len INT DEFAULT 0;
+    DECLARE v_bookId VARCHAR(36); 
+
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred during book insertion';
+    END;
+
+    -- Start a transaction to ensure both book and author links are created atomically.
+    START TRANSACTION;
+    
+    -- Validate required inputs
+    IF p_title IS NULL OR p_authorIds IS NULL OR p_authorIds = ''  OR p_genreIds IS NULL OR p_genreIds = '' OR p_publisherId IS NULL OR p_publisherId = '' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Required fields (title, author_ids, p_genreIds, p_publisherId) cannot be null or empty';
+    END IF;
+
+    SET v_bookId = UUID();
+    SET p_bookId = v_bookId;
+
+    INSERT INTO books (
+        id,
+        title,
+        thumbnailUrl,
+        isbn,
+        quantity,
+        availableCopies,
+        pageCount,
+        publisherId,
+        description,
+        status,
+        createdAt,
+        updatedAt
+    ) VALUES (
+        v_bookId,
+        p_title,
+        p_thumbnailUrl,
+        p_isbn,
+        p_quantity,
+        p_availableCopies,
+        p_pageCount,
+        p_publisherId,
+        p_description,
+        p_status,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    );
+
+    -- Append trailing comma to ensure last author ID is processed
+    SET p_authorIds = CONCAT(p_authorIds, ',');
+
+    -- Loop through the comma-separated list of author IDs
+    SET v_len = LOCATE(',', p_authorIds, v_pos);
+    WHILE v_len > 0 DO
+        SET v_authorId = TRIM(SUBSTRING(p_authorIds, v_pos, v_len - v_pos));
+        
+        -- Check if the author ID is not empty
+        IF v_authorId <> '' THEN
+            -- Insert a record into the join table
+            INSERT INTO book_authors (bookId, authorId, createdAt, updatedAt)
+            VALUES (v_bookId, v_authorId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        END IF;
+
+        SET v_pos = v_len + 1;
+        SET v_len = LOCATE(',', p_authorIds, v_pos); -- Move to the next comma
+    END WHILE;
+
+    -- Append trailing comma to ensure last genre ID is processed
+    SET v_pos = 1;
+    SET v_len = 0;
+    SET p_genreIds = CONCAT(p_genreIds, ',');
+
+    -- Loop through the comma-separated list of author IDs
+    SET v_len = LOCATE(',', p_genreIds, v_pos);
+    WHILE v_len > 0 DO
+        SET v_genreId = TRIM(SUBSTRING(p_genreIds, v_pos, v_len - v_pos));
+        
+        -- Check if the author ID is not empty
+        IF v_genreId <> '' THEN
+            -- Insert a record into the join table
+            INSERT INTO book_genres (bookId, genreId, createdAt, updatedAt)
+            VALUES (v_bookId, v_genreId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        END IF;
+
+        SET v_pos = v_len + 1;
+        SET v_len = LOCATE(',', p_genreIds, v_pos); -- Move to the next comma
+    END WHILE;
+
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, v_bookId, 'CREATE', CONCAT('Added new book: "', p_title, '" (ID: ', v_bookId, ')'));
+
+    -- Commit the transaction if all operations were successful
+    COMMIT;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateBookInventory (
+    IN p_bookId VARCHAR(36),
+    IN p_newQuantity INT,
+    IN p_staffId VARCHAR(36)
+)
+BEGIN
+    DECLARE v_currentQuantity INT;
+    DECLARE v_quantityDiff INT;
+
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while updating book inventory';
+    END;
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Validate input
+    IF p_bookId IS NULL OR p_newQuantity < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID cannot be null and new quantity cannot be negative';
+    END IF;
+
+    -- Lock the row and get the current quantity to ensure consistency.
+    SELECT quantity INTO v_currentQuantity
+    FROM books
+    WHERE id = p_bookId FOR UPDATE;
+
+    -- Check if the book was found
+    IF v_currentQuantity IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book not found';
+    END IF;
+
+    -- Calculate the difference between the new and current quantity
+    SET v_quantityDiff = p_newQuantity - v_currentQuantity;
+
+    -- Update both quantity and availableCopies
+    UPDATE books
+    SET 
+        quantity = p_newQuantity,
+        availableCopies = availableCopies + v_quantityDiff,
+        updatedAt = CURRENT_TIMESTAMP
+    WHERE id = p_bookId;
+
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Updated inventory for book ID ', p_bookId, ' to ', p_newQuantity));
+
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE RetireBook(
+    IN p_bookId VARCHAR(36),
+    IN p_staffId VARCHAR(36)
+)
+BEGIN
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while retiring the book';
+    END;
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Validate input
+    IF p_bookId IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID cannot be null';
+    END IF;
+
+    -- Update the book's status to 'unavailable'
+    UPDATE books
+    SET
+        status = 'unavailable',
+        updatedAt = CURRENT_TIMESTAMP
+    WHERE id = p_bookId;
+
+    -- Check if a row was affected
+    IF ROW_COUNT() = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book not found';
+    END IF;
+
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Book ID ', p_bookId, ' retired'));
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+-- This procedure adds a log entry for staff actions, handling foreign key constraints.
+CREATE PROCEDURE AddStaffLog(
+    IN p_staffId VARCHAR(36),
+    IN p_bookId VARCHAR(36),
+    IN p_actionType VARCHAR(50),
+    IN p_actionDetails TEXT
+)
+BEGIN
+    -- Generate a unique ID for the new log entry
+    DECLARE v_logId VARCHAR(36);
+
+    -- This handler catches foreign key constraint errors and provides a specific message
+    DECLARE EXIT HANDLER FOR 1452 -- MySQL error code for 'Cannot add or update a child row: a foreign key constraint fails'
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Foreign key constraint failed in Staff_Logs. Check if staffId or bookId are valid.';
+    END;
+
+    SET v_logId = UUID();
+    -- Insert the new log entry into the Staff_Logs table with current timestamps
+    INSERT INTO staff_logs (
+        id,
+        userId,
+        bookId,
+        actionType,
+        actionDetails,
+        createdAt,
+        updatedAt
+    ) VALUES (
+        v_logId,
+        p_staffId,
+        p_bookId,
+        p_actionType,
+        p_actionDetails,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    );
+END $$
 
 DELIMITER ;
 

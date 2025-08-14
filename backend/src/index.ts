@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import cors from "cors";
 import mongoDBConnection from './database/mongodb/connection';
 import mysqlConnection from './database/mysql/connection';
 import authRouter from './routes/authRoutes';
 import authMiddleware from './middleware/authMiddleware';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/apiRoutes';
-import cors from 'cors';
+import bookRouter from './routes/bookRoutes';
 
 dotenv.config();
 
@@ -14,19 +15,18 @@ const app = express();
 const port = process.env.PORT || 5000;
 const appName = process.env.APP_NAME || 'Smart Library Platform';
 
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  })
-);
 
 app.get('/', (req: Request, res: Response) => {
   res.send(`Hello World from ${appName}! Let's get an HD!`);
@@ -35,13 +35,14 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/auth', authRouter);
 app.use(authMiddleware.verifyJWT);
 app.use('/api/v1', apiRouter);
+app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {
     console.log('🚀 Starting Smart Library Platform Backend...');
 
     // Connect to MongoDB
-    await mongoDBConnection.connect();
+    // await mongoDBConnection.connect();
 
     // Connect to MySQL
     await mysqlConnection.connect();
