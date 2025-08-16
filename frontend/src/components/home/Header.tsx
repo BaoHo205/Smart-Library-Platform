@@ -1,53 +1,108 @@
 'use client';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { ChevronsUpDown } from 'lucide-react';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/home-command';
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+import { Input } from '../ui/input';
+import Combobox from './ComboBox';
+import axiosInstance from '@/config/axiosConfig';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const Header = () => {
-  const [inputValue, setInputValue] = useState('');
+interface Options {
+  value: string;
+  label: string;
+}
+
+interface HeaderProps {
+  onCurrentGenreChange: (genre: string) => void;
+  onSearchParamChange: (param: string) => void;
+  onSearchInputChange: (input: string) => void; // Add input change handler
+  searchParam: string;
+  searchInput: string;
+  currentGenre: string;
+}
+
+const options: Options[] = [
+  {
+    value: 'title',
+    label: 'Title',
+  },
+  {
+    value: 'author',
+    label: 'Author',
+  },
+  {
+    value: 'publisher',
+    label: 'Publisher',
+  }
+];
+
+const Header: React.FC<HeaderProps> = ({
+  onCurrentGenreChange,
+  onSearchParamChange,
+  onSearchInputChange,
+  searchParam,
+  searchInput
+}) => {
+  const [genres, setGenres] = useState<Options[]>([]);
+
+  const fetchGenres = async (): Promise<void> => {
+    try {
+      const response = await axiosInstance.get<Options[]>('api/v1/genres');
+      setGenres(response.data);
+    } catch (error) {
+      console.error('Failed to fetch genres:', error);
+      setGenres([]); // Set empty array on error
+    }
+  };
+
+  useEffect(() => {
+    fetchGenres();
+  }, []);
 
   return (
     <header className="flex items-center justify-between">
       <div className="flex h-full gap-5">
-        <Command className="h-full w-sm rounded-b-sm border shadow-2xs">
-          <CommandInput
-            placeholder={'Type a command or search...'}
-            value={inputValue}
-            onValueChange={setInputValue}
-            className="h-full"
+        <div className="flex items-center h-full w-[25vw] rounded-lg border shadow-2xs p-1.5">
+          <Select value={searchParam} onValueChange={onSearchParamChange}>
+            <SelectTrigger className="w-[10rem] h-full rounded-md m-0 bg-neutral-100 font-medium">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            placeholder="Search books, authors, publishers..."
+            value={searchInput}
+            onChange={(e) => onSearchInputChange(e.target.value)}
+            className="h-full border-0 focus-visible:ring-0 rounded-r-none shadow-none"
           />
-
-          {inputValue && (
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem>Search Books</CommandItem>
-                <CommandItem>Search Authors</CommandItem>
-              </CommandGroup>
-            </CommandList>
-          )}
-        </Command>
-        <Button className="h-full bg-white text-neutral-900 shadow-sm hover:bg-white">
-          Category <ChevronsUpDown />
-        </Button>
+        </div>
+        <Combobox
+          options={genres}
+          optionName='genre'
+          className='h-full w-[12vw] rounded-lg'
+          onValueChange={onCurrentGenreChange}
+        />
       </div>
-      <div className="flex items-center gap-3 rounded-sm p-3 shadow-sm">
+      <div className="flex items-center gap-3 rounded-lg py-1.5 px-2.5 shadow-sm border">
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <span>Nhat Minh</span>
+        <span className='text-sm font-medium'>Nhat Minh</span>
       </div>
     </header>
   );
 };
+
 export default Header;

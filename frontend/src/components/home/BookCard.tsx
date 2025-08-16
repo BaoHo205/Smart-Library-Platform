@@ -5,36 +5,43 @@ import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
 
 export interface BookCardProps {
-  title: string;
-  author: string;
-  genres: string[];
-  imageUrl: string;
-  rating: number;
+  id: string,
+  title: string,
+  thumbnailUrl: string,
+  authors: string,
+  genres: string,
+  rating: number | 4.5;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
+  // id,
   title,
-  author,
+  authors,
   genres,
-  imageUrl,
+  // thumbnailUrl,
   rating,
 }) => {
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
         <h1 className="text-xl font-bold">{title}</h1>
-        <p className="text-muted-foreground text-sm">{author}</p>
+        <p className="text-muted-foreground text-sm">{authors}</p>
         <div className="flex gap-2">
-          {genres.map(genre => (
+          {/* {genres.map(genre => (
             <Badge variant={'default'} key={genre}>
               {genre}
+            </Badge>
+          ))} */}
+          {genres.split(',').map((genre) => (
+            <Badge variant={'default'} key={genre}>
+              {genre.trim()}
             </Badge>
           ))}
         </div>
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={imageUrl || '/default-image.png'}
+          src={'/default-image.png'}
           width={100}
           height={100}
           alt={title}
