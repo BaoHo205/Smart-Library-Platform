@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import UserService from '../services/UserService';
 
 const addReview = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Add book review'
+  // #swagger.description = 'Add a review for a book. Requires user or staff authentication.'
   try {
     const reviewData = req.body;
     if (!reviewData || Object.keys(reviewData).length === 0) {
@@ -34,6 +37,10 @@ const addReview = async (req: Request, res: Response) => {
 };
 
 const updateReview = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Update book review'
+  // #swagger.description = 'Update an existing book review by review ID. Requires user or staff authentication.'
+  // #swagger.parameters['reviewId'] = { description: 'Review ID to update', type: 'string' }
   try {
     const reviewId = req.params.reviewId;
     if (!reviewId) {
