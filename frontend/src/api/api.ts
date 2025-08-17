@@ -22,21 +22,28 @@ const login = async (loginData: LoginData): Promise<AuthResponse> => {
       localStorage.setItem('accessToken', response.data.data.accessToken);
     }
 
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Login failed');
+    return {
+      success: true,
+      message: response.data.message,
+      data: {
+        accessToken: response.data.data?.accessToken || '',
+      },
+    };
+  } catch (error) { 
+    console.error('Login failed:', error);
+    throw new Error()
   }
 };
 
-const logout = async (): Promise<void> => {
+export const logout = async (): Promise<void> => {
   try {
     localStorage.removeItem('accessToken');
 
     const response = await axiosInstance.post('/auth/logout');
 
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Logout failed');
+  } catch (error) {
+    console.error('Logout failed:', error);
   } finally {
     localStorage.removeItem('accessToken');
     window.location.href = '/login';

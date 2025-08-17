@@ -51,6 +51,7 @@ const login = async (req: Request, res: Response) => {
     const loginData = req.body;
     console.log('Login data:', loginData);
     const result = await authService.login(loginData);
+    console.log(result);
     if (!result) {
       return res
         .status(401)
@@ -66,6 +67,8 @@ const login = async (req: Request, res: Response) => {
       success: true,
       message: result.message,
       data: {
+        name: result.data.userName,
+        role: result.data.role,
         accessToken: result.data.accessToken,
       },
     });
