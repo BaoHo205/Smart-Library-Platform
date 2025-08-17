@@ -1,3 +1,4 @@
+import { logout } from '@/api/api';
 import { Button } from '@/components/ui/button';
 import {
   SidebarMenu,
@@ -7,13 +8,22 @@ import {
 import { LogOut } from 'lucide-react';
 
 export default function NavFooter() {
+  const handleLogout = async () => {
+    try {
+      console.log('Logging out...');
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton asChild className="w-full">
-          <Button>
+          <Button onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
-            <span>Logout</span>
+            <span>Log Out</span>
           </Button>
         </SidebarMenuButton>
       </SidebarMenuItem>
