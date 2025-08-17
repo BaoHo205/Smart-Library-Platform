@@ -4,39 +4,36 @@ const doc = {
   info: {
     version: '1.0',
     title: 'Smart Library Platform API',
-    description: 'API documentation for the Smart Library Platform'
+    description: 'API documentation for the Smart Library Platform',
   },
   servers: [
     {
       url: 'http://localhost:5000',
-      description: 'Local server'
-    }
+      description: 'Local server',
+    },
   ],
   tags: [
     {
       name: 'Auth',
-      description: 'Authentication-related endpoints'
+      description: 'Authentication-related endpoints',
     },
     {
       name: 'Books',
-      description: 'Book-related endpoints'
+      description: 'Book-related endpoints',
     },
     {
       name: 'Users',
-      description: 'User-related endpoints'
+      description: 'User-related endpoints',
     },
     {
       name: 'Staff',
-      description: 'Staff-related endpoints'
-    }
+      description: 'Staff-related endpoints',
+    },
   ],
-  components: {}
+  components: {},
 };
 
 const outputFile = './swagger-output.json';
-const routes = [
-  './routes/apiRoutes.ts',
-  './routes/authRoutes.ts',
-];
+const routes = ['./routes/apiRoutes.ts', './routes/authRoutes.ts'];
 
 swaggerAutogen()(outputFile, routes, doc);

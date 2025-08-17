@@ -39,7 +39,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(authMiddleware.verifyJWT);
 app.use('/api/v1', apiRouter);
 
-
 const run = async () => {
   try {
     console.log('🚀 Starting Smart Library Platform Backend...');

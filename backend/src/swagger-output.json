@@ -31,15 +31,11 @@
       "description": "Staff-related endpoints"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/user/reviews/add": {
       "post": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Add book review",
         "description": "Add a review for a book. Requires user or staff authentication.",
         "responses": {
@@ -57,9 +53,7 @@
     },
     "/user/reviews/update/{reviewId}": {
       "put": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Update book review",
         "description": "Update an existing book review by review ID. Requires user or staff authentication.",
         "parameters": [
@@ -86,9 +80,7 @@
     },
     "/staff/most-borrowed-books": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get most borrowed books",
         "description": "Retrieve statistics of the most frequently borrowed books. Staff access required.",
         "parameters": [
@@ -118,9 +110,7 @@
     },
     "/staff/top-active-readers": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get top active readers",
         "description": "Retrieve statistics of the most active library users/readers. Staff access required.",
         "responses": {
@@ -135,9 +125,7 @@
     },
     "/staff/low-availability": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get books with low availability",
         "description": "Retrieve books that have low availability/stock levels. Staff access required.",
         "responses": {
@@ -152,9 +140,7 @@
     },
     "/books/": {
       "get": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Get books",
         "description": "Search and retrieve books based on query parameters such as title, author, and genre.",
         "parameters": [
@@ -219,9 +205,7 @@
     },
     "/books/borrow/{bookId}": {
       "post": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Borrow a book",
         "description": "Borrow a specific book by its ID. Requires user authentication.",
         "parameters": [
@@ -263,9 +247,7 @@
     },
     "/books/return/{bookId}": {
       "put": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Return a book",
         "description": "Return a borrowed book by its ID. Requires user authentication.",
         "parameters": [
@@ -305,9 +287,7 @@
     },
     "/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register new user",
         "description": "Create a new user account with email and password",
         "responses": {
@@ -325,9 +305,7 @@
     },
     "/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User login",
         "description": "Authenticate user and return access and refresh tokens",
         "responses": {
@@ -345,9 +323,7 @@
     },
     "/refresh": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Refresh access token",
         "description": "Generate a new access token using refresh token",
         "responses": {
@@ -365,9 +341,7 @@
     },
     "/logout": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User logout",
         "description": "Logout user and invalidate tokens",
         "responses": {
