@@ -196,3 +196,5 @@ proc: BEGIN
     
     COMMIT;
 END //
+
+DELIMITER ;

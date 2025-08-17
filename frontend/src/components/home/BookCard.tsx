@@ -24,8 +24,8 @@ const BookCard: React.FC<BookCardProps> = ({
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <h1 className="text-xl font-bold">{title}</h1>
-        <p className="text-muted-foreground text-sm">{authors}</p>
+        <h1 className="text-xl font-bold text-ellipsis text-nowrap overflow-hidden">{title}</h1>
+        <p className="text-muted-foreground text-sm text-ellipsis text-nowrap overflow-hidden">{authors}</p>
         <div className="flex gap-2">
           {/* {genres.map(genre => (
             <Badge variant={'default'} key={genre}>
