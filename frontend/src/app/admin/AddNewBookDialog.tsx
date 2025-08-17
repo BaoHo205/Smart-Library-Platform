@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -24,38 +23,31 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"; // Adjust this import path as needed
+} from "@/components/ui/form";
 import { Plus, Minus } from "lucide-react";
 import { ComboboxWithCreate } from "./ComboboxWithCreate";
-
-export interface Publisher {
-    id?: string;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-export interface Author {
-    id?: string;
-    firstName: string;
-    lastName: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import axiosInstance from "@/config/axiosConfig";
+import { useDataStore } from '@/lib/useDataStore';
 
 const formSchema = z.object({
     bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
-    isbn: z.string().optional(),
+    isbn: z.string({ message: "ISBN is required" }).min(5, { message: "ISBN is at least 5 chars." }),
     publisher: z.string().min(1, { message: "Publisher is required." }),
-    author: z.string().min(1, { message: "Author is required." }),
+    author: z.array(z.string()).min(1, { message: "At least one author is required." }),
+    genre: z.array(z.string()).min(1, { message: "At least one genre is required." }),
     thumbnailLink: z.string().url({ message: "Invalid URL." }).optional(),
-    bookQuantity: z.number().min(0, { message: "Quantity cannot be negative." }),
-    description: z.string().optional(),
+    bookQuantity: z.number({ message: "Quantity is required." }).min(1, { message: "Quantity cannot be negative." }),
+    description: z.string({ message: "Book description is required." }).min(200, { message: "Book description must above 200 chars" }),
+    pageCount: z.number({ message: "Page count is required." }).min(10, { message: "The number of book pages is larger than 10" })
 });
 
-export function AddNewBookDialog() {
+export const AddNewBookDialog = () => {
     const [open, setOpen] = useState(false);
-    const [publisherList, setPublisherList] = useState<Publisher[]>([]);
-    const [authorList, setAuthorList] = useState<Author[]>([]);
+    const publisherList = useDataStore((s) => s.publisherList);
+    const authorList = useDataStore((s) => s.authorList);
+    const genreList = useDataStore((s) => s.genreList);
+    const addPublisher = useDataStore((s) => s.addPublisher);
+    const addAuthor = useDataStore((s) => s.addAuthor);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -63,53 +55,70 @@ export function AddNewBookDialog() {
             bookTitle: "",
             isbn: "",
             publisher: "",
-            author: "",
+            author: [], // Change this to an empty array
+            genre: [],
             thumbnailLink: "",
             bookQuantity: 0,
             description: "",
+            pageCount: 0,
         },
     });
 
-    useEffect(() => {
-        if (open) {
-            // Simulate fetching data from backend
-            setPublisherList([{ id: "pub1", name: "FTECH", createdAt: new Date(), updatedAt: new Date() }]);
-            setAuthorList([{ id: "auth1", firstName: "Robert", lastName: "Ludke", createdAt: new Date(), updatedAt: new Date() }]);
-        }
-    }, [open]);
-
-    const handleNewPublisher = async (name: string) => {
-        console.log("Creating new publisher:", name);
-        // 1. Simulate API call and get the new publisher object
-        const newPublisherId = `pub${Date.now()}`;
-        const newPublisher = { id: newPublisherId, name: name, createdAt: new Date(), updatedAt: new Date() };
-
-        // 2. Update the state with the new publisher
-        setPublisherList([...publisherList, newPublisher]);
-
-        // 3. Set the form value to the new publisher's ID
-        form.setValue("publisher", newPublisher.id as string);
+    const handleCreatePublisher = async (name: string) => {
+        const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
+        console.log(createdPublisher.data.data[0]);
+        addPublisher(createdPublisher.data.data[0]);
+        const publisherId = createdPublisher.data.data[0].id
+        console.log(publisherId)
+        form.setValue("publisher", publisherId);
     };
 
-    const handleNewAuthor = async (fullName: string) => {
-        console.log("Creating new author:", fullName);
+    const handleCreateAuthor = async (
+        fullName: string
+    ) => {
         const [firstName, ...lastNameParts] = fullName.split(' ');
         const lastName = lastNameParts.join(' ');
 
-        // 1. Simulate API call and get the new author object
-        const newAuthorId = `auth${Date.now()}`;
-        const newAuthor = { id: newAuthorId, firstName: firstName, lastName: lastName, createdAt: new Date(), updatedAt: new Date() };
+        const created = await axiosInstance.post("/api/v1/authors/create", { firstName, lastName });
+        const authorId = created.data.data[0].id
 
-        // 2. Update the state with the new author
-        setAuthorList([...authorList, newAuthor]);
+        addAuthor(created.data.data[0]);
 
-        // 3. Set the form value to the new author's ID
-        form.setValue("author", newAuthor.id as string);
+        // This is a crucial change: add the new author ID to the existing array
+        const currentAuthors = form.getValues("author");
+        form.setValue("author", [...currentAuthors, authorId]);
     };
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        console.log("Submitting values:", values);
+        // Convert the arrays of IDs to comma-separated strings
+        const authorIdsString = values.author.join(',');
+        const genreIdsString = values.genre.join(',');
+
+        try {
+            const newBookData = {
+                title: values.bookTitle,
+                thumbnailUrl: values.thumbnailLink || null,
+                isbn: values.isbn || null,
+                quantity: values.bookQuantity,
+                pageCount: values.pageCount,
+                publisherId: values.publisher,
+                description: values.description || null,
+                status: "available",
+                authorIds: authorIdsString,
+                genreIds: genreIdsString,
+                staffId: "",
+            };
+            const response = await axiosInstance.post('/api/v1/books/add', newBookData);
+            // console.log("Book created successfully:", response.data);
+            form.reset();
+            setOpen(false);
+        } catch (error) {
+            console.error('Error creating new book:', error);
+        }
+
         setOpen(false);
+        form.reset(); // Reset form after successful submission or for a new entry
     }
 
     const handleQuantityChange = (delta: number) => {
@@ -117,13 +126,24 @@ export function AddNewBookDialog() {
         form.setValue("bookQuantity", Math.max(0, currentQuantity + delta));
     };
 
+    const handlePageChange = (delta: number) => {
+        const currentPage = form.getValues("pageCount");
+        form.setValue("pageCount", Math.max(0, currentPage + delta));
+    }
+
     const publisherOptions = publisherList.map(p => ({
         id: p.id!,
         label: p.name,
     }));
+
     const authorOptions = authorList.map(a => ({
         id: a.id!,
         label: `${a.firstName} ${a.lastName}`,
+    }));
+
+    const genreOptions = genreList.map(g => ({
+        id: g.id!,
+        label: `${g.name}`,
     }));
 
     return (
@@ -163,18 +183,19 @@ export function AddNewBookDialog() {
                                 )}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                             <FormField
                                 control={form.control}
                                 name="publisher"
                                 render={({ field }) => (
                                     <FormItem>
+                                        <FormLabel>Publisher</FormLabel>
                                         <FormControl>
                                             <ComboboxWithCreate
                                                 items={publisherOptions}
                                                 value={field.value}
                                                 onValueChange={field.onChange}
-                                                onNewItem={handleNewPublisher}
+                                                onNewItem={handleCreatePublisher}
                                                 placeholder="Select or add publisher..."
                                                 searchPlaceholder="Search publisher..."
                                                 emptyMessage="No publisher found."
@@ -185,21 +206,50 @@ export function AddNewBookDialog() {
                                     </FormItem>
                                 )}
                             />
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
                             <FormField
                                 control={form.control}
                                 name="author"
                                 render={({ field }) => (
                                     <FormItem>
+                                        <FormLabel>Author</FormLabel>
                                         <FormControl>
                                             <ComboboxWithCreate
                                                 items={authorOptions}
                                                 value={field.value}
                                                 onValueChange={field.onChange}
-                                                onNewItem={handleNewAuthor}
-                                                placeholder="Select or add author..."
-                                                searchPlaceholder="Search author..."
+                                                onNewItem={handleCreateAuthor}
+                                                placeholder="Select or add author(s)..."
+                                                searchPlaceholder="Search author(s)..."
                                                 emptyMessage="No author found."
                                                 label="Author"
+                                                multiple // Enable multi-select for authors
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="genre"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Genre</FormLabel>
+                                        <FormControl>
+                                            <ComboboxWithCreate
+                                                items={genreOptions}
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                                onNewItem={() => { }}
+                                                placeholder="Select or add genre(s)..."
+                                                searchPlaceholder="Search genre(s)..."
+                                                emptyMessage="No genre found."
+                                                label="Genre"
+                                                multiple // Enable multi-select for authors
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -221,31 +271,62 @@ export function AddNewBookDialog() {
                                     </FormItem>
                                 )}
                             />
-                            <div className="flex flex-col gap-1.5">
-                                <Label htmlFor="bookQuantity">Book Quantity</Label>
-                                <div className="flex items-center space-x-2">
-                                    <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)}>
-                                        <Minus className="h-4 w-4" />
-                                    </Button>
-                                    <FormField
-                                        control={form.control}
-                                        name="bookQuantity"
-                                        render={({ field }) => (
-                                            <Input
-                                                id="bookQuantity"
-                                                type="number"
-                                                value={field.value}
-                                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                                className="w-16 text-center"
-                                            />
-                                        )}
-                                    />
-                                    <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
-                                        <Plus className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                                <FormMessage />
-                            </div>
+                            <FormField
+                                control={form.control}
+                                name="bookQuantity"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel htmlFor="bookQuantity">Book Quantity</FormLabel>
+                                        <div className="flex items-center space-x-2">
+                                            <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)}>
+                                                <Minus className="h-4 w-4" />
+                                            </Button>
+                                            <FormControl>
+                                                <Input
+                                                    id="bookQuantity"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    className="w-16 text-center"
+                                                />
+                                            </FormControl>
+                                            <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="pageCount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel htmlFor="pageCount">Book Pages</FormLabel>
+                                        <div className="flex items-center space-x-2">
+                                            <Button type="button" variant="outline" size="icon" onClick={() => handlePageChange(-1)}>
+                                                <Minus className="h-4 w-4" />
+                                            </Button>
+                                            <FormControl>
+                                                <Input
+                                                    id="pageCount"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    className="w-16 text-center"
+                                                />
+                                            </FormControl>
+                                            <Button type="button" variant="outline" size="icon" onClick={() => handlePageChange(1)}>
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                         <FormField
                             control={form.control}
@@ -271,4 +352,4 @@ export function AddNewBookDialog() {
             </DialogContent>
         </Dialog>
     );
-}
+};

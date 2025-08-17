@@ -5,23 +5,27 @@ import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { EditBookDialog } from "./EditBookDialog"
+import { Badge } from "@/components/ui/badge"
 
 export type BookShow = {
-    thumbnail_url: string
+    thumbnailUrl: string
+    isbn: string
     id: string
     title: string
     author: string
-    publisher: string
-    genre: [string]
+    publisherName: string
+    authors: string
+    genres: string
     quantity: number
+    description: string
 }
 
 export const columns: ColumnDef<BookShow>[] = [
     {
-        accessorKey: "thumbnail_url",
+        accessorKey: "thumbnailUrl",
         header: "Book Image",
         cell: ({ row }) => {
-            const url = row.getValue("thumbnail_url") as string;
+            const url = row.getValue("thumbnailUrl") as string;
             return (
                 <img
                     src={url}
@@ -32,24 +36,49 @@ export const columns: ColumnDef<BookShow>[] = [
         },
     },
     {
-        accessorKey: "id",
-        header: "Book ID",
+        accessorKey: "isbn",
+        header: "ISBN",
     },
     {
         accessorKey: "title",
         header: "Book Name",
     },
     {
-        accessorKey: "author",
+        accessorKey: "authors",
         header: "Book Author",
+        cell: ({ row }) => {
+            const authors: string[] = (row.getValue("authors") as string).split(", ");
+            return (
+                <div className="flex flex-col gap-2 items-center">
+                    {authors.map((author, index) => (
+                        <Badge key={index} variant="outline">
+                            {author.trim()}
+                        </Badge>
+                    ))}
+                </div>
+            )
+        }
     },
     {
-        accessorKey: "publisher",
+        accessorKey: "publisherName",
         header: "Publisher",
     },
     {
-        accessorKey: "genre",
+        accessorKey: "genres",
         header: "Genre",
+        cell: ({ row }) => {
+            const genres: string[] = (row.getValue("genres") as string).split(", ");
+            return (
+                <div className="flex flex-col gap-2 items-center">
+                    {genres.map((genre, index) => (
+                        <Badge key={index} variant="outline">
+                            {genre.trim()}
+                        </Badge>
+                    ))}
+                </div>
+            );
+
+        }
     },
     {
         accessorKey: "quantity",
@@ -57,6 +86,7 @@ export const columns: ColumnDef<BookShow>[] = [
     },
     {
         id: "edit",
+        header: "Action",
         cell: ({ row }) => {
             const book = row.original;
             return (

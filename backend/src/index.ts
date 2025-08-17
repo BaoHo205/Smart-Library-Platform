@@ -18,6 +18,7 @@ const appName = process.env.APP_NAME || 'Smart Library Platform';
 app.use(cors({
   origin: ['http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true
 }));
 
@@ -35,7 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/auth', authRouter);
 app.use(authMiddleware.verifyJWT);
 app.use('/api/v1', apiRouter);
-app.use('/api/books', bookRouter)
+// app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {

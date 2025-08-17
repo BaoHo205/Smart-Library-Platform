@@ -232,9 +232,10 @@ BEGIN
 
     -- Log the staff action
     CALL AddStaffLog(p_staffId, v_bookId, 'CREATE', CONCAT('Added new book: "', p_title, '" (ID: ', v_bookId, ')'));
-
+    
     -- Commit the transaction if all operations were successful
     COMMIT;
+
 END $$
 DELIMITER ;
 
@@ -462,3 +463,55 @@ proc: BEGIN
     
     COMMIT;
 END //
+
+DELIMITER //
+
+CREATE PROCEDURE CreateAuthor(
+    IN p_firstName VARCHAR(255),
+    IN p_lastName VARCHAR(255)
+)
+BEGIN
+    -- Generate a unique ID for the new author
+    DECLARE v_authorId VARCHAR(36);
+
+    SET v_authorId = UUID();
+
+    START TRANSACTION;
+
+    INSERT INTO authors (id, firstName, lastName, createdAt, updatedAt)
+    VALUES (v_authorId, p_firstName, p_lastName, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    -- Return the inserted author
+    SELECT id, firstName, lastName
+    FROM authors
+    WHERE id = v_authorId;
+
+    COMMIT;
+END //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE CreatePublisher(
+    IN p_name VARCHAR(255)
+)
+BEGIN
+    -- Generate a unique ID for the new publisher
+    DECLARE v_publisherId VARCHAR(36);
+
+    SET v_publisherId = UUID();
+
+    START TRANSACTION;
+
+    INSERT INTO publishers (id, name, createdAt, updatedAt)
+    VALUES (v_publisherId, p_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    -- Return the inserted author
+    SELECT id, name
+    FROM publishers
+    WHERE id = v_publisherId;
+
+    COMMIT;
+END //
+
+DELIMITER ;

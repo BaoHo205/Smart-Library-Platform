@@ -17,7 +17,8 @@ export const axiosInstance = axios.create({
 // Request interceptor - adds auth token to requests
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('accessToken');
+        // const token = localStorage.getItem('accessToken');
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmQ4Mzc2Mi0yODEyLTRhZTYtODYyMy0xOTBmYjU2Mzc4NjUiLCJyb2xlIjoidXNlciIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTU0NDkyMjIsImV4cCI6MTc1NTQ1MTAyMn0.HMIeNgg4QYzY12B5Xt_MjxbqO6QwwmojxgVYW8aAyo8";
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -35,7 +36,7 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config;
-        
+
         if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
             originalRequest._retry = true;
 
@@ -46,12 +47,12 @@ axiosInstance.interceptors.response.use(
                     const response = await axios.post('http://localhost:5000/auth/refresh', {
                         withCredentials: true
                     });
-                    
+
                     const newToken = response.data?.data?.accessToken;
                     if (newToken) {
                         localStorage.setItem('accessToken', newToken);
                     }
-                    
+
                     // Resolve all waiting requests
                     waiters.forEach((waiter) => waiter());
                     waiters = [];
@@ -69,7 +70,7 @@ axiosInstance.interceptors.response.use(
             await new Promise<void>((resolve) => waiters.push(resolve));
             return axiosInstance(originalRequest);
         }
-        
+
         return Promise.reject(error);
     }
 );

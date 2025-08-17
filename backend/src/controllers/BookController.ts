@@ -80,7 +80,7 @@ const getBooks = async (
 
     res.status(200).json({
       success: true,
-      data: result,
+      result
     });
   } catch (err) {
     console.error('Error retrieving books:', err);

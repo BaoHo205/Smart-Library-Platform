@@ -280,17 +280,52 @@ const returnBook = async (
   }
 };
 
-const getBookById = async (bookId: string): Promise<BookDetails | null> => {
+const getBookById = async (bookId: string): Promise<BookListItem | null> => {
   try {
-    const results = (await pool.executeQuery(
-      `SELECT b.*, p.name as publisherName 
-             FROM books b 
-             LEFT JOIN publishers p ON b.publisherId = p.id 
-             WHERE b.id = ?`,
-      [bookId]
-    )) as BookDetails[];
+    // Define clause for a specific book ID
+    const where: string[] = ['b.id = ?'];
+    const params: SqlParam[] = [bookId];
 
-    return results[0] || null;
+    // Where clause
+    const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    // Base FROM clause
+    const baseFrom = `
+    FROM books b
+    JOIN publishers p ON p.id = b.publisherId
+    LEFT JOIN (
+      SELECT ba.bookId, GROUP_CONCAT(CONCAT(a.firstName, ' ', a.lastName) ORDER BY a.lastName SEPARATOR ', ') AS authors
+      FROM book_authors ba
+      JOIN authors a ON a.id = ba.authorId
+      GROUP BY ba.bookId
+    ) AS authors ON authors.bookId = b.id
+    LEFT JOIN (
+      SELECT bg.bookId, GROUP_CONCAT(g.name ORDER BY g.name SEPARATOR ', ') AS genres
+      FROM book_genres bg
+      JOIN genres g ON g.id = bg.genreId
+      GROUP BY bg.bookId
+    ) AS genres ON genres.bookId = b.id
+  `;
+
+    // Main query
+    const sql = `
+    SELECT
+      b.id,
+      b.title,
+      b.thumbnailUrl,
+      b.isbn,
+      b.pageCount,
+      b.quantity,
+      b.availableCopies,
+      p.name AS publisherName,
+      COALESCE(authors.authors, '') AS authors,
+      COALESCE(genres.genres, '') AS genres
+    ${baseFrom}
+    ${whereSql}
+    LIMIT 1
+  `;
+    const result = (await pool.executeQuery(sql, params)) as BookListItem[];
+
+    return result[0] || null;
   } catch (error) {
     console.error('Error getting book by ID:', error);
     return null;
@@ -340,7 +375,7 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> =
       bookData.isbn || null,
       bookData.quantity || null,
       bookData.quantity || null,
-      bookData.pageCount || null,
+      bookData.pageCount || 500,
       bookData.publisherId || null,
       bookData.description || null,
       bookData.status || 'available',
@@ -353,12 +388,18 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> =
     await pool.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const selectRows = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow;
+    const result = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow[];
 
-    if (!selectRows) {
+    if (!result) {
       throw new Error('Failed to retrieve new book ID from procedure');
     }
-    return selectRows.id;
+
+    console.log(result[0].id)
+
+    const book = await getBookById(result[0].id);
+    console.log(book)
+
+    return result[0].id;
   } catch (error) {
     console.error('Error in bookService.addNewBook:', error);
     if (error instanceof Error) {
@@ -384,9 +425,6 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
 
     const results = await mysqlConnection.executeQuery(procedure, params);
 
-    // Stored procedures don't return affectedRows directly, so we'll assume success if no error is thrown
-    // and handle logic in the procedure itself. We can check the result set for a status if the procedure provides one.
-    // For now, we'll return true on successful execution.
     return true;
   } catch (error) {
     console.error(`Error in bookService.updateBookInventory for ID ${bookId}:`, error);
@@ -412,7 +450,7 @@ const retireBook = async (bookId: string, staffId: string): Promise<boolean> => 
     const params = [bookId, staffId];
 
     const results = await mysqlConnection.executeQuery(procedure, params);
-    return true; // Assume success if the procedure call doesn't throw an error
+    return true;
   } catch (error) {
     console.error(`Error in bookService.retireBook for ID ${bookId}:`, error);
     if (error instanceof Error) {
