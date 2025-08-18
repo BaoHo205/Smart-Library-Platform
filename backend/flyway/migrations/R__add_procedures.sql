@@ -468,6 +468,10 @@ proc: BEGIN
     
     -- Insert or update review based on whether it already exists
     IF v_existing_review > 0 THEN
+        SELECT id INTO p_reviewId
+        FROM reviews
+        WHERE userId = p_userId AND bookId = p_bookId;
+        
         UPDATE reviews
         SET rating = p_rating,
             comment = p_comment,
@@ -476,7 +480,6 @@ proc: BEGIN
         
         SET p_success = TRUE;
         SET p_message = 'Review updated successfully';
-        SET p_reviewId = NULL; -- No new review ID needed for updates
     ELSE
         SET p_reviewId = UUID();
         INSERT INTO reviews (
