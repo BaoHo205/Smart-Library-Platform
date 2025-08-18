@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/api/api";
 
+
 export function LoginForm({
   className,
   ...props
@@ -23,43 +24,43 @@ export function LoginForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    
+
     console.log('Input changed:', { id, value }); // Debug log
-    
+
     setFormData(prevData => ({
       ...prevData,
       [id]: value
     }));
-    
+
     // Clear error when user starts typing
     if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     console.log('Form submitted with data:', formData); // Debug log
-    
+
     // Validate form data
     if (!formData.username.trim()) {
       setError('Username is required');
       return;
     }
-    
+
     if (!formData.password.trim()) {
       setError('Password is required');
       return;
     }
-    
+
     setLoading(true);
     setError('');
 
     try {
-      
+
       const response = await api.login(formData);
-      
+
       if (response.success) {
-        router.push('/'); 
+        router.push('/');
       } else {
         setError(response.message || 'Login failed');
       }
@@ -71,7 +72,7 @@ export function LoginForm({
     }
   };
   return (
-    <form className={cn("flex flex-col gap-6", className)}  onSubmit={handleSubmit} {...props}>
+    <form className={cn('flex flex-col gap-6', className)} onSubmit={ handleSubmit } {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -93,7 +94,7 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required onChange={handleChange} value={formData.password}/>
+          <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
         </div>
         <Button type="submit" className="w-full" >
           Login

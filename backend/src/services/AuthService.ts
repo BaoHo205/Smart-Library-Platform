@@ -72,7 +72,7 @@ const login = async (loginData: ILoginData) => {
       [loginData.username]
     )) as Array<{
       id: string;
-      username: string;
+      userName: string;
       password: string;
       role: UserRole;
     }>;
@@ -101,7 +101,16 @@ const login = async (loginData: ILoginData) => {
     const accessToken = await jwtService.generateAccessToken(payload);
     const refreshToken = await jwtService.generateRefreshToken(payload);
 
-    return { message: 'Login successful', data: { accessToken, refreshToken } };
+    return {
+      message: 'Login successful',
+      data: {
+        userId: existingUser[0].id,
+        userName: existingUser[0].userName,
+        role: existingUser[0].role,
+        accessToken,
+        refreshToken,
+      },
+    };
   } catch (error) {
     throw new Error(
       `${error instanceof Error ? error.message : 'Unknown error'}`

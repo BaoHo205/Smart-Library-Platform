@@ -151,4 +151,6 @@ pnpm-lock.yaml
 # Vercel
 .vercel
 
-
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

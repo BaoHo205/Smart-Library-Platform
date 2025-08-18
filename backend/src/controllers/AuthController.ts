@@ -18,6 +18,9 @@ const accessCookieOptions: CookieOptions = {
 };
 
 const register = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Register new user'
+  // #swagger.description = 'Create a new user account with email and password'
   try {
     const registrationData = req.body;
     const result = await authService.register(registrationData);
@@ -41,10 +44,14 @@ const register = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'User login'
+  // #swagger.description = 'Authenticate user and return access and refresh tokens'
   try {
     const loginData = req.body;
     console.log('Login data:', loginData);
     const result = await authService.login(loginData);
+    console.log(result);
     if (!result) {
       return res
         .status(401)
@@ -60,6 +67,9 @@ const login = async (req: Request, res: Response) => {
       success: true,
       message: result.message,
       data: {
+        id: result.data.userId,
+        name: result.data.userName,
+        role: result.data.role,
         accessToken: result.data.accessToken,
       },
     });
@@ -72,6 +82,9 @@ const login = async (req: Request, res: Response) => {
 };
 
 const generateNewAccessToken = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Refresh access token'
+  // #swagger.description = 'Generate a new access token using refresh token'
   try {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
@@ -115,6 +128,9 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
 };
 
 const logout = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'User logout'
+  // #swagger.description = 'Logout user and invalidate tokens'
   try {
     const cookies = req.cookies;
 

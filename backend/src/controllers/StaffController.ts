@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import StaffService from '../services/StaffService';
 
 const getMostBorrowedBooks = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Staff']
+  // #swagger.summary = 'Get most borrowed books'
+  // #swagger.description = 'Retrieve statistics of the most frequently borrowed books. Staff access required.'
   try {
     const { startDate, endDate } = req.query;
 
@@ -57,6 +60,9 @@ const getMostBorrowedBooks = async (req: Request, res: Response) => {
 };
 
 const getTopActiveReaders = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Staff']
+  // #swagger.summary = 'Get top active readers'
+  // #swagger.description = 'Retrieve statistics of the most active library users/readers. Staff access required.'
   try {
     const result = await StaffService.getTopActiveReaders();
     res.status(200).json({
@@ -73,6 +79,9 @@ const getTopActiveReaders = async (req: Request, res: Response) => {
 };
 
 const getBooksWithLowAvailability = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Staff']
+  // #swagger.summary = 'Get books with low availability'
+  // #swagger.description = 'Retrieve books that have low availability/stock levels. Staff access required.'
   try {
     const response = await StaffService.getBooksWithLowAvailability();
     res.status(200).json({
