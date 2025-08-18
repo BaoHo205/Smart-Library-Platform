@@ -189,7 +189,6 @@ export const AddNewBookDialog = () => {
                                 name="publisher"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Publisher</FormLabel>
                                         <FormControl>
                                             <ComboboxWithCreate
                                                 items={publisherOptions}
@@ -213,7 +212,6 @@ export const AddNewBookDialog = () => {
                                 name="author"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Author</FormLabel>
                                         <FormControl>
                                             <ComboboxWithCreate
                                                 items={authorOptions}
@@ -238,7 +236,6 @@ export const AddNewBookDialog = () => {
                                 name="genre"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Genre</FormLabel>
                                         <FormControl>
                                             <ComboboxWithCreate
                                                 items={genreOptions}
