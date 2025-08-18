@@ -35,6 +35,41 @@
     "http"
   ],
   "paths": {
+    "/user/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "description": "Get current user profile information using JWT token.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/user/reviews/add": {
       "post": {
         "tags": [
@@ -217,6 +252,67 @@
         }
       }
     },
+    "/books/{bookId}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get book information by ID",
+        "description": "Retrieve detailed information about a specific book by its ID.",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Book ID to retrieve information for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/{bookId}/reviews": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get all reviews for a specific book",
+        "description": "Retrieve all reviews for a specific book by its ID with user information.",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Book ID to retrieve reviews for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/books/borrow/{bookId}": {
       "post": {
         "tags": [
@@ -307,6 +403,31 @@
         }
       }
     },
+    "/checkouts/{userId}": {
+      "get": {
+        "tags": [
+          "Checkouts"
+        ],
+        "summary": "Get all checkouts by user ID",
+        "description": "Retrieve a list of all checkouts for a specific user.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/register": {
       "post": {
         "tags": [
@@ -375,6 +496,9 @@
         "summary": "User logout",
         "description": "Logout user and invalidate tokens",
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "204": {
             "description": "No Content"
           },
