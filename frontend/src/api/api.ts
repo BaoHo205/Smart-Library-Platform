@@ -20,6 +20,7 @@ const login = async (loginData: LoginData): Promise<AuthResponse> => {
     // Store access token in localStorage
     if (response.data.data?.accessToken) {
       localStorage.setItem('accessToken', response.data.data.accessToken);
+      localStorage.setItem('userId', response.data.data.id);
     }
 
     return {

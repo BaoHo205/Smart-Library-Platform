@@ -104,6 +104,7 @@ const login = async (loginData: ILoginData) => {
     return {
       message: 'Login successful',
       data: {
+        userId: existingUser[0].id,
         userName: existingUser[0].userName,
         role: existingUser[0].role,
         accessToken,

@@ -23,7 +23,8 @@ const BookCard: React.FC<BookCardProps> = ({
   // thumbnailUrl,
   rating,
 }) => {
-  const { checkouts, setCheckouts } = useUserProfile('a331b5fe-9707-4ac5-ae58-88cc47abe34e');
+  const userId = localStorage.getItem('userId') as string;
+  const { checkouts, setCheckouts } = useUserProfile(userId);
 
   const handleBorrow = async () => {
     try {

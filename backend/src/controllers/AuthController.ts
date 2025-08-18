@@ -67,6 +67,7 @@ const login = async (req: Request, res: Response) => {
       success: true,
       message: result.message,
       data: {
+        id: result.data.userId,
         name: result.data.userName,
         role: result.data.role,
         accessToken: result.data.accessToken,
