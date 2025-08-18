@@ -60,7 +60,7 @@ const Combobox: React.FC<ComboboxProps> = ({
         >
           {value
             ? options.find((option) => option.label === value)?.label
-            : `Select ${optionName.charAt(0).toUpperCase() + optionName.slice(1)}`}
+            : 'All Genres'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>

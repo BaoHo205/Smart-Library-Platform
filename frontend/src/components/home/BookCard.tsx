@@ -3,6 +3,8 @@ import { Card, CardHeader, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
+import axiosInstance from '@/config/axiosConfig';
+import useUserProfile from '@/hooks/useUserProfile';
 
 export interface BookCardProps {
   id: string,
@@ -14,13 +16,38 @@ export interface BookCardProps {
 }
 
 const BookCard: React.FC<BookCardProps> = ({
-  // id,
+  id,
   title,
   authors,
   genres,
   // thumbnailUrl,
   rating,
 }) => {
+  const { checkouts, setCheckouts } = useUserProfile('a331b5fe-9707-4ac5-ae58-88cc47abe34e');
+
+  const handleBorrow = async () => {
+    try {
+      const response = await axiosInstance.post(`/api/v1/books/borrow/${id}`, {
+        "dueDate": Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days from now
+      });
+      setCheckouts((prevCheckouts) => [
+        ...prevCheckouts,
+        {
+          bookId: id,
+          bookName: title,
+          checkoutDate: new Date(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          returnDate: null,
+          isReturned: false,
+          isLate: false,
+        },
+      ]);
+      console.log('Book borrowed successfully:', response.data);
+    } catch (error) {
+      console.error('Error borrowing book:', error);
+    }
+  };
+
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
@@ -53,7 +80,7 @@ const BookCard: React.FC<BookCardProps> = ({
           <Star size={18} />
           <span className="text-xs font-bold">{rating}/5</span>
         </div>
-        <Button>Borrow</Button>
+        <Button onClick={handleBorrow} disabled={checkouts.some((checkout) => checkout.bookId === id)}>{checkouts.some((checkout) => checkout.bookId === id) ? 'Borrowed' : 'Borrow'}</Button>
       </CardFooter>
     </Card>
   );

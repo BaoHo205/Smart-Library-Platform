@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { Input } from '../ui/input';
 import Combobox from './ComboBox';
 import axiosInstance from '@/config/axiosConfig';
+import debounce from 'lodash.debounce';
 import {
   Select,
   SelectContent,
@@ -49,6 +50,8 @@ const Header: React.FC<HeaderProps> = ({
   searchInput
 }) => {
   const [genres, setGenres] = useState<Options[]>([]);
+  const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
+  const debouncedSearchInputChange = useCallback(debounce((nextValue) => onSearchInputChange(nextValue), 500), []);
 
   const fetchGenres = async (): Promise<void> => {
     try {
@@ -82,8 +85,11 @@ const Header: React.FC<HeaderProps> = ({
           </Select>
           <Input
             placeholder="Search books, authors, publishers..."
-            value={searchInput}
-            onChange={(e) => onSearchInputChange(e.target.value)}
+            value={currSearchInput}
+            onChange={(e) => {
+              setCurrSearchInput(e.target.value);
+              debouncedSearchInputChange(e.target.value);
+            }}
             className="h-full border-0 focus-visible:ring-0 rounded-r-none shadow-none"
           />
         </div>

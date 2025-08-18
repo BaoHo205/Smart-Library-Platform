@@ -6,6 +6,9 @@ async function handleGetAllGenres(
   res: Response,
   next: NextFunction
 ) {
+  // #swagger.tags = ['Genres']
+  // #swagger.summary = 'Get all genres'
+  // #swagger.description = 'Retrieve a list of all book genres.'
   try {
     const genres = await getAllGenres();
     res.status(200).json(genres);
