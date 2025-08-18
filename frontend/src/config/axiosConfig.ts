@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 declare module 'axios' {
-  interface InternalAxiosRequestConfig<D = any> {
+  interface InternalAxiosRequestConfig<> {
     _retry?: boolean;
   }
 }

@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import mysql from '../database/mysql/connection';
+import { RowDataPacket } from 'mysql2';
+import { UserRole } from '@/types';
+
 interface IReviewData {
   bookId: string;
   userId: string;
@@ -12,6 +15,15 @@ interface IUpdateReviewData {
   userId: string;
   rating?: number;
   comment?: string;
+}
+
+interface UserProfile {
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
 }
 
 const addReview = async (reviewData: IReviewData) => {
@@ -92,7 +104,31 @@ const updateReview = async (
   }
 };
 
+const getUserById = async (userId: string): Promise<UserProfile | null> => {
+  try {
+    const query = `
+      SELECT id, userName, firstName, lastName, email, role
+      FROM users 
+      WHERE id = ?
+    `;
+    
+    const result = (await mysql.executeQuery(query, [userId])) as (UserProfile & RowDataPacket)[];
+    
+    if (result.length === 0) {
+      return null;
+    }
+    
+    return result[0];
+  } catch (error) {
+    console.error('Error getting user by ID:', error);
+    throw new Error(
+      `Failed to get user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
 export default {
   addReview,
   updateReview,
+  getUserById,
 };

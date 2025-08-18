@@ -70,7 +70,7 @@ class JwtService implements IJwtService {
           type: 'access',
         },
         this.accessTokenSecret,
-        { expiresIn: '30m' }
+        { expiresIn: '7d' }
       );
 
       return accessToken;
@@ -95,7 +95,6 @@ class JwtService implements IJwtService {
       if (decoded.type !== 'access') {
         throw new Error('Invalid token type');
       }
-      console.log(decoded);
       return decoded;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
