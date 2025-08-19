@@ -1,258 +1,175 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
-import BookDetail from "@/components/books/BookDetail"
-import BookReviews from "@/components/books/BookReview"
-import api from "@/api/api"
-import { getBookById } from "@/api/book"
-import { notFound } from "next/navigation"
+// "use client"
 
-interface BookDetailType {
-  id: string
-  title: string
-  author: string
-  genre: string[]
-  publisher: string
-  description: string
-  coverImage?: string
-  rating: number
-  totalReviews: number
-  offlineLocation?: string
-}
+// import { useEffect, useState } from "react"
+// import { Card, CardContent } from "@/components/ui/card"
+// import { Button } from "@/components/ui/button"
+// import BookDetail from "@/components/books/BookDetail"
+// import BookReviews from "@/components/books/BookReviews"
+// import api from "@/api/api"
+// import { BookDetails, ReviewWithUser } from "@/api/api"
 
-interface Review {
-  id: string
-  userId: string
-  userName: string
-  userAvatar?: string
-  rating: number
-  comment: string
-  createdAt: string
-}
-
-interface BookDetailPageProps {
-  params: { id: string }
-}
-
-// // Mock data
-// const mockBook: BookDetailType = {
-//   id: "1",
-//   title: "Application Health and Well-being",
-//   author: "Robert L.Ludke",
-//   genre: ["Health", "Psychology", "Woman"],
-//   publisher: "FTECH",
-//   description:
-//     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\n\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-//   rating: 0,
-//   totalReviews: 1000,
-//   offlineLocation: "Beanland Library",
+// // Interface to match BookDetail component props
+// interface BookDetailType {
+//   id: string
+//   title: string
+//   author: string
+//   genre: string[]
+//   publisher: string
+//   description: string
+//   coverImage?: string
+//   rating: number
+//   totalReviews: number
+//   offlineLocation?: string
 // }
 
-const mockReviews: Review[] = [
-  {
-    id: "1",
-    userId: "user1",
-    userName: "John Doe",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    comment:
-      "This book completely changed my perspective on health and well-being. The author provides practical insights that are easy to implement in daily life.",
-    createdAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    userId: "user2",
-    userName: "Sarah Johnson",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    rating: 4,
-    comment: "Great resource for anyone interested in psychology and health. Well-researched and engaging throughout.",
-    createdAt: "2024-01-10T14:20:00Z",
-  },
-  {
-    id: "3",
-    userId: "user3",
-    userName: "Mike Chen",
-    userAvatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    comment:
-      "Excellent book! The chapters on mental health were particularly insightful. Highly recommend to healthcare professionals.",
-    createdAt: "2024-01-05T09:15:00Z",
-  },
-];
+// // Interface to match Review component props
+// export interface Review {
+//   id: string
+//   userId: string
+//   userName: string
+//   userAvatar?: string
+//   rating: number
+//   comment: string
+//   createdAt: string
+// }
 
-export default function BookDetailPage({ bookId = '1' }: BookDetailPageProps) {
-  const [book, setBook] = useState<BookDetailType | null>(null);
-  const [reviews, setReviews] = useState<Review[]>(mockReviews);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// // Adapter function to convert BookDetails to BookDetailType
+// const adaptBookDetails = (book: BookDetails): BookDetailType => {
+//   return {
+//     id: book.id,
+//     title: book.title,
+//     author: book.authors.join(', '),
+//     genre: book.genres,
+//     publisher: book.publisherName,
+//     description: book.description || 'No description available',
+//     coverImage: book.thumbnailUrl || undefined,
+//     rating: book.avgRating,
+//     totalReviews: book.numberOfRatings,
+//     offlineLocation: undefined // We don't have this in the API
+//   }
+// }
 
-  // API functions ready for later implementation
-  const fetchBookData = async () => {
-    try {
-      setLoading(true)
-      const [bookResponse, reviewsResponse] = await Promise.all([
-        axios.get(`http://localhost:5000/api/v1/books/${bookId}`),
-        axios.get(`http://localhost:5000/api/v1/books/${bookId}/reviews`),
-      ])
+// // Adapter function to convert ReviewWithUser to Review
+// const adaptReview = (review: ReviewWithUser): Review => {
+//   return {
+//     id: review.id,
+//     userId: review.userId,
+//     userName: review.name || review.userName,
+//     userAvatar: undefined, // Not provided by API
+//     rating: review.rating,
+//     comment: review.comment || '',
+//     createdAt: review.createdAt.toString()
+//   }
+// }
 
-      setBook(bookResponse.data)
-      setReviews(reviewsResponse.data)
-    } catch (err) {
-      setError("Failed to fetch book data")
-      console.error("Error fetching book data:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
+// interface BookDetailPageProps {
+//   bookId: string
+// }
 
-  const handleAddReview = (rating: number, comment: string) => {
-    // For now, add review to local state (replace with API call later)
-    const newReviewData: Review = {
-      id: Date.now().toString(),
-      userId: "current-user",
-      userName: "Current User",
-      userAvatar: "/placeholder.svg?height=40&width=40",
-      rating: rating,
-      comment: comment,
-      createdAt: new Date().toISOString(),
-    }
+// export default function BookDetailPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e' }: BookDetailPageProps) {
+//   const [book, setBook] = useState<BookDetailType | null>(null)
+//   const [reviews, setReviews] = useState<Review[] | null>(null) // Use null to check if data has been fetched
+//   const [loading, setLoading] = useState(false) // Start with loading true
+//   const [error, setError] = useState<string | null>(null)
 
-    setReviews((prev) => [newReviewData, ...prev])
+//   // API functions ready for later implementation
+//   const fetchBookData = async () => {
+//     setLoading(true)
+//     setError(null)
+//     setBook(null)
+//     setReviews(null)
 
-    // TODO: Uncomment when API is ready
-    /*
-    try {
-      const reviewData = {
-        rating: rating,
-        comment: comment,
-        userId: "current-user-id",
-        userName: "Current User",
-      }
+//     try {
+//       // Use the bookId prop in the API call
+//       const [bookResponse, reviewsResponse] = await Promise.all([
+//         api.getBookInfoById(bookId),
+//         api.getReviewsByBookId(bookId),
+//       ])
+//       console.log("Book Response:", bookResponse)
+//       console.log("Reviews Response:", reviewsResponse)
+//       // Convert API responses to component-friendly formats
+//       setBook(adaptBookDetails(bookResponse))
+//       setReviews(reviewsResponse.map(adaptReview))
+//     } catch (err) {
+//       setError("Failed to fetch book data. Please check the book ID and try again.")
+//       console.error("Error fetching book data:", err)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
 
-      await axios.post(`http://localhost:5000/api/v1/books/${bookId}/reviews`, reviewData)
+//   useEffect(() => {
+//     // Only fetch if bookId is available
+//     if (bookId) {
+//       fetchBookData()
+//     }
+//   }, [bookId])
+
+//   const handleAddReview = async (rating: number, comment: string) => {
+//     try {
+//       await api.addReview(bookId, rating, comment);
       
-      // Refresh reviews after adding
-      const reviewsResponse = await axios.get(`http://localhost:5000/api/v1/books/${bookId}/reviews`)
-      setReviews(reviewsResponse.data)
-    } catch (err) {
-      console.error("Error adding review:", err)
-    }
-    */
-  }
+//       // Re-fetch reviews to update the list
+//       const updatedReviews = await api.getReviewsByBookId(bookId);
+//       setReviews(updatedReviews.map(adaptReview));
+//     } catch (err) {
+//       console.error("Error adding review:", err);
+//       // You might want to set a state to show an error message to the user.
+//     }
+//   }
 
-  if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto p-6 space-y-12">
-        {/* Book Detail Section */}
-        <div className="space-y-8">
-          {/* Your existing BookDetail component (we'll modify it to accept book as prop) */}
-          <BookDetail book={book} />
+//   // Render states
+//   if (loading) {
+//     return (
+//       <div className="max-w-6xl mx-auto p-6">
+//         <div className="animate-pulse">
+//           <div className="grid md:grid-cols-3 gap-8">
+//             <div className="bg-gray-200 aspect-[3/4] rounded-lg"></div>
+//             <div className="md:col-span-2 space-y-4">
+//               <div className="h-8 bg-gray-200 rounded"></div>
+//               <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+//               <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     )
+//   }
 
-          {/* Add the interactive borrow button */}
-          <div className="flex justify-start">
-            <BorrowButton bookId={bookId} bookTitle={book.title} />
-          </div>
-        </div>
+//   if (error || !book) {
+//     return (
+//       <div className="max-w-6xl mx-auto p-6">
+//         <Card>
+//           <CardContent className="p-8 text-center">
+//             <p className="text-red-500">{error || "Book not found"}</p>
+//             <Button onClick={fetchBookData} className="mt-4">
+//               Try Again
+//             </Button>
+//           </CardContent>
+//         </Card>
+//       </div>
+//     )
+//   }
 
-        {/* Reviews Section - Your existing BookReview component */}
-        <BookReviews bookId={bookId} />
-      </div>
-    )
-  } catch (error) {
-    console.error('Error fetching book:', error)
-    notFound()
-  }
+//   return (
+//     <div className="max-w-6xl mx-auto p-6 space-y-12">
+//       {/* Book Detail Section */}
+//       <BookDetail book={book} />
 
-  // useEffect(() => {
-  //   if (!api.isAuthenticated()) {
-  //     router.push("/login")
-  //     return
-  //   }
-  // }, [router])
+//       {/* Reviews Section */}
+//       <BookReviews reviews={reviews} onAddReview={handleAddReview} />
+//     </div>
+//   )
+// }
 
-  // // API functions ready for later implementation
-  // useEffect(() => {
-  //   const fetchBookData = async () => {
-  //     try {
-  //       setLoading(true)
-  //       const [bookResponse, reviewsResponse] = await Promise.all([
-  //         axios.get(`http://localhost:5000/api/v1/books/${bookId}`),
-  //         axios.get(`http://localhost:5000/api/v1/books/${bookId}/reviews`),
-  //       ])
+import BookInfoPage from "@/components/books/BookInfo";
 
-  //       setBook(bookResponse.data)
-  //       setReviews(reviewsResponse.data)
-  //     } catch (err) {
-  //       setError("Failed to fetch book data")
-  //       console.error("Error fetching book data:", err)
-  //       // For now, keep using mock data on error
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
+export default function BookDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
 
-  //   // Uncomment when API is ready
-  //   // fetchBookData()
-  // }, [bookId])
-
-  // const handleAddReview = (rating: number, comment: string) => {
-  //   // For now, add review to local state (replace with API call later)
-  //   const newReviewData: Review = {
-  //     id: Date.now().toString(),
-  //     userId: "current-user",
-  //     userName: "Current User",
-  //     userAvatar: "/placeholder.svg?height=40&width=40",
-  //     rating: rating,
-  //     comment: comment,
-  //     createdAt: new Date().toISOString(),
-  //   }
-
-  //   setReviews((prev) => [newReviewData, ...prev])
-
-  //   // TODO: Uncomment when API is ready
-  //   /*
-  //   try {
-  //     const reviewData = {
-  //       rating: rating,
-  //       comment: comment,
-  //       userId: "current-user-id",
-  //       userName: "Current User",
-  //     }
-
-  //     await axios.post(`http://localhost:5000/api/v1/books/${bookId}/reviews`, reviewData)
-      
-  //     // Refresh reviews after adding
-  //     const reviewsResponse = await axios.get(`http://localhost:5000/api/v1/books/${bookId}/reviews`)
-  //     setReviews(reviewsResponse.data)
-  //   } catch (err) {
-  //     console.error("Error adding review:", err)
-  //   }
-  //   */
-  // }
-
-  // if (loading) {
-  //   return (
-  //     <div className="max-w-6xl mx-auto p-6">
-  //       <div className="animate-pulse">
-  //         <div className="grid md:grid-cols-3 gap-8">
-  //           <div className="bg-gray-200 aspect-[3/4] rounded-lg"></div>
-  //           <div className="md:col-span-2 space-y-4">
-  //             <div className="h-8 bg-gray-200 rounded"></div>
-  //             <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-  //             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // return (
-  //   <div className="max-w-6xl mx-auto p-6 space-y-12">
-  //     {/* Book Detail Section */}
-  //     {book && <BookDetail book={book} />}
-
-  //     {/* Reviews Section */}
-  //     <BookReviews reviews={reviews} onAddReview={handleAddReview} />
-  //   </div>
-  // )
+  return (
+    <div className="max-w-6xl mx-auto p-6 space-y-12">
+      <BookInfoPage bookId={id} />
+    </div>
+  );
 }

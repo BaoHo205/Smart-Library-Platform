@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import useUser from '@/hooks/useUser';
 
@@ -8,29 +8,44 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { isAuthenticated, loading } = useUser();
+  const { isAuthenticated, loading, checkAuth } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   useEffect(() => {
-    if (loading) {
+    // Run auth check on initial load
+    const runInitialAuthCheck = async () => {
+      await checkAuth();
+      setInitialCheckDone(true);
+    };
+
+    runInitialAuthCheck();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    // Don't redirect until we've done the initial auth check
+    if (!initialCheckDone) {
       return;
     }
 
     // Redirect to login if not authenticated
-    if (!isAuthenticated) {
-      router.replace('/login');
-      return;
-    }
+    if (!loading) {
+      // Redirect to login if not authenticated
+      if (!isAuthenticated && pathname !== '/login') {
+        router.replace('/login');
+        return;
+      }
 
-    // Redirect authenticated users away from login page
-    if (isAuthenticated && pathname === '/login') {
-      router.replace('/');
+      // Redirect authenticated users away from login page
+      if (isAuthenticated && pathname === '/login') {
+        router.replace('/');
+      }
     }
-  }, [isAuthenticated, loading, pathname, router]);
+  }, [isAuthenticated, loading, pathname, router, initialCheckDone]);
 
   // Show loading spinner while checking authentication
-  if (loading) {
+  if (loading || !initialCheckDone) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
@@ -39,7 +54,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }
 
   // Don't render protected content if not authenticated
-  if (!isAuthenticated) {
+  if (!isAuthenticated && pathname !== '/login') {
     return null;
   }
 

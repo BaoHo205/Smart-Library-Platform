@@ -1,5 +1,6 @@
 'use client'
 import { Geist, Geist_Mono } from 'next/font/google';
+import { usePathname } from 'next/navigation';
 import './globals.css';
 import {
   SidebarInset,
@@ -7,8 +8,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/sidebar/AppSidebar';
-import AuthProvider from '@/components/auth/AuthProvider';
-import { usePathname } from 'next/navigation';
+
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,8 +38,7 @@ export default function RootLayout({
           // Login page without sidebar and auth protection
           children
         ) : (
-          // Protected pages with sidebar
-          <AuthProvider>
+
             <SidebarProvider>
               <AppSidebar />
               <SidebarInset>
@@ -48,7 +48,7 @@ export default function RootLayout({
                 </main>
               </SidebarInset>
             </SidebarProvider>
-          </AuthProvider>
+
         )}
       </body>
     </html>

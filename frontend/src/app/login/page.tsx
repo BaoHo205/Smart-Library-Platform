@@ -23,7 +23,7 @@ export default function LoginPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
-          src="/placeholder.svg"
+          src="/smart_library_platform.png"
           width={100}
           height={100}
           alt="Image"

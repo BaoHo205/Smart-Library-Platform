@@ -123,18 +123,30 @@ const generateNewAccessToken = async (refreshToken: string) => {
     if (!refreshToken) {
       throw new Error('Refresh token is required');
     }
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
-    if (!payload) {
+    const decoded = await jwtService.verifyRefreshToken(refreshToken);
+    if (!decoded) {
       throw new Error('Invalid refresh token');
     }
+
     const newAccessToken = await jwtService.generateAccessToken({
-      userId: payload.userId,
-      role: payload.role,
+      userId: decoded.userId,
+      role: decoded.role
+    });
+
+    const newRefreshToken = await jwtService.generateRefreshToken({
+      userId: decoded.userId,
+      role: decoded.role
     });
 
     return {
+      success: true,
       message: 'Access token refreshed successfully',
-      data: { newAccessToken, refreshToken },
+      data: {
+        newRefreshToken,
+        newAccessToken,
+        userId: decoded.userId,  
+        role: decoded.role      
+      }
     };
   } catch (error) {
     throw new Error(

@@ -26,15 +26,8 @@ const useUser = () => {
 
     try {
       // Check if we have a token in localStorage
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setLoading(false);
-        setIsAuthenticated(false);
-        return;
-      }
-
-      // Verify token with backend
       const response = await axiosInstance.get('/api/v1/user/profile');
+
       if (response.data.success) {
         setUser(response.data.data);
         setIsAuthenticated(true);
@@ -47,7 +40,6 @@ const useUser = () => {
     } catch (error) {
       console.error('Auth check failed:', error);
       // Remove invalid token
-      localStorage.removeItem('accessToken');
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -55,11 +47,21 @@ const useUser = () => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    setUser(null);
-    setIsAuthenticated(false);
-    hasCheckedAuth.current = false; // Reset for next login
+  const logout = async () => {
+    try {
+      // Call the logout API endpoint which will clear the cookies
+      await axiosInstance.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Update local state
+      setUser(null);
+      setIsAuthenticated(false);
+      hasCheckedAuth.current = false; // Reset for next login
+
+      // Redirect to login page
+      window.location.href = '/login';
+    }
   };
 
   useEffect(() => {

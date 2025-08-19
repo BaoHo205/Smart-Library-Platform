@@ -13,7 +13,7 @@ const accessCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
-  maxAge: 30 * 60 * 1000, // 30 minutes
+  maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',
 };
 
@@ -49,20 +49,29 @@ const login = async (req: Request, res: Response) => {
   // #swagger.description = 'Authenticate user and return access and refresh tokens'
   try {
     const loginData = req.body;
-    console.log('Login data:', loginData);
     const result = await authService.login(loginData);
-    console.log(result);
+
     if (!result) {
       return res
         .status(401)
         .json({ success: false, message: 'Invalid credentials' });
     }
-
-    // Set cookies
     res.cookie('refreshToken', result.data.refreshToken, refreshCookieOptions);
     res.cookie('accessToken', result.data.accessToken, accessCookieOptions);
+    res.cookie('userId', result.data.userId, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('userRole', result.data.role, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
-    // Return consistent shape
+    // Return response
     return res.status(200).json({
       success: true,
       message: result.message,
@@ -100,10 +109,11 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Invalid refresh token' });
     }
 
-    if (tokenResult.data.refreshToken) {
+    // Update token cookies
+    if (tokenResult.data.newRefreshToken) {
       res.cookie(
         'refreshToken',
-        tokenResult.data.refreshToken,
+        tokenResult.data.newRefreshToken,
         refreshCookieOptions
       );
     }
@@ -113,6 +123,15 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
       tokenResult.data.newAccessToken,
       accessCookieOptions
     );
+
+    if (tokenResult.data.userId) {
+      res.cookie('userId', tokenResult.data.userId, {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+    }
     return res.status(200).json({
       success: true,
       message: tokenResult.message,
@@ -137,19 +156,31 @@ const logout = async (req: Request, res: Response) => {
     if (!cookies?.refreshToken) {
       return res.status(204).json({
         success: false,
-        message: 'No refresh token found',});
+        message: 'No refresh token found',
+      });
     }
 
-    res.clearCookie('refreshToken', {
+     // Clear all authentication cookies
+    const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict' as const,
+      path: '/',
+    };
+
+    res.clearCookie('refreshToken', cookieOptions);
+    res.clearCookie('accessToken', cookieOptions);
+
+    // Clear user data cookies
+    const userDataCookieOptions = {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict' as const,
+      path: '/',
+    };
+    
+    res.clearCookie('userId', userDataCookieOptions);
+    res.clearCookie('userRole', userDataCookieOptions);
+
     res.status(200).json({
       success: true,
       message: 'User logged out successfully',
