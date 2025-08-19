@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import UserService from '../services/UserService';
 import JwtService from '../services/JwtServices';
+import { AuthRequest } from '@/middleware/authMiddleware';
 
 const getProfile = async (req: Request, res: Response) => {
   // #swagger.tags = ['Users']
@@ -55,19 +56,25 @@ const getProfile = async (req: Request, res: Response) => {
   }
 };
 
-const addReview = async (req: Request, res: Response) => {
+const addReview = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Users']
   // #swagger.summary = 'Add book review'
   // #swagger.description = 'Add a review for a book. Requires user or staff authentication.'
   try {
-    const reviewData = req.body;
+    // Combine the request body with the userId from the authenticated request
+    const reviewData = {
+      ...req.body,
+      userId: req.userId
+    };
+    
+    console.log('Received review data:', reviewData);
     if (!reviewData || Object.keys(reviewData).length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Review data is required',
       });
     }
-    console.log('Adding review:', req.body);
+    console.log('Adding review with userId:', req.userId);
 
     const result = await UserService.addReview(reviewData);
     if (result) {

@@ -7,6 +7,7 @@ import BookDetail from "@/components/books/BookDetail"
 import BookReviews from "@/components/books/BookReviews"
 import api from "@/api/api"
 import { BookDetails, ReviewWithUser } from "@/api/api"
+import useUser from '@/hooks/useUser'
 
 // Interface to match BookDetail component props
 interface BookDetailType {
@@ -67,6 +68,7 @@ interface BookDetailPageProps {
 }
 
 export default function BookInfoPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e' }: BookDetailPageProps) {
+  const { isAuthenticated } = useUser();
   const [book, setBook] = useState<BookDetailType | null>(null)
   const [reviews, setReviews] = useState<Review[] | null>(null) // Use null to check if data has been fetched
   const [loading, setLoading] = useState(false) // Start with loading true
@@ -107,6 +109,12 @@ export default function BookInfoPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a4
 
   const handleAddReview = async (rating: number, comment: string) => {
     try {
+      if (!isAuthenticated) {
+        // Handle case where user is not authenticated
+        console.error("User not authenticated");
+        return;
+      }
+
       await api.addReview(bookId, rating, comment);
       
       // Re-fetch reviews to update the list

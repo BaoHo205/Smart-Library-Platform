@@ -145,7 +145,7 @@ const addReview = async (
       rating,
       comment
     };
-    const response = await axiosInstance.post('/api/v1/users/reviews/add', reviewData);
+    const response = await axiosInstance.post('/api/v1/user/reviews/add', reviewData);
     return response.data.data;
   } catch (error) {
     console.error(`Failed to add review for book ID ${bookId}:`, error);
