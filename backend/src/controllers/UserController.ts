@@ -9,15 +9,7 @@ const getProfile = async (req: Request, res: Response) => {
   // #swagger.security = [{ "bearerAuth": [] }]
   try {
     // Extract token from Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authorization token required',
-      });
-    }
-
-    const token = authHeader.replace('Bearer ', '');
+    const token = req.cookies?.accessToken;
     
     // Verify token and get user ID
     const decoded = await JwtService.verifyAccessToken(token);

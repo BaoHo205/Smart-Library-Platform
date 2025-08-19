@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/sidebar/AppSidebar';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 
 
@@ -38,7 +39,7 @@ export default function RootLayout({
           // Login page without sidebar and auth protection
           children
         ) : (
-
+          <AuthProvider>
             <SidebarProvider>
               <AppSidebar />
               <SidebarInset>
@@ -48,7 +49,7 @@ export default function RootLayout({
                 </main>
               </SidebarInset>
             </SidebarProvider>
-
+          </AuthProvider>
         )}
       </body>
     </html>
