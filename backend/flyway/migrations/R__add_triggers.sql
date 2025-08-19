@@ -55,9 +55,10 @@ BEGIN
 	SET avgRating = COALESCE(
 		(SELECT AVG(r.rating)
 		FROM reviews r
-		WHERE b.id = NEW.bookId), 
+		WHERE r.bookId = NEW.bookId), 
 	0
-  );
+    ) WHERE b.id = NEW.bookId;
+    
 END//
 
 DELIMITER ;
