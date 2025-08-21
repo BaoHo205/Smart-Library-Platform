@@ -21,7 +21,15 @@ const createNewAuthor = async (req: Request, res: Response) => {
     try {
         const { firstName, lastName } = req.body;
 
-        const author: AuthorRow = await AuthorService.createNewAuthor(firstName, lastName);
+        // Validation for empty or null names.
+        if (!firstName || !lastName || firstName.trim() === '' || lastName.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'First name and last name are required.',
+            });
+        }
+
+        const author: AuthorRow = await AuthorService.createNewAuthor(firstName.trim(), lastName.trim());
 
         res.status(200).json({
             success: true,

@@ -20,7 +20,14 @@ const getPublishers = async (req: Request, res: Response) => {
 const createNewPublisher = async (req: Request, res: Response) => {
     try {
         const { name } = req.body;
-        const publisher: PublisherRow = await PublisherService.createNewPublisher(name);
+
+        if (!name || name.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                message: 'Name is required.',
+            });
+        }
+        const publisher: PublisherRow = await PublisherService.createNewPublisher(name.trim());
 
         res.status(200).json({
             success: true,
