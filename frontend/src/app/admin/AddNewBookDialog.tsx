@@ -28,6 +28,7 @@ import { Plus, Minus } from "lucide-react";
 import { ComboboxWithCreate } from "./ComboboxWithCreate";
 import axiosInstance from "@/config/axiosConfig";
 import { useDataStore } from '@/lib/useDataStore';
+import { toast } from "sonner";
 
 const formSchema = z.object({
     bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
@@ -65,28 +66,36 @@ export const AddNewBookDialog = () => {
     });
 
     const handleCreatePublisher = async (name: string) => {
-        const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
-        console.log(createdPublisher.data.data[0]);
-        addPublisher(createdPublisher.data.data[0]);
-        const publisherId = createdPublisher.data.data[0].id
-        console.log(publisherId)
-        form.setValue("publisher", publisherId);
+        try {
+            const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
+
+            addPublisher(createdPublisher.data.data[0]);
+            const publisherId = createdPublisher.data.data[0].id
+
+            form.setValue("publisher", publisherId);
+            toast.success("Publisher created successfully.");
+        } catch (error) {
+            toast.error("Failed to create publisher: " + error);
+        }
     };
 
-    const handleCreateAuthor = async (
-        fullName: string
-    ) => {
+    const handleCreateAuthor = async (fullName: string) => {
         const [firstName, ...lastNameParts] = fullName.split(' ');
         const lastName = lastNameParts.join(' ');
+        try {
+            const created = await axiosInstance.post("/api/v1/authors/create", { firstName, lastName });
+            const authorId = created.data.data[0].id
 
-        const created = await axiosInstance.post("/api/v1/authors/create", { firstName, lastName });
-        const authorId = created.data.data[0].id
+            addAuthor(created.data.data[0]);
 
-        addAuthor(created.data.data[0]);
+            // This is a crucial change: add the new author ID to the existing array
+            const currentAuthors = form.getValues("author");
+            form.setValue("author", [...currentAuthors, authorId]);
 
-        // This is a crucial change: add the new author ID to the existing array
-        const currentAuthors = form.getValues("author");
-        form.setValue("author", [...currentAuthors, authorId]);
+            toast.success("Author created successfully.");
+        } catch (error) {
+            toast.error("Failed to create author: " + error);
+        }
     };
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -110,15 +119,14 @@ export const AddNewBookDialog = () => {
                 staffId: "",
             };
             const response = await axiosInstance.post('/api/v1/books/add', newBookData);
-            // console.log("Book created successfully:", response.data);
+            console.log("Book created successfully:", response.data);
             form.reset();
             setOpen(false);
+            toast.success("Book added successfully!"); // Added success toast
         } catch (error) {
             console.error('Error creating new book:', error);
+            toast.error("Failed to add book."); // Added error toast
         }
-
-        setOpen(false);
-        form.reset(); // Reset form after successful submission or for a new entry
     }
 
     const handleQuantityChange = (delta: number) => {

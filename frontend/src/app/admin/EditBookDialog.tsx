@@ -28,6 +28,7 @@ import {
 import { Plus, Minus } from "lucide-react";
 import { ComboboxWithCreate } from "./ComboboxWithCreate";
 import { BookShow } from "./columns";
+import { toast } from "sonner"
 import axiosInstance from "@/config/axiosConfig";
 import { useDataStore } from "@/lib/useDataStore";
 
@@ -61,6 +62,8 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
   const authorList = useDataStore((s) => s.authorList);
   const addPublisher = useDataStore((s) => s.addPublisher);
   const addAuthor = useDataStore((s) => s.addAuthor);
+  const retireBook = useDataStore((s) => s.retireBook)
+  const updateQuantity = useDataStore((s) => s.updateQuantity)
   // const [publisherList, setPublisherList] = useState<Publisher[]>([]);
   // const [authorList, setAuthorList] = useState<Author[]>([]);
 
@@ -97,31 +100,36 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
   }, [open, book, publisherList, authorList, form]);
 
   const handleCreatePublisher = async (name: string) => {
-    const createdPublisher = await axiosInstance.post("api/v1/publishers/create", {
-      name: name,
-    });
-    console.log(createdPublisher.data.data[0]);
-    addPublisher(createdPublisher.data.data[0]);
-    const id = createdPublisher.data.data[0].id
-    console.log(id)
-    form.setValue("publisher", id);
+    try {
+      const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
+
+      addPublisher(createdPublisher.data.data[0]);
+      const publisherId = createdPublisher.data.data[0].id
+
+      form.setValue("publisher", publisherId);
+      toast.success("Publisher created successfully.");
+    } catch (error) {
+      toast.error("Failed to create publisher: " + error);
+    }
   };
 
-  const handleCreateAuthor = async (
-    fullName: string
-  ) => {
+  const handleCreateAuthor = async (fullName: string) => {
     const [firstName, ...lastNameParts] = fullName.split(' ');
     const lastName = lastNameParts.join(' ');
+    try {
+      const created = await axiosInstance.post("/api/v1/authors/create", { firstName, lastName });
+      const authorId = created.data.data[0].id
 
-    const created = await axiosInstance.post("api/v1/authors/create", {
-      firstName: firstName,
-      lastName: lastName
-    });
+      addAuthor(created.data.data[0]);
 
-    const id = created.data.data[0].id
+      // This is a crucial change: add the new author ID to the existing array
+      const currentAuthors = form.getValues("author");
+      form.setValue("author", [...currentAuthors, authorId]);
 
-    addAuthor(created.data.data[0]);
-    form.setValue("author", id);
+      toast.success("Authorx created successfully.");
+    } catch (error) {
+      toast.error("Failed to create author: " + error);
+    }
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -138,9 +146,13 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
 
   const handleRetireBook = async () => {
     try {
-      axiosInstance.put(`/api/v1/books/retired/${book.id}`)
+      await axiosInstance.put(`/api/v1/books/retired/${book.id}`);
+      toast.success("Book retired successfully.");
+      retireBook(book.id);
+      setOpen(false);
     } catch (error) {
       console.error("Failed to retire book:", error);
+      toast.error("Failed to retire book.");
     }
   }
 
@@ -153,9 +165,12 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
       })
       console.log("Inventory updated successfully:", updatedValue.data.data);
       form.reset();
+      updateQuantity(book.id, currentQuantity);
       setOpen(false);
+      toast.success("Book quantity has been updated successfully.");
     } catch (error) {
       console.error("Failed to update inventory:", error);
+      toast.error("Failed to update inventory.");
     }
   }
 
