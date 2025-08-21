@@ -1,5 +1,13 @@
 import BookCard, { BookCardProps } from './BookCard';
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink, PaginationEllipsis } from '../ui/pagination';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationLink,
+  PaginationEllipsis,
+} from '../ui/pagination';
 
 interface BookCardListProps {
   books: BookCardProps[];
@@ -10,18 +18,18 @@ interface BookCardListProps {
   onPageChange?: (page: number) => void; // Add this for direct page navigation
 }
 
-const BookCardList: React.FC<BookCardListProps> = ({ 
-  books, 
-  pages = 1, 
-  currentPage = 1, 
-  onNextPage, 
+const BookCardList: React.FC<BookCardListProps> = ({
+  books,
+  pages = 1,
+  currentPage = 1,
+  onNextPage,
   onPrevPage,
-  onPageChange 
+  onPageChange,
 }) => {
   // Safety check for books array
   if (!books || !Array.isArray(books)) {
     return (
-      <div className="text-center py-8">
+      <div className="py-8 text-center">
         <p className="text-gray-500">No books available</p>
       </div>
     );
@@ -51,7 +59,15 @@ const BookCardList: React.FC<BookCardListProps> = ({
         pageNumbers.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
       } else {
         // Show first + ellipsis + current-1, current, current+1 + ellipsis + last
-        pageNumbers.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        pageNumbers.push(
+          1,
+          '...',
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          '...',
+          totalPages
+        );
       }
     }
 
@@ -59,7 +75,12 @@ const BookCardList: React.FC<BookCardListProps> = ({
   };
 
   const handlePageClick = (page: number): void => {
-    if (onPageChange && page !== currentPage && page >= 1 && page <= totalPages) {
+    if (
+      onPageChange &&
+      page !== currentPage &&
+      page >= 1 &&
+      page <= totalPages
+    ) {
       onPageChange(page);
     }
   };
@@ -80,11 +101,9 @@ const BookCardList: React.FC<BookCardListProps> = ({
     <>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {books.length > 0 ? (
-          books.map(book => (
-            <BookCard key={book.id} {...book} />
-          ))
+          books.map(book => <BookCard key={book.id} {...book} />)
         ) : (
-          <div className="col-span-full text-center py-8">
+          <div className="col-span-full py-8 text-center">
             <p className="text-gray-500">No books found</p>
           </div>
         )}
@@ -95,13 +114,17 @@ const BookCardList: React.FC<BookCardListProps> = ({
           <PaginationContent>
             {/* Previous Button */}
             <PaginationItem>
-              <PaginationPrevious 
-                href="#" 
-                onClick={(e) => {
+              <PaginationPrevious
+                href="#"
+                onClick={e => {
                   e.preventDefault();
                   handlePrevious();
                 }}
-                className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={
+                  currentPage <= 1
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
 
@@ -113,7 +136,7 @@ const BookCardList: React.FC<BookCardListProps> = ({
                 ) : (
                   <PaginationLink
                     href="#"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.preventDefault();
                       handlePageClick(pageNum as number);
                     }}
@@ -128,13 +151,17 @@ const BookCardList: React.FC<BookCardListProps> = ({
 
             {/* Next Button */}
             <PaginationItem>
-              <PaginationNext 
-                href="#" 
-                onClick={(e) => {
+              <PaginationNext
+                href="#"
+                onClick={e => {
                   e.preventDefault();
                   handleNext();
                 }}
-                className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={
+                  currentPage >= totalPages
+                    ? 'pointer-events-none opacity-50'
+                    : 'cursor-pointer'
+                }
               />
             </PaginationItem>
           </PaginationContent>

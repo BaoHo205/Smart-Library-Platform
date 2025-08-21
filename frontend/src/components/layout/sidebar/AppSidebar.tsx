@@ -10,7 +10,7 @@ import NavHeader from './NavHeader';
 import NavMain from './NavMain';
 
 interface AppSidebarProps {
-  userRole: string | null;  
+  userRole: string | null;
 }
 
 export default async function AppSidebar({ userRole }: AppSidebarProps) {
@@ -27,7 +27,7 @@ export default async function AppSidebar({ userRole }: AppSidebarProps) {
 
       {/* Sidebar content with navigation items */}
       <SidebarContent className="transition-all duration-300 ease-in-out">
-        <NavMain userRole={userRole}/>        
+        <NavMain userRole={userRole} />
       </SidebarContent>
 
       {/* Sidebar footer with logout button */}

@@ -1,11 +1,9 @@
-'use client'
+'use client';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { usePathname } from 'next/navigation';
 import './globals.css';
 import AuthProvider from '@/components/auth/AuthProvider';
 import { Toaster } from 'react-hot-toast';
-
-
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

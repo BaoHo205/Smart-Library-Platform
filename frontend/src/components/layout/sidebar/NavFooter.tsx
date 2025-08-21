@@ -10,7 +10,7 @@ import useUser from '@/hooks/useUser';
 import { LogOut } from 'lucide-react';
 
 export default function NavFooter() {
-  const {logout} = useUser();
+  const { logout } = useUser();
   const handleLogout = async () => {
     try {
       console.log('Logging out...');

@@ -79,9 +79,11 @@ export interface ReviewsResponse {
 }
 
 const login = async (loginData: LoginData): Promise<AuthResponse> => {
-
   try {
-    const response = await axiosInstance.post('/auth/login', loginData) as AuthResponse;
+    const response = (await axiosInstance.post(
+      '/auth/login',
+      loginData
+    )) as AuthResponse;
 
     return {
       success: true,
@@ -90,13 +92,12 @@ const login = async (loginData: LoginData): Promise<AuthResponse> => {
     };
   } catch (error) {
     console.error('Login failed:', error);
-    throw new Error('Login failed.')
+    throw new Error('Login failed.');
   }
 };
 
 export const logout = async (): Promise<void> => {
   try {
-
     const response = await axiosInstance.post('/auth/logout');
     window.location.href = '/login';
     return response.data;
@@ -139,9 +140,12 @@ const addReview = async (
     const reviewData = {
       bookId,
       rating,
-      comment
+      comment,
     };
-    const response = await axiosInstance.post('/api/v1/user/reviews/add', reviewData);
+    const response = await axiosInstance.post(
+      '/api/v1/user/reviews/add',
+      reviewData
+    );
     return response.data.data;
   } catch (error) {
     console.error(`Failed to add review for book ID ${bookId}:`, error);
@@ -157,43 +161,52 @@ const updateReview = async (
   try {
     const reviewData = {
       rating,
-      comment
+      comment,
     };
-    const response = await axiosInstance.put(`/api/v1/user/reviews/update/${reviewId}`, reviewData);
+    const response = await axiosInstance.put(
+      `/api/v1/user/reviews/update/${reviewId}`,
+      reviewData
+    );
     return response.data.data;
   } catch (error) {
     console.error(`Failed to update review with ID ${reviewId}:`, error);
     throw error;
   }
-}
+};
 
 const borrowBook = async (
   bookId: string,
   dueDate: string
 ): Promise<BorrowBookResponse> => {
   try {
-    const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, {
-      dueDate
-    });
+    const response = await axiosInstance.post(
+      `/api/v1/books/borrow/${bookId}`,
+      {
+        dueDate,
+      }
+    );
 
     return response.data;
   } catch (error) {
     console.error(`Failed to borrow book with ID ${bookId}:`, error);
     throw error;
   }
-}
-
+};
 
 const isBookBorrowed = async (bookId: string): Promise<boolean> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/books/${bookId}/isBorrowed`);
+    const response = await axiosInstance.get(
+      `/api/v1/books/${bookId}/isBorrowed`
+    );
     return response.data.isBorrowed || false;
   } catch (error) {
-    console.error(`Failed to check borrow status for book ID ${bookId}:`, error);
+    console.error(
+      `Failed to check borrow status for book ID ${bookId}:`,
+      error
+    );
     return false;
   }
-}
-
+};
 
 export default {
   login,
@@ -203,5 +216,5 @@ export default {
   getReviewsByBookId,
   updateReview,
   borrowBook,
-  isBookBorrowed
+  isBookBorrowed,
 };

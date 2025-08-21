@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { BookCardProps } from '@/components/home/BookCard';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '@/config/axiosConfig';
 
 export default function Home() {
-  const [currentGenre, setCurrentGenre] = useState<string>("");
+  const [currentGenre, setCurrentGenre] = useState<string>('');
   const [searchParam, setSearchParam] = useState<string>('title');
   const [searchInput, setSearchInput] = useState<string>('');
   const [books, setBooks] = useState<BookCardProps[]>([]);
@@ -60,8 +60,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchBooks();
-  }, [currentGenre, searchParam, searchInput, currentPage]); 
-  
+  }, [currentGenre, searchParam, searchInput, currentPage]);
+
   return (
     <div className="flex">
       <div className="flex w-full flex-col justify-center gap-6 p-6">
@@ -80,11 +80,11 @@ export default function Home() {
           height={100}
           className="h-full w-full"
         />
-        <BookCardList 
-          books={books} 
-          pages={pages} 
-          currentPage={currentPage} 
-          onNextPage={handleNextPage} 
+        <BookCardList
+          books={books}
+          pages={pages}
+          currentPage={currentPage}
+          onNextPage={handleNextPage}
           onPrevPage={handlePrevPage}
           onPageChange={handlePageChange}
         />

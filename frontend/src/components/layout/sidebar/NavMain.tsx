@@ -90,8 +90,8 @@ const fetchDataByRole = (userRole: string | null) => {
   } else if (userRole === 'user') {
     return userData;
   }
-  return userData
-}
+  return userData;
+};
 
 export default function NavMain({ userRole }: NavMainProps) {
   const data = fetchDataByRole(userRole);

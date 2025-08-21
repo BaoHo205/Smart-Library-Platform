@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import axiosInstance from '@/config/axiosConfig';
 
@@ -8,7 +8,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: "user" | "staff";
+  role: 'user' | 'staff';
 }
 
 const useUser = () => {
@@ -75,7 +75,7 @@ const useUser = () => {
     loading,
     isAuthenticated,
     logout,
-    checkAuth
+    checkAuth,
   };
 };
 
