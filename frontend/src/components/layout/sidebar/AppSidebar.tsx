@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import {
   Sidebar,
@@ -11,11 +9,14 @@ import NavFooter from './NavFooter';
 import NavHeader from './NavHeader';
 import NavMain from './NavMain';
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps {
+  userRole: string | null;  
+}
+
+export default async function AppSidebar({ userRole }: AppSidebarProps) {
   return (
     <Sidebar
       variant="inset"
-      {...props}
       collapsible="icon"
       className="transition-all duration-300 ease-in-out"
     >
@@ -26,7 +27,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* Sidebar content with navigation items */}
       <SidebarContent className="transition-all duration-300 ease-in-out">
-        <NavMain />
+        <NavMain userRole={userRole}/>        
       </SidebarContent>
 
       {/* Sidebar footer with logout button */}

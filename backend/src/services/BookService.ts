@@ -21,6 +21,7 @@ export interface BookListItem {
   pageCount: number | null;
   quantity: number;
   availableCopies: number;
+  avgRating: number | null;
   publisherName: string;
   authors: string;
   genres: string;
@@ -198,6 +199,7 @@ async function searchBooks(
       b.pageCount,
       b.quantity,
       b.availableCopies,
+      b.avgRating,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres

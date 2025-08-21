@@ -12,7 +12,7 @@ export interface BookCardProps {
   thumbnailUrl: string,
   authors: string,
   genres: string,
-  rating: number | 4.5;
+  avgRating: number | 4.5;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
@@ -21,7 +21,7 @@ const BookCard: React.FC<BookCardProps> = ({
   authors,
   genres,
   // thumbnailUrl,
-  rating,
+  avgRating,
 }) => {
   const userId = localStorage.getItem('userId') as string;
   const { checkouts, setCheckouts } = useUserProfile(userId);
@@ -79,7 +79,7 @@ const BookCard: React.FC<BookCardProps> = ({
       <CardFooter className="flex items-center justify-between">
         <div className="flex gap-1.5">
           <Star size={18} />
-          <span className="text-xs font-bold">{rating}/5</span>
+          <span className="text-xs font-bold">{avgRating}/5</span>
         </div>
         <Button onClick={handleBorrow} disabled={checkouts.some((checkout) => checkout.bookId === id)}>{checkouts.some((checkout) => checkout.bookId === id) ? 'Borrowed' : 'Borrow'}</Button>
       </CardFooter>
