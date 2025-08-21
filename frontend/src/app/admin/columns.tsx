@@ -18,6 +18,7 @@ export type BookShow = {
     genres: string
     quantity: number
     description: string
+    status: string
 }
 
 export const columns: ColumnDef<BookShow>[] = [
@@ -79,6 +80,22 @@ export const columns: ColumnDef<BookShow>[] = [
             );
 
         }
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+            const isAvailable = status === "available";
+            return (
+                <Badge
+                    variant="outline"
+                    className={`${isAvailable ? "bg-green-100 text-green-800 border-green-300" : "bg-red-100 text-red-800 border-red-300"}`}
+                >
+                    {status}
+                </Badge>
+            );
+        },
     },
     {
         accessorKey: "quantity",
