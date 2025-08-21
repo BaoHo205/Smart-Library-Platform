@@ -150,7 +150,7 @@ export default function BookReviews({ reviews, onAddReview, onUpdateReview, curr
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <Avatar>
-                  <AvatarImage src={review.userAvatar || "/placeholder.svg?height=40&width=40"} />
+                  <AvatarImage src={review.userAvatar || "https://github.com/shadcn.png"} />
                   <AvatarFallback>
                     {review.userName
                       .split(" ")
@@ -168,7 +168,6 @@ export default function BookReviews({ reviews, onAddReview, onUpdateReview, curr
                         <span className="font-semibold text-gray-900">{review.userName}</span>
                       </div>
 
-                      {/* Add this section to make rating editing more obvious */}
                       <div className="space-y-2">
                         {/* <label className="text-sm font-medium text-gray-700">Rating:</label> */}
                         {renderStars(editReviewRating, true, setEditReviewRating, true)}

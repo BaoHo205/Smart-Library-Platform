@@ -60,16 +60,17 @@ export interface BookResponse {
   message?: string;
 }
 
-// Review interfaces
-// export interface Review {
-//   id: string;
-//   bookId: string;
-//   userId: string;
-//   userName: string;
-//   rating: number;
-//   comment: string;
-//   createdAt: string;
-// }
+export interface BorrowBookResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    checkoutId: string;
+    userId: string;
+    bookId: string;
+    dueDate: string;
+    checkoutDate: string;
+  };
+}
 
 export interface ReviewsResponse {
   success: boolean;
@@ -166,6 +167,22 @@ const updateReview = async (
   }
 }
 
+const borrowBook = async (
+  bookId: string, 
+  dueDate: string 
+): Promise<BorrowBookResponse> => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, { 
+      dueDate 
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to borrow book with ID ${bookId}:`, error);
+    throw error;
+  }
+}
+
 
 
 export default {
@@ -174,5 +191,6 @@ export default {
   addReview,
   getBookInfoById,
   getReviewsByBookId,
-  updateReview
+  updateReview,
+  borrowBook
 };

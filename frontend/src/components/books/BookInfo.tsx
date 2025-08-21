@@ -67,18 +67,27 @@ const adaptReview = (review: IReview): Review => {
   }
 }
 
+// Helper function to generate due date (2 weeks from now)
+const generateDueDate = (): string => {
+  const today = new Date()
+  const dueDate = new Date(today)
+  dueDate.setDate(today.getDate() + 14) // 2 weeks from now
+  return dueDate.toISOString().split("T")[0] // Format: yyyy-mm-dd
+}
+
 interface BookDetailPageProps {
   bookId: string
 }
 
 export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a46e65e" }: BookDetailPageProps) {
-  const { isAuthenticated, user } = useUser() // Get user object to access user ID
+  const { user } = useUser() // User is guaranteed to be authenticated
   const [book, setBook] = useState<BookDetailType | null>(null)
-  const [reviews, setReviews] = useState<Review[] | null>(null) // Use null to check if data has been fetched
-  const [loading, setLoading] = useState(false) // Start with loading true
+  const [reviews, setReviews] = useState<Review[] | null>(null)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [borrowing, setBorrowing] = useState(false)
+  const [isBorrowed, setIsBorrowed] = useState(false)
 
-  // API functions ready for later implementation
   const fetchBookData = async () => {
     setLoading(true)
     setError(null)
@@ -86,16 +95,18 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
     setReviews(null)
 
     try {
-      // Use the bookId prop in the API call
       const [bookResponse, reviewsResponse] = await Promise.all([
         api.getBookInfoById(bookId),
         api.getReviewsByBookId(bookId),
       ])
-      console.log("Book Response:", bookResponse)
-      console.log("Reviews Response:", reviewsResponse)
-      // Convert API responses to component-friendly formats
+
       setBook(adaptBookDetails(bookResponse))
       setReviews(reviewsResponse.map(adaptReview))
+
+      // Check if current user has already borrowed this book
+      // You might need to add this API call or check from the book response
+      // For now, we'll assume the book response includes this information
+      // setIsBorrowed(bookResponse.isBorrowedByCurrentUser || false)
     } catch (err) {
       setError("Failed to fetch book data. Please check the book ID and try again.")
       console.error("Error fetching book data:", err)
@@ -105,61 +116,71 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   }
 
   useEffect(() => {
-    // Only fetch if bookId is available
     if (bookId) {
       fetchBookData()
     }
   }, [bookId])
 
-  const handleAddReview = async (rating: number, comment: string) => {
+  const handleBorrow = async () => {
     try {
-      if (!isAuthenticated) {
-        console.error("User not authenticated")
-        return
-      }
+      setBorrowing(true)
+      const dueDate = generateDueDate()
 
-      await api.addReview(bookId, rating, comment)
+      await api.borrowBook(bookId, dueDate)
 
-      // Re-fetch reviews to update the list
-      const updatedBookInfo = await api.getBookInfoById(bookId)
-      setBook(adaptBookDetails(updatedBookInfo)) // consider to use useState for book rating after update.
+      // Set borrowed state to true after successful borrow
+      setIsBorrowed(true)
 
-      const updatedReviews = await api.getReviewsByBookId(bookId)
-      setReviews(updatedReviews.map(adaptReview))
+      // Refresh book data to update availability status
+      await fetchBookData()
+
+      console.log("Book borrowed successfully")
+      // You might want to show a success message
     } catch (err) {
-      console.error("Error adding review:", err)
-      // You might want to set a state to show an error message to the user.
+      console.error("Error borrowing book:", err)
+      setError("Failed to borrow book. Please try again.")
+    } finally {
+      setBorrowing(false)
     }
   }
 
-  const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
+  const handleAddReview = async (rating: number, comment: string) => {
     try {
-      if (!isAuthenticated) {
-        console.error("User not authenticated")
-        return
-      }
+      await api.addReview(bookId, rating, comment)
 
-      // Call your API to update the review
-      await api.updateReview(reviewId, rating, comment)
-
-      // Re-fetch both book info and reviews to update the UI
+      // Refresh data to show new review and updated rating
       const [updatedBookInfo, updatedReviews] = await Promise.all([
         api.getBookInfoById(bookId),
         api.getReviewsByBookId(bookId),
       ])
 
-      setBook(adaptBookDetails(updatedBookInfo)) // Update book rating if it changed
+      setBook(adaptBookDetails(updatedBookInfo))
       setReviews(updatedReviews.map(adaptReview))
-
-      console.log("Review updated successfully")
     } catch (err) {
-      console.error("Error updating review:", err)
-      // You might want to set a state to show an error message to the user
-      // For now, we could show a toast notification or set an error state
+      console.error("Error adding review:", err)
+      setError("Failed to add review. Please try again.")
     }
   }
 
-  // Render states
+  const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
+    try {
+      await api.updateReview(reviewId, rating, comment)
+
+      // Refresh data to show updated review and rating
+      const [updatedBookInfo, updatedReviews] = await Promise.all([
+        api.getBookInfoById(bookId),
+        api.getReviewsByBookId(bookId),
+      ])
+
+      setBook(adaptBookDetails(updatedBookInfo))
+      setReviews(updatedReviews.map(adaptReview))
+    } catch (err) {
+      console.error("Error updating review:", err)
+      setError("Failed to update review. Please try again.")
+    }
+  }
+
+  // Loading state
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto p-6">
@@ -177,6 +198,7 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
     )
   }
 
+  // Error state
   if (error || !book) {
     return (
       <div className="max-w-6xl mx-auto p-6">
@@ -195,14 +217,14 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-12">
       {/* Book Detail Section */}
-      <BookDetail book={book} />
+      <BookDetail book={book} onBorrow={handleBorrow} borrowing={borrowing} isBorrowed={isBorrowed} />
 
       {/* Reviews Section */}
       <BookReviews
         reviews={reviews}
         onAddReview={handleAddReview}
         onUpdateReview={handleUpdateReview}
-        currentUserId={user?.id} 
+        currentUserId={user?.id}
       />
     </div>
   )

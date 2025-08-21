@@ -1,8 +1,9 @@
 "use client"
 
-import { Star, MapPin, Book } from "lucide-react"
+import { Star, MapPin, Book, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 interface BookDetail {
   id: string
@@ -19,9 +20,12 @@ interface BookDetail {
 
 interface BookDetailProps {
   book: BookDetail
+  onBorrow: () => void
+  borrowing: boolean
+  isBorrowed: boolean
 }
 
-export default function BookDetail({ book }: BookDetailProps) {
+export default function BookDetail({ book, onBorrow, borrowing, isBorrowed }: BookDetailProps) {
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
@@ -42,8 +46,24 @@ export default function BookDetail({ book }: BookDetailProps) {
         {/* Book Cover */}
         <div className="flex justify-center">
           <div className="w-full max-w-sm">
-            <div className="w-full h-full min-h-[400px] bg-gray-200 rounded-lg shadow-lg flex items-center justify-center">
-              <Book className="w-16 h-16 text-gray-400" />
+            <div className="w-full h-full min-h-[400px] bg-gray-200 rounded-lg shadow-lg overflow-hidden relative">
+              {book.coverImage ? (
+                <Image
+                  src={book.coverImage || "/placeholder.svg"}
+                  alt={`Cover of ${book.title}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  priority={true}
+                  onError={() => {
+                    console.log("Failed to load book cover image")
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full min-h-[400px] flex items-center justify-center">
+                  <Book className="w-16 h-16 text-gray-400" />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -93,10 +113,21 @@ export default function BookDetail({ book }: BookDetailProps) {
           </div>
 
           <div className="mt-6">
-            <Button className="bg-slate-800 hover:bg-slate-700">
-              <Book className="w-4 h-4 mr-2" />
-              Borrow
-            </Button>
+            {isBorrowed ? (
+              <Button className="bg-slate-600 hover:bg-slate-600 cursor-not-allowed" disabled={true}>
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Borrowed
+              </Button>
+            ) : (
+              <Button
+                className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50"
+                onClick={onBorrow}
+                disabled={borrowing}
+              >
+                <Book className="w-4 h-4 mr-2" />
+                {borrowing ? "Borrowing..." : "Borrow"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
