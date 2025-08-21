@@ -71,7 +71,6 @@ const updateReview = async (
   updateData: IUpdateReviewData
 ) => {
   try {
-    console.log('Update review by user:', updateData.userId);
     const existingReview = (await mysql.executeQuery(
       'SELECT * FROM reviews WHERE id = ?',
       [reviewId]
@@ -79,9 +78,6 @@ const updateReview = async (
     if (!existingReview || existingReview.length === 0) {
       throw new Error('User not found');
     }
-
-    console.log(existingReview);
-
     const updatedAt = new Date();
     const query = `
         UPDATE reviews
@@ -95,8 +91,14 @@ const updateReview = async (
       reviewId,
       updateData.userId,
     ];
-    const res = await mysql.executeQuery(query, params);
-    return { message: 'Review added successfully', res };
+    await mysql.executeQuery(query, params);
+
+    const res = (await mysql.executeQuery(
+      'SELECT * FROM reviews WHERE id = ?',
+      [reviewId]
+    )) as (IUpdateReviewData & RowDataPacket)[];
+    
+    return { message: 'Review added successfully', res: res[0] };
   } catch (error) {
     throw new Error(
       `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -97,7 +97,7 @@ const addReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-const updateReview = async (req: Request, res: Response) => {
+const updateReview = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Users']
   // #swagger.summary = 'Update book review'
   // #swagger.description = 'Update an existing book review by review ID. Requires user or staff authentication.'
@@ -111,7 +111,10 @@ const updateReview = async (req: Request, res: Response) => {
       });
     }
 
-    const updateData = req.body;
+    const updateData = {
+      ...req.body,
+      userId: req.userId
+    };
     if (!updateData || Object.keys(updateData).length === 0) {
       return res.status(400).json({
         success: false,
@@ -119,16 +122,16 @@ const updateReview = async (req: Request, res: Response) => {
       });
     }
 
-    console.log('Update review with ID:', reviewId, 'Data:', updateData);
-
     const result = await UserService.updateReview(reviewId, updateData);
     if (result) {
+      // console.log('Review updated successfully:', result.res);
       res.status(201).json({
         success: true,
         message: result.message,
         data: result.res,
       });
     } else {
+      // console.error('Failed to update review:', result);
       res.status(400).json({
         success: false,
         message: 'Failed to add review',

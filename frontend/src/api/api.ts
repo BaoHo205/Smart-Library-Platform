@@ -21,7 +21,7 @@ export interface BookDetails {
 }
 
 // ReviewWithUser interface to match backend
-export interface ReviewWithUser {
+export interface IReview {
   id: string;
   userId: string;
   bookId: string;
@@ -73,7 +73,7 @@ export interface BookResponse {
 
 export interface ReviewsResponse {
   success: boolean;
-  data: ReviewWithUser[];
+  data: IReview[];
   message?: string;
 }
 
@@ -106,11 +106,6 @@ export const logout = async (): Promise<void> => {
   }
 };
 
-// const isAuthenticated = () => {
-//   return !!localStorage.getItem('accessToken');
-// };
-
-
 // Get book info by ID
 const getBookInfoById = async (bookId: string): Promise<BookDetails> => {
   try {
@@ -123,7 +118,7 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails> => {
 };
 
 // Get all reviews for a book by ID
-const getReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> => {
+const getReviewsByBookId = async (bookId: string): Promise<IReview[]> => {
   try {
     const response = await axiosInstance.get(`/api/v1/books/${bookId}/reviews`);
     return response.data.data;
@@ -138,7 +133,7 @@ const addReview = async (
   bookId: string,
   rating: number,
   comment: string
-): Promise<ReviewWithUser> => {
+): Promise<IReview> => {
   try {
     const reviewData = {
       bookId,
@@ -153,6 +148,24 @@ const addReview = async (
   }
 };
 
+const updateReview = async (
+  reviewId: string,
+  rating: number,
+  comment: string
+): Promise<IReview> => {
+  try {
+    const reviewData = {
+      rating,
+      comment
+    };
+    const response = await axiosInstance.put(`/api/v1/user/reviews/update/${reviewId}`, reviewData);
+    return response.data.data;
+  } catch (error) {
+    console.error(`Failed to update review with ID ${reviewId}:`, error);
+    throw error;
+  }
+}
+
 
 
 export default {
@@ -161,4 +174,5 @@ export default {
   addReview,
   getBookInfoById,
   getReviewsByBookId,
+  updateReview
 };

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import BookDetail from "@/components/books/BookDetail"
 import BookReviews from "@/components/books/BookReviews"
 import api from "@/api/api"
-import { BookDetails, ReviewWithUser } from "@/api/api"
-import useUser from '@/hooks/useUser'
+import type { BookDetails, IReview } from "@/api/api"
+import useUser from "@/hooks/useUser"
 
 // Interface to match BookDetail component props
 interface BookDetailType {
@@ -27,11 +27,14 @@ interface BookDetailType {
 export interface Review {
   id: string
   userId: string
-  userName: string
-  userAvatar?: string
+  bookId: string
   rating: number
   comment: string
   createdAt: string
+  updatedAt: string
+  userName: string
+  // userAvatar?: string
+  name: string
 }
 
 // Adapter function to convert BookDetails to BookDetailType
@@ -39,27 +42,28 @@ const adaptBookDetails = (book: BookDetails): BookDetailType => {
   return {
     id: book.id,
     title: book.title,
-    author: book.authors.join(', '),
+    author: book.authors.join(", "),
     genre: book.genres,
     publisher: book.publisherName,
-    description: book.description || 'No description available',
+    description: book.description || "No description available",
     coverImage: book.thumbnailUrl || undefined,
     rating: book.avgRating,
     totalReviews: book.numberOfRatings,
-    offlineLocation: undefined // We don't have this in the API
+    offlineLocation: undefined, // We don't have this in the API
   }
 }
 
-// Adapter function to convert ReviewWithUser to Review
-const adaptReview = (review: ReviewWithUser): Review => {
+const adaptReview = (review: IReview): Review => {
   return {
     id: review.id,
     userId: review.userId,
-    userName: review.name || review.userName,
-    userAvatar: undefined, // Not provided by API
+    bookId: review.bookId,
     rating: review.rating,
-    comment: review.comment || '',
-    createdAt: review.createdAt.toString()
+    comment: review.comment || "",
+    createdAt: review.createdAt.toString(),
+    updatedAt: review.updatedAt.toString(),
+    userName: review.name || review.userName,
+    name: review.name,
   }
 }
 
@@ -67,8 +71,8 @@ interface BookDetailPageProps {
   bookId: string
 }
 
-export default function BookInfoPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e' }: BookDetailPageProps) {
-  const { isAuthenticated } = useUser();
+export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a46e65e" }: BookDetailPageProps) {
+  const { isAuthenticated, user } = useUser() // Get user object to access user ID
   const [book, setBook] = useState<BookDetailType | null>(null)
   const [reviews, setReviews] = useState<Review[] | null>(null) // Use null to check if data has been fetched
   const [loading, setLoading] = useState(false) // Start with loading true
@@ -110,19 +114,48 @@ export default function BookInfoPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a4
   const handleAddReview = async (rating: number, comment: string) => {
     try {
       if (!isAuthenticated) {
-        // Handle case where user is not authenticated
-        console.error("User not authenticated");
-        return;
+        console.error("User not authenticated")
+        return
       }
 
-      await api.addReview(bookId, rating, comment);
-      
+      await api.addReview(bookId, rating, comment)
+
       // Re-fetch reviews to update the list
-      const updatedReviews = await api.getReviewsByBookId(bookId);
-      setReviews(updatedReviews.map(adaptReview));
+      const updatedBookInfo = await api.getBookInfoById(bookId)
+      setBook(adaptBookDetails(updatedBookInfo)) // consider to use useState for book rating after update.
+
+      const updatedReviews = await api.getReviewsByBookId(bookId)
+      setReviews(updatedReviews.map(adaptReview))
     } catch (err) {
-      console.error("Error adding review:", err);
+      console.error("Error adding review:", err)
       // You might want to set a state to show an error message to the user.
+    }
+  }
+
+  const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
+    try {
+      if (!isAuthenticated) {
+        console.error("User not authenticated")
+        return
+      }
+
+      // Call your API to update the review
+      await api.updateReview(reviewId, rating, comment)
+
+      // Re-fetch both book info and reviews to update the UI
+      const [updatedBookInfo, updatedReviews] = await Promise.all([
+        api.getBookInfoById(bookId),
+        api.getReviewsByBookId(bookId),
+      ])
+
+      setBook(adaptBookDetails(updatedBookInfo)) // Update book rating if it changed
+      setReviews(updatedReviews.map(adaptReview))
+
+      console.log("Review updated successfully")
+    } catch (err) {
+      console.error("Error updating review:", err)
+      // You might want to set a state to show an error message to the user
+      // For now, we could show a toast notification or set an error state
     }
   }
 
@@ -165,7 +198,12 @@ export default function BookInfoPage({ bookId = '0418ba35-d180-4c9c-8cca-b9b41a4
       <BookDetail book={book} />
 
       {/* Reviews Section */}
-      <BookReviews reviews={reviews} onAddReview={handleAddReview} />
+      <BookReviews
+        reviews={reviews}
+        onAddReview={handleAddReview}
+        onUpdateReview={handleUpdateReview}
+        currentUserId={user?.id} 
+      />
     </div>
   )
 }
