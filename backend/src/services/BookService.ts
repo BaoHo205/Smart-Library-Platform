@@ -101,9 +101,18 @@ export interface ReturnBookResult {
 async function searchBooks(
   filters: BookSearchFilters
 ): Promise<BookSearchResult> {
-  const page = Math.max(1, Number(filters.page) || 1);
-  const pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
-  const offset = (page - 1) * pageSize;
+  let page = 1;
+  let pageSize = 10;
+  let offset = 0;
+  let paginationSql = '';
+
+  // Only apply pagination if page or pageSize are provided by the user.
+  if (filters.page || filters.pageSize) {
+    page = Math.max(1, Number(filters.page) || 1);
+    pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
+    offset = (page - 1) * pageSize;
+    paginationSql = `LIMIT ${pageSize} OFFSET ${offset}`;
+  }
 
   // Define clause
   const where: string[] = [];
@@ -181,13 +190,15 @@ async function searchBooks(
       b.pageCount,
       b.quantity,
       b.availableCopies,
+      b.status,
+      b.description,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres
     ${baseFrom}
     ${whereSql}
     ORDER BY ${sortCol} ${order}
-    LIMIT ${pageSize} OFFSET ${offset}
+    ${paginationSql}
   `;
 
   // Count query
