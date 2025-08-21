@@ -168,14 +168,14 @@ const updateReview = async (
 }
 
 const borrowBook = async (
-  bookId: string, 
-  dueDate: string 
+  bookId: string,
+  dueDate: string
 ): Promise<BorrowBookResponse> => {
   try {
-    const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, { 
-      dueDate 
+    const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, {
+      dueDate
     });
-    
+
     return response.data;
   } catch (error) {
     console.error(`Failed to borrow book with ID ${bookId}:`, error);
@@ -183,6 +183,16 @@ const borrowBook = async (
   }
 }
 
+
+const isBookBorrowed = async (bookId: string): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/books/${bookId}/isBorrowed`);
+    return response.data.isBorrowed || false;
+  } catch (error) {
+    console.error(`Failed to check borrow status for book ID ${bookId}:`, error);
+    return false;
+  }
+}
 
 
 export default {
@@ -192,5 +202,6 @@ export default {
   getBookInfoById,
   getReviewsByBookId,
   updateReview,
-  borrowBook
+  borrowBook,
+  isBookBorrowed
 };

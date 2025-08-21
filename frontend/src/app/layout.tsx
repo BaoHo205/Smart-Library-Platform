@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/sidebar/AppSidebar';
 import AuthProvider from '@/components/auth/AuthProvider';
+import { Toaster } from 'react-hot-toast';
 
 
 
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Toaster position="top-right" />
         {isLoginPage ? (
           // Login page without sidebar and auth protection
           children

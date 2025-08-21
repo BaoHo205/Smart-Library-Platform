@@ -8,6 +8,7 @@ import BookReviews from "@/components/books/BookReviews"
 import api from "@/api/api"
 import type { BookDetails, IReview } from "@/api/api"
 import useUser from "@/hooks/useUser"
+import toast from "react-hot-toast"
 
 // Interface to match BookDetail component props
 interface BookDetailType {
@@ -91,17 +92,27 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   const fetchBookData = async () => {
     setLoading(true)
     setError(null)
-    setBook(null)
-    setReviews(null)
 
     try {
-      const [bookResponse, reviewsResponse] = await Promise.all([
-        api.getBookInfoById(bookId),
-        api.getReviewsByBookId(bookId),
-      ])
+      // const [bookResponse, reviewsResponse] = await Promise.all([
+      //   api.getBookInfoById(bookId),
+      //   api.getReviewsByBookId(bookId),
+      // ])
 
-      setBook(adaptBookDetails(bookResponse))
-      setReviews(reviewsResponse.map(adaptReview))
+      // setBook(adaptBookDetails(bookResponse))
+      // setReviews(reviewsResponse.map(adaptReview))
+
+      // Fetch book details
+      const bookResponse = await api.getBookInfoById(bookId);
+      setBook(adaptBookDetails(bookResponse));
+      
+      // Check if the book is already borrowed by this user
+      const borrowStatus = await api.isBookBorrowed(bookId);
+      setIsBorrowed(borrowStatus);
+
+      // Fetch reviews
+      const reviewsResponse = await api.getReviewsByBookId(bookId);
+      setReviews(reviewsResponse.map(adaptReview));
 
       // Check if current user has already borrowed this book
       // You might need to add this API call or check from the book response
@@ -122,20 +133,29 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   }, [bookId])
 
   const handleBorrow = async () => {
+    if (borrowing) return;
+
+    setBorrowing(true);
     try {
-      setBorrowing(true)
+      // setBorrowing(true)
       const dueDate = generateDueDate()
 
-      await api.borrowBook(bookId, dueDate)
+      // await api.borrowBook(bookId, dueDate)
 
-      // Set borrowed state to true after successful borrow
-      setIsBorrowed(true)
+      // // Set borrowed state to true after successful borrow
+      // setIsBorrowed(true)
 
-      // Refresh book data to update availability status
-      await fetchBookData()
+      // // Refresh book data to update availability status
+      // await fetchBookData()
 
-      console.log("Book borrowed successfully")
-      // You might want to show a success message
+      // console.log("Book borrowed successfully")
+      const result = await api.borrowBook(bookId, dueDate);
+      if (result.success) {
+        setIsBorrowed(true);
+        toast.success("Book borrowed successfully!");
+      } else {
+        toast.error(result.message || "Failed to borrow book");
+      }
     } catch (err) {
       console.error("Error borrowing book:", err)
       setError("Failed to borrow book. Please try again.")

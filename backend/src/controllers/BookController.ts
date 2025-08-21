@@ -219,7 +219,7 @@ const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
 };
 
 
-const getBookInfoById = async ( req: AuthRequest, res: Response): Promise<void> => {
+const getBookInfoById = async (req: AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Books']
   // #swagger.summary = 'Get book information by ID'
   // #swagger.description = 'Retrieve detailed information about a specific book by its ID.'
@@ -232,7 +232,7 @@ const getBookInfoById = async ( req: AuthRequest, res: Response): Promise<void> 
         success: false,
         message: 'Book ID is required',
       });
-      return; 
+      return;
     }
 
     const bookInfo = await BookService.getBookInfoById(bookId);
@@ -242,7 +242,7 @@ const getBookInfoById = async ( req: AuthRequest, res: Response): Promise<void> 
         success: false,
         message: 'Book not found',
       });
-      return; 
+      return;
     }
 
     res.status(200).json({
@@ -290,4 +290,39 @@ const getAllReviewsByBookId = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-export default { borrowBook, returnBook, getBooks, getBookInfoById, getAllReviewsByBookId };
+const isBookBorrowed = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+    const userId = req.userId;
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: 'User ID is required',
+      });
+      return;
+    }
+
+    const result = await BookService.isBookBorrowed(bookId, userId);
+    res.status(200).json({
+      success: true,
+      isBorrowed: result
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Error checking borrow status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    });
+  }
+
+}
+export default { borrowBook, returnBook, getBooks, getBookInfoById, getAllReviewsByBookId, isBookBorrowed };

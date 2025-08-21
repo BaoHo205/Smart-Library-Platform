@@ -396,10 +396,32 @@ const getAllReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> 
   }
 };
 
+const isBookBorrowed = async (
+  bookId: string,
+  userId: string
+): Promise<boolean> => {
+  try {
+    const query = `
+      SELECT COUNT(*) as count
+      FROM checkouts
+      WHERE bookId = ? AND userId = ? AND returnDate IS NULL
+    `;
+    
+    const result = await pool.executeQuery(query, [bookId, userId]) as (boolean & RowDataPacket)[];
+    const isBookBorrowed = result[0].count > 0;
+    return isBookBorrowed;
+  } catch (error) {
+    console.error('Error checking if book is borrowed:', error);
+    return false;
+  }
+};
+
+
 export default {
   searchBooks,
   borrowBook,
   returnBook,
   getBookInfoById,
   getAllReviewsByBookId,
+  isBookBorrowed
 };
