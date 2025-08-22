@@ -130,12 +130,12 @@ const generateNewAccessToken = async (refreshToken: string) => {
 
     const newAccessToken = await jwtService.generateAccessToken({
       userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role,
     });
 
     const newRefreshToken = await jwtService.generateRefreshToken({
       userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role,
     });
 
     return {
@@ -144,9 +144,9 @@ const generateNewAccessToken = async (refreshToken: string) => {
       data: {
         newRefreshToken,
         newAccessToken,
-        userId: decoded.userId,  
-        role: decoded.role      
-      }
+        userId: decoded.userId,
+        role: decoded.role,
+      },
     };
   } catch (error) {
     throw new Error(

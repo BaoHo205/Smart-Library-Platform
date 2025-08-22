@@ -30,10 +30,11 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-            // Skip refresh logic if we're on login page or calling auth endpoints
-      const isAuthEndpoint = originalRequest.url?.includes('/auth/') || 
-                           originalRequest.url?.includes('/user/profile');
-      
+      // Skip refresh logic if we're on login page or calling auth endpoints
+      const isAuthEndpoint =
+        originalRequest.url?.includes('/auth/') ||
+        originalRequest.url?.includes('/user/profile');
+
       if (isAuthEndpoint || window.location.pathname === '/login') {
         return Promise.reject(error);
       }

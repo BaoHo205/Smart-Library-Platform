@@ -22,11 +22,11 @@ const useUser = () => {
     if (hasCheckedAuth.current) {
       return;
     }
-    
+
     try {
       // Check if we have a token in localStorage
       const response = await axiosInstance.get('/api/v1/user/profile');
-      
+
       if (response.data.success) {
         setUser(response.data.data);
         setIsAuthenticated(true);

@@ -18,18 +18,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster position="top-right" />
-          <AuthProvider>
-            <main>
-              <div className="max-w-screen">{children}</div>
-            </main>
-          </AuthProvider>
+        <AuthProvider>
+          <main>
+            <div className="max-w-screen">{children}</div>
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

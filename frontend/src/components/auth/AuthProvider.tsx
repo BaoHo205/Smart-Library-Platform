@@ -28,7 +28,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (!initialCheckDone || loading) {
       return;
     }
-    
+
     // Redirect authenticated users away from login page
     if (isAuthenticated && pathname === '/login') {
       router.replace('/');

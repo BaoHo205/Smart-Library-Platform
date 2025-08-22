@@ -12,10 +12,10 @@ export interface Checkout extends RowDataPacket {
 }
 
 async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
-  const rows = await pool.executeQuery(
+  const rows = (await pool.executeQuery(
     'SELECT b.id AS bookId, b.title AS bookName, c.checkoutDate, c.dueDate, c.returnDate, c.isReturned, c.isLate FROM checkouts c JOIN books b ON c.bookId = b.id WHERE c.userId = ?',
     [userId]
-  ) as Checkout[];
+  )) as Checkout[];
   return rows;
 }
 

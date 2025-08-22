@@ -21,19 +21,19 @@ export function LoginForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    
+
     setFormData(prevData => ({
       ...prevData,
       [id]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (error) setError('');
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
