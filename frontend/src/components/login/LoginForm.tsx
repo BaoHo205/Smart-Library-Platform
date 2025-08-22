@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/api/api";
 
-
 export function LoginForm({
   className,
   ...props
@@ -25,8 +24,6 @@ export function LoginForm({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
 
-    console.log('Input changed:', { id, value }); // Debug log
-
     setFormData(prevData => ({
       ...prevData,
       [id]: value
@@ -38,8 +35,6 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('Form submitted with data:', formData); // Debug log
 
     // Validate form data
     if (!formData.username.trim()) {
@@ -96,6 +91,11 @@ export function LoginForm({
           </div>
           <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
         </div>
+        {error && (
+          <div className="text-red-500 text-sm text-center">
+            {error}
+          </div>
+        )}
         <Button type="submit" className="w-full" >
           Login
         </Button>

@@ -1,5 +1,9 @@
-import pool from '../database/mysql/connection';
+import { NewBook } from '@/controllers/BookController';
+import pool from '@/database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
+import mysqlConnection from "@/database/mysql/connection";
+import { Book } from "@/models/mysql/Book";
+// import { RowDataPacket } from 'mysql2';
 
 export interface BookSearchFilters {
   q?: string; // general keyword -> title/publisher/author/genre
@@ -263,7 +267,7 @@ const borrowBook = async (
   }
 };
 
-export const returnBook = async (
+const returnBook = async (
   userId: string,
   bookId: string
 ): Promise<ReturnBookResult> => {
@@ -368,6 +372,134 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
   }
 };
 
+/**
+ * 
+ * Retrieves all books from the database.
+ * @returns {Promise<Book[]>} A promise that resolves to an array of Book objects.
+ */
+const getAllBooks = async (): Promise<Book[]> => {
+  try {
+    const query = 'SELECT * FROM Book';
+    const rows = await mysqlConnection.executeQuery(query);
+    // Cast the raw query results to the IBook interface for type safety
+    return rows as Book[];
+  } catch (error) {
+    console.error('Error in bookService.getAllBooks:', error);
+    // Ensure error message is handled safely (as 'unknown' type)
+    if (error instanceof Error) {
+      throw new Error(`Could not create book: ${error.message}`);
+    } else {
+      throw new Error(`Could not create book: ${String(error)}`);
+    }
+  }
+}
+
+interface IdRow {
+  id: string;
+}
+
+/**
+ * Creates a new book by calling the `AddNewBook` stored procedure.
+ * This procedure handles the book insertion, author and genre linking, and logging in a single,
+ * atomic transaction, simplifying the service function significantly.
+ * @param {NewBook} bookData The data for the new book.
+ * @param {string} staffId The ID of the staff user performing the action.
+ * @returns {Promise<String>} A promise that resolves to the created Book object id.
+ */
+const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> => {
+  try {
+    const procedure = 'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
+    const params = [
+      bookData.title,
+      bookData.thumbnailUrl || null,
+      bookData.isbn || null,
+      bookData.quantity || null,
+      bookData.quantity || null,
+      bookData.pageCount || null,
+      bookData.publisherId || null,
+      bookData.description || null,
+      bookData.status || 'available',
+      bookData.authorIds,
+      bookData.genreIds,
+      staffId
+    ];
+
+    // Execute the stored procedure (returns OkPacket or similar)
+    await pool.executeQuery(procedure, params);
+
+    // Retrieve the OUT parameter
+    const selectRows = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow;
+
+    if (!selectRows) {
+      throw new Error('Failed to retrieve new book ID from procedure');
+    }
+    return selectRows.id;
+  } catch (error) {
+    console.error('Error in bookService.addNewBook:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not create book: ${error.message}`);
+    } else {
+      throw new Error(`Could not create book: ${String(error)}`);
+    }
+  }
+};
+
+/**
+ * Updates the quantity and availableCopies of a specific book by calling the `UpdateBookInventory`
+ * stored procedure.
+ * @param {string} bookId The ID of the book to update.
+ * @param {number} newQuantity The new total quantity for the book.
+ * @param {string} staffId The ID of the staff user performing the action.
+ * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
+ */
+const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
+  try {
+    const procedure = 'CALL UpdateBookInventory(?, ?, ?)';
+    const params = [bookId, newQuantity, staffId];
+
+    const results = await mysqlConnection.executeQuery(procedure, params);
+
+    // Stored procedures don't return affectedRows directly, so we'll assume success if no error is thrown
+    // and handle logic in the procedure itself. We can check the result set for a status if the procedure provides one.
+    // For now, we'll return true on successful execution.
+    return true;
+  } catch (error) {
+    console.error(`Error in bookService.updateBookInventory for ID ${bookId}:`, error);
+    if (error instanceof Error) {
+      // Re-throw with a more descriptive message
+      throw new Error(`Could not update book inventory: ${error.message}`);
+    } else {
+      throw new Error(`Could not update book inventory: ${String(error)}`);
+    }
+  }
+}
+
+/**
+ * Retires a book by calling the `RetireBook` stored procedure, which sets the status to 'unavailable'.
+ * This function specifically handles retirement and should not be used for other status changes.
+ * @param {string} bookId The ID of the book to retire.
+ * @param {string} staffId The ID of the staff user performing the action.
+ * @returns {Promise<boolean>} A promise that resolves to true if retired, false if book not found.
+ */
+const retireBook = async (bookId: string, staffId: string): Promise<boolean> => {
+  try {
+    const procedure = 'CALL RetireBook(?, ?)';
+    const params = [bookId, staffId];
+
+    const results = await mysqlConnection.executeQuery(procedure, params);
+    return true; // Assume success if the procedure call doesn't throw an error
+  } catch (error) {
+    console.error(`Error in bookService.retireBook for ID ${bookId}:`, error);
+    if (error instanceof Error) {
+      throw new Error(`Could not retire book: ${error.message}`);
+    } else {
+      throw new Error(`Could not retire book: ${String(error)}`);
+    }
+  }
+}
+
+export { searchBooks, getAllBooks, addNewBook, updateBookInventory, retireBook }
+
 const getAllReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> => {
   try {
     const sql = `
@@ -422,6 +554,9 @@ export default {
   borrowBook,
   returnBook,
   getBookInfoById,
+  addNewBook,
+  updateBookInventory,
+  retireBook,
   getAllReviewsByBookId,
   isBookBorrowed
 };

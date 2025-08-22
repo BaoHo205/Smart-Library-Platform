@@ -23,10 +23,10 @@ export default function LoginPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
-          src="/smart_library_platform.png"
+          src="/DB_cover_image.png"
           width={100}
           height={100}
-          alt="Image"
+          alt="5aesiunhan cam sach"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
