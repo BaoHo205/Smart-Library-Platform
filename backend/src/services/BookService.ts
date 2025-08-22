@@ -406,7 +406,7 @@ interface IdRow {
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<String>} A promise that resolves to the created Book object id.
  */
-const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> => {
+const addNewBook = async (bookData: NewBook, staffId: string): Promise<string> => {
   try {
     const procedure = 'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
     const params = [

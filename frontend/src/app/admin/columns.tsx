@@ -1,9 +1,7 @@
 // components/columns.tsx
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
-import Image from "next/image"
 import { EditBookDialog } from "./EditBookDialog"
 
 export type BookShow = {
