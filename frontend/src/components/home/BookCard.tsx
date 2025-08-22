@@ -5,13 +5,14 @@ import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
 import axiosInstance from '@/config/axiosConfig';
 import useUserProfile from '@/hooks/useUserProfile';
+import { CheckoutItem } from '@/types/checkout.type';
 
 export interface BookCardProps {
-  id: string;
-  title: string;
-  thumbnailUrl: string;
-  authors: string;
-  genres: string;
+  id: string,
+  title: string,
+  coverImage: string,
+  authors: string,
+  genres: string,
   avgRating: number | 4.5;
 }
 
@@ -20,11 +21,12 @@ const BookCard: React.FC<BookCardProps> = ({
   title,
   authors,
   genres,
-  // thumbnailUrl,
+  // coverImage,
   avgRating,
 }) => {
   const userId = localStorage.getItem('userId') as string;
-  const { checkouts, setCheckouts } = useUserProfile(userId);
+  const { checkouts = [], setCheckouts } = useUserProfile(userId);
+  console.log('Checkouts:', checkouts);
 
   const handleBorrow = async () => {
     try {
@@ -39,9 +41,9 @@ const BookCard: React.FC<BookCardProps> = ({
           checkoutDate: new Date(),
           dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           returnDate: null,
-          isReturned: false,
-          isLate: false,
-        },
+          isReturned: 0,
+          isLate: 0,
+        } as CheckoutItem,
       ]);
       console.log('Book borrowed successfully:', response.data);
     } catch (error) {

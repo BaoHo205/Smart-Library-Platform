@@ -4,6 +4,8 @@ import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowData
 export interface Checkout extends RowDataPacket {
   bookId: string;
   bookName: string;
+  bookAuthors: string;
+  bookGenres: string;
   checkoutDate: Date;
   dueDate: Date;
   returnDate: Date | null;
@@ -13,7 +15,35 @@ export interface Checkout extends RowDataPacket {
 
 async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
   const rows = await pool.executeQuery(
-    'SELECT b.id AS bookId, b.title AS bookName, c.checkoutDate, c.dueDate, c.returnDate, c.isReturned, c.isLate FROM checkouts c JOIN books b ON c.bookId = b.id WHERE c.userId = ?',
+    `SELECT 
+      b.id AS bookId,
+      b.title AS bookName,
+      COALESCE(authors.authors, '') AS bookAuthors,
+      COALESCE(genres.genres, '') AS bookGenres,
+      c.checkoutDate,
+      c.dueDate,
+      c.returnDate,
+      c.isReturned,
+      c.isLate
+    FROM checkouts c
+    JOIN books b ON c.bookId = b.id
+    LEFT JOIN (
+      SELECT 
+        ba.bookId, 
+        GROUP_CONCAT(CONCAT(a.firstName, ' ', a.lastName) ORDER BY a.lastName SEPARATOR ', ') AS authors
+      FROM book_authors ba
+      JOIN authors a ON a.id = ba.authorId
+      GROUP BY ba.bookId
+    ) AS authors ON authors.bookId = b.id
+    LEFT JOIN (
+      SELECT 
+        bg.bookId, 
+        GROUP_CONCAT(g.name ORDER BY g.name SEPARATOR ', ') AS genres
+      FROM book_genres bg
+      JOIN genres g ON g.id = bg.genreId
+      GROUP BY bg.bookId
+    ) AS genres ON genres.bookId = b.id
+    WHERE c.userId = ?`,
     [userId]
   ) as Checkout[];
   return rows;
