@@ -25,22 +25,20 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     // Don't redirect until we've done the initial auth check
-    if (!initialCheckDone) {
+    if (!initialCheckDone || loading) {
+      return;
+    }
+    
+    // Redirect authenticated users away from login page
+    if (isAuthenticated && pathname === '/login') {
+      router.replace('/');
       return;
     }
 
     // Redirect to login if not authenticated
-    if (!loading) {
-      // Redirect to login if not authenticated
-      if (!isAuthenticated && pathname !== '/login') {
-        router.replace('/login');
-        return;
-      }
-
-      // Redirect authenticated users away from login page
-      if (isAuthenticated && pathname === '/login') {
-        router.replace('/');
-      }
+    if (!isAuthenticated && pathname !== '/login') {
+      router.replace('/login');
+      return;
     }
   }, [isAuthenticated, loading, pathname, router, initialCheckDone]);
 

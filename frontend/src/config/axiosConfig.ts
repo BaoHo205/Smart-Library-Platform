@@ -30,6 +30,14 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+            // Skip refresh logic if we're on login page or calling auth endpoints
+      const isAuthEndpoint = originalRequest.url?.includes('/auth/') || 
+                           originalRequest.url?.includes('/user/profile');
+      
+      if (isAuthEndpoint || window.location.pathname === '/login') {
+        return Promise.reject(error);
+      }
+
       if (!refreshing) {
         refreshing = true;
         try {
@@ -44,8 +52,10 @@ axiosInstance.interceptors.response.use(
           waiters.forEach(waiter => waiter());
           waiters = [];
         } catch (refreshError) {
-          // Refresh failed, redirect to login
-          window.location.href = '/login';
+          // Only redirect if not already on login page
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
           return Promise.reject(refreshError);
         } finally {
           refreshing = false;

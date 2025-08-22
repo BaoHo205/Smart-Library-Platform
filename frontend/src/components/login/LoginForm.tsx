@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import api from '@/api/api';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({
   className,
@@ -20,21 +21,19 @@ export function LoginForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-
-    console.log('Input changed:', { id, value }); // Debug log
-
+    
     setFormData(prevData => ({
       ...prevData,
       [id]: value,
     }));
-
+    
     // Clear error when user starts typing
     if (error) setError('');
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -58,7 +57,8 @@ export function LoginForm({
       const response = await api.login(formData);
 
       if (response.success) {
-        router.push('/');
+        router.refresh(); // Reload to update auth state
+        toast.success('Login successful');
       } else {
         setError(response.message || 'Login failed');
       }

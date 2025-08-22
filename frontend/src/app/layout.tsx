@@ -1,6 +1,4 @@
-'use client';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { usePathname } from 'next/navigation';
 import './globals.css';
 import AuthProvider from '@/components/auth/AuthProvider';
 import { Toaster } from 'react-hot-toast';
@@ -20,8 +18,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isLoginPage = pathname === '/login';
 
   return (
     <html lang="en">
@@ -29,16 +25,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster position="top-right" />
-        {isLoginPage ? (
-          // Login page without sidebar and auth protection
-          children
-        ) : (
           <AuthProvider>
             <main>
               <div className="max-w-screen">{children}</div>
             </main>
           </AuthProvider>
-        )}
       </body>
     </html>
   );
