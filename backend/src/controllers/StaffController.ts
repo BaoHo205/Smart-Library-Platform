@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import StaffService from '../services/StaffService';
+import { AuthRequest } from '@/middleware/authMiddleware';
 
-const getMostBorrowedBooks = async (req: Request, res: Response) => {
+const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Staff']
-  // #swagger.summary = 'Get most borrowed books'
+  // #swagger.summary = 'Get most borrowed books in a specific period'
   // #swagger.description = 'Retrieve statistics of the most frequently borrowed books. Staff access required.'
   try {
     const { startDate, endDate } = req.query;
@@ -59,12 +60,14 @@ const getMostBorrowedBooks = async (req: Request, res: Response) => {
   }
 };
 
-const getTopActiveReaders = async (req: Request, res: Response) => {
+const getTopActiveReaders = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Staff']
-  // #swagger.summary = 'Get top active readers'
+  // #swagger.summary = 'Get top active readers by total checkouts'
   // #swagger.description = 'Retrieve statistics of the most active library users/readers. Staff access required.'
   try {
-    const result = await StaffService.getTopActiveReaders();
+    const limit = req.query.limit || '10'; // Default to 10 if not provided
+    const monthsBack = Number(req.query.monthsBack) || 6; // Default to 6
+    const result = await StaffService.getTopActiveReaders(monthsBack, String(limit));
     res.status(200).json({
       success: true,
       message: 'Top active readers retrieved successfully',
@@ -78,12 +81,12 @@ const getTopActiveReaders = async (req: Request, res: Response) => {
   }
 };
 
-const getBooksWithLowAvailability = async (req: Request, res: Response) => {
+const getBooksWithLowAvailability = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Staff']
   // #swagger.summary = 'Get books with low availability'
   // #swagger.description = 'Retrieve books that have low availability/stock levels. Staff access required.'
   try {
-    const response = await StaffService.getBooksWithLowAvailability();
+    const response = await StaffService.getBooksWithLowAvailability(req.query.interval ? Number(req.query.interval) : 60);
     res.status(200).json({
       success: true,
       message: 'Books with low availability retrieved successfully',

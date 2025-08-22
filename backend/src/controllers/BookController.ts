@@ -220,6 +220,121 @@ const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
+const getBookInfoById = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Get book information by ID'
+  // #swagger.description = 'Retrieve detailed information about a specific book by its ID.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to retrieve information for', type: 'string' }
+  try {
+    const { bookId } = req.params;
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    const bookInfo = await BookService.getBookInfoById(bookId);
+
+    if (!bookInfo) {
+      res.status(404).json({
+        success: false,
+        message: 'Book not found',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bookInfo,
+    });
+  } catch (error) {
+    console.error('Error retrieving book info:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while retrieving book info',
+    });
+  }
+};
+
+const getAllReviewsByBookId = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Get all reviews for a specific book'
+  // #swagger.description = 'Retrieve all reviews for a specific book by its ID with user information.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to retrieve reviews for', type: 'string', in: 'path' }
+  try {
+    const { bookId } = req.params;
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    const reviews = await BookService.getAllReviewsByBookId(bookId);
+
+    res.status(200).json({
+      success: true,
+      data: reviews,
+      total: reviews.length,
+    });
+  } catch (error) {
+    console.error('Error retrieving book reviews:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while retrieving book reviews',
+    });
+  }
+};
+
+const isBookBorrowed = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+    const userId = req.userId;
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: 'User ID is required',
+      });
+      return;
+    }
+
+    const result = await BookService.isBookBorrowed(bookId, userId);
+    res.status(200).json({
+      success: true,
+      isBorrowed: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Error checking borrow status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    });
+  }
+
+}
+
 export interface NewBook {
   title: string;
   thumbnailUrl: string;
@@ -334,4 +449,4 @@ export const retireBook = async (req: Request, res: Response): Promise<void> => 
   }
 }
 
-export default { borrowBook, returnBook, getBooks, addNewBook, updateBookInventory, retireBook };
+export default { borrowBook, returnBook, getBooks, addNewBook, updateBookInventory, retireBook, getBookInfoById, getAllReviewsByBookId, isBookBorrowed };

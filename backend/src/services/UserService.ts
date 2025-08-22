@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import mysql from '../database/mysql/connection';
+import { RowDataPacket } from 'mysql2';
+import { UserRole } from '@/types';
+
 interface IReviewData {
   bookId: string;
   userId: string;
@@ -12,6 +15,15 @@ interface IUpdateReviewData {
   userId: string;
   rating?: number;
   comment?: string;
+}
+
+interface UserProfile {
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
 }
 
 const addReview = async (reviewData: IReviewData) => {
@@ -59,7 +71,6 @@ const updateReview = async (
   updateData: IUpdateReviewData
 ) => {
   try {
-    console.log('Update review by user:', updateData.userId);
     const existingReview = (await mysql.executeQuery(
       'SELECT * FROM reviews WHERE id = ?',
       [reviewId]
@@ -67,9 +78,6 @@ const updateReview = async (
     if (!existingReview || existingReview.length === 0) {
       throw new Error('User not found');
     }
-
-    console.log(existingReview);
-
     const updatedAt = new Date();
     const query = `
         UPDATE reviews
@@ -83,8 +91,14 @@ const updateReview = async (
       reviewId,
       updateData.userId,
     ];
-    const res = await mysql.executeQuery(query, params);
-    return { message: 'Review added successfully', res };
+    await mysql.executeQuery(query, params);
+
+    const res = (await mysql.executeQuery(
+      'SELECT * FROM reviews WHERE id = ?',
+      [reviewId]
+    )) as (IUpdateReviewData & RowDataPacket)[];
+
+    return { message: 'Review added successfully', res: res[0] };
   } catch (error) {
     throw new Error(
       `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -92,7 +106,32 @@ const updateReview = async (
   }
 };
 
+const getUserById = async (userId: string): Promise<UserProfile | null> => {
+  try {
+    const query = `
+      SELECT id, userName, firstName, lastName, email, role
+      FROM users 
+      WHERE id = ?
+    `;
+
+    const result = (await mysql.executeQuery(query, [userId])) as (UserProfile &
+      RowDataPacket)[];
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error('Error getting user by ID:', error);
+    throw new Error(
+      `Failed to get user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
 export default {
   addReview,
   updateReview,
+  getUserById,
 };
