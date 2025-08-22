@@ -73,7 +73,7 @@ const generateDueDate = (): string => {
   const today = new Date()
   const dueDate = new Date(today)
   dueDate.setDate(today.getDate() + 14) // 2 weeks from now
-  return dueDate.toISOString().split("T")[0] // Format: yyyy-mm-dd
+  return dueDate.toISOString().split("T")[0] 
 }
 
 interface BookDetailPageProps {
@@ -81,9 +81,9 @@ interface BookDetailPageProps {
 }
 
 export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a46e65e" }: BookDetailPageProps) {
-  const { user } = useUser() // User is guaranteed to be authenticated
-  const [book, setBook] = useState<BookDetailType | null>(null)
-  const [reviews, setReviews] = useState<Review[] | null>(null)
+  const { user } = useUser() 
+  const [book, setBook] = useState<BookDetailType>()
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [borrowing, setBorrowing] = useState(false)
@@ -237,7 +237,7 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-12">
       {/* Book Detail Section */}
-      <BookDetail book={book} onBorrow={handleBorrow} borrowing={borrowing} isBorrowed={isBorrowed} />
+      <BookDetail book={book} reviews={reviews} onBorrow={handleBorrow} borrowing={borrowing} isBorrowed={isBorrowed} />
 
       {/* Reviews Section */}
       <BookReviews
