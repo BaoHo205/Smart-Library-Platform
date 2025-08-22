@@ -1,5 +1,5 @@
-import axiosInstance from "@/config/axiosConfig";
-import { useState, useEffect } from "react";
+import axiosInstance from '@/config/axiosConfig';
+import { useState, useEffect } from 'react';
 
 interface CheckOut {
   bookId: string;
@@ -9,7 +9,7 @@ interface CheckOut {
   returnDate: Date | null;
   isReturned: boolean;
   isLate: boolean;
- }
+}
 
 const useUserProfile = (userId: string) => {
   const [checkouts, setCheckouts] = useState<CheckOut[]>([]);
@@ -18,7 +18,7 @@ const useUserProfile = (userId: string) => {
       const response = await axiosInstance.get(`/api/v1/checkouts/${userId}`);
       setCheckouts(response.data);
     } catch (error) {
-      console.error("Error fetching checkouts:", error);
+      console.error('Error fetching checkouts:', error);
       throw error;
     }
   };

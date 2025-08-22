@@ -220,8 +220,10 @@ const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
-
-const getBookInfoById = async (req: AuthRequest, res: Response): Promise<void> => {
+const getBookInfoById = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   // #swagger.tags = ['Books']
   // #swagger.summary = 'Get book information by ID'
   // #swagger.description = 'Retrieve detailed information about a specific book by its ID.'
@@ -258,9 +260,12 @@ const getBookInfoById = async (req: AuthRequest, res: Response): Promise<void> =
       message: 'Internal server error while retrieving book info',
     });
   }
-}
+};
 
-const getAllReviewsByBookId = async (req: AuthRequest, res: Response): Promise<void> => {
+const getAllReviewsByBookId = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   // #swagger.tags = ['Books']
   // #swagger.summary = 'Get all reviews for a specific book'
   // #swagger.description = 'Retrieve all reviews for a specific book by its ID with user information.'
@@ -292,7 +297,10 @@ const getAllReviewsByBookId = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-const isBookBorrowed = async (req: AuthRequest, res: Response): Promise<void> => {
+const isBookBorrowed = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   try {
     const { bookId } = req.params;
     const userId = req.userId;
@@ -316,9 +324,8 @@ const isBookBorrowed = async (req: AuthRequest, res: Response): Promise<void> =>
     const result = await BookService.isBookBorrowed(bookId, userId);
     res.status(200).json({
       success: true,
-      isBorrowed: result
+      isBorrowed: result,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,

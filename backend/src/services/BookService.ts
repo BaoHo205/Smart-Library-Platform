@@ -3,7 +3,6 @@ import pool from '@/database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 import mysqlConnection from "@/database/mysql/connection";
 import { Book } from "@/models/mysql/Book";
-// import { RowDataPacket } from 'mysql2';
 
 export interface BookSearchFilters {
   q?: string; // general keyword -> title/publisher/author/genre
@@ -25,6 +24,7 @@ export interface BookListItem {
   pageCount: number | null;
   quantity: number;
   availableCopies: number;
+  avgRating: number | null;
   publisherName: string;
   authors: string;
   genres: string;
@@ -202,6 +202,7 @@ async function searchBooks(
       b.pageCount,
       b.quantity,
       b.availableCopies,
+      b.avgRating,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres
@@ -348,7 +349,9 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
       WHERE b.id = ?
     `;
 
-    const results = (await pool.executeQuery(sql, [bookId])) as BookDetailsRaw[];
+    const results = (await pool.executeQuery(sql, [
+      bookId,
+    ])) as BookDetailsRaw[];
 
     if (results.length === 0) {
       return null;
@@ -359,10 +362,16 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
     // Convert authors and genres from comma-separated strings to arrays
     const bookDetails: BookDetails = {
       ...book,
-      authors: book.authors ? book.authors.split(', ').filter((author: string) => author.trim() !== '') : [],
-      genres: book.genres ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '') : [],
+      authors: book.authors
+        ? book.authors
+            .split(', ')
+            .filter((author: string) => author.trim() !== '')
+        : [],
+      genres: book.genres
+        ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '')
+        : [],
       avgRating: Number(book.avgRating) || 0,
-      numberOfRatings: Number(book.numberOfRatings) || 0
+      numberOfRatings: Number(book.numberOfRatings) || 0,
     };
 
     return bookDetails;
@@ -498,9 +507,8 @@ const retireBook = async (bookId: string, staffId: string): Promise<boolean> => 
   }
 }
 
-export { searchBooks, getAllBooks, addNewBook, updateBookInventory, retireBook }
-
 const getAllReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> => {
+
   try {
     const sql = `
       SELECT 
@@ -519,7 +527,9 @@ const getAllReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> 
       ORDER BY r.updatedAt DESC
     `;
 
-    const results = (await pool.executeQuery(sql, [bookId])) as (ReviewWithUser & RowDataPacket)[];
+    const results = (await pool.executeQuery(sql, [
+      bookId,
+    ])) as (ReviewWithUser & RowDataPacket)[];
 
     return results;
   } catch (error) {
@@ -538,8 +548,11 @@ const isBookBorrowed = async (
       FROM checkouts
       WHERE bookId = ? AND userId = ? AND returnDate IS NULL
     `;
-    
-    const result = await pool.executeQuery(query, [bookId, userId]) as (boolean & RowDataPacket)[];
+
+    const result = (await pool.executeQuery(query, [
+      bookId,
+      userId,
+    ])) as (boolean & RowDataPacket)[];
     const isBookBorrowed = result[0].count > 0;
     return isBookBorrowed;
   } catch (error) {
@@ -548,15 +561,15 @@ const isBookBorrowed = async (
   }
 };
 
-
 export default {
   searchBooks,
   borrowBook,
   returnBook,
   getBookInfoById,
+  getAllBooks,
   addNewBook,
   updateBookInventory,
   retireBook,
   getAllReviewsByBookId,
-  isBookBorrowed
+  isBookBorrowed,
 };

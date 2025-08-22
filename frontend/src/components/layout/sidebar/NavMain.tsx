@@ -1,3 +1,5 @@
+'use client';
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,8 +18,38 @@ import {
 import { BookOpen, ChevronDown, FileText, Search, User } from 'lucide-react';
 import Link from 'next/link';
 
-// Sidebar items
-const data = {
+interface NavMainProps {
+  userRole: string | null;
+}
+
+// User Sidebar items
+const userData = {
+  navigation: [
+    {
+      title: 'Book Browsing',
+      icon: Search,
+      url: '/',
+    },
+    {
+      title: 'Personal Details',
+      icon: User,
+      url: '/me',
+      items: [
+        {
+          title: 'My Loans',
+          url: '/loans',
+        },
+        {
+          title: 'Reading Analytics',
+          url: '/analytics',
+        },
+      ],
+    },
+  ],
+};
+
+// Staff Sidebar items
+const staffData = {
   navigation: [
     {
       title: 'Book Browsing',
@@ -52,7 +84,18 @@ const data = {
   ],
 };
 
-export default function NavMain() {
+const fetchDataByRole = (userRole: string | null) => {
+  if (userRole === 'staff') {
+    return staffData;
+  } else if (userRole === 'user') {
+    return userData;
+  }
+  return userData;
+};
+
+export default function NavMain({ userRole }: NavMainProps) {
+  const data = fetchDataByRole(userRole);
+
   return (
     <SidebarGroup>
       <SidebarGroupContent>

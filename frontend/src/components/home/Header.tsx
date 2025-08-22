@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface Options {
   value: string;
@@ -39,7 +39,7 @@ const options: Options[] = [
   {
     value: 'publisher',
     label: 'Publisher',
-  }
+  },
 ];
 
 const Header: React.FC<HeaderProps> = ({
@@ -47,11 +47,14 @@ const Header: React.FC<HeaderProps> = ({
   onSearchParamChange,
   onSearchInputChange,
   searchParam,
-  searchInput
+  searchInput,
 }) => {
   const [genres, setGenres] = useState<Options[]>([]);
   const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
-  const debouncedSearchInputChange = useCallback(debounce((nextValue) => onSearchInputChange(nextValue), 500), []);
+  const debouncedSearchInputChange = useCallback(
+    debounce(nextValue => onSearchInputChange(nextValue), 500),
+    []
+  );
 
   const fetchGenres = async (): Promise<void> => {
     try {
@@ -70,13 +73,13 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header className="flex items-center justify-between">
       <div className="flex h-full gap-5">
-        <div className="flex items-center h-full w-[25vw] rounded-lg border shadow-2xs p-1.5">
+        <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
           <Select value={searchParam} onValueChange={onSearchParamChange}>
-            <SelectTrigger className="w-[10rem] h-full rounded-md m-0 bg-neutral-100 font-medium">
+            <SelectTrigger className="m-0 h-full w-[10rem] rounded-md bg-neutral-100 font-medium">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {options.map((option) => (
+              {options.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -86,26 +89,26 @@ const Header: React.FC<HeaderProps> = ({
           <Input
             placeholder="Search books, authors, publishers..."
             value={currSearchInput}
-            onChange={(e) => {
+            onChange={e => {
               setCurrSearchInput(e.target.value);
               debouncedSearchInputChange(e.target.value);
             }}
-            className="h-full border-0 focus-visible:ring-0 rounded-r-none shadow-none"
+            className="h-full rounded-r-none border-0 shadow-none focus-visible:ring-0"
           />
         </div>
         <Combobox
           options={genres}
-          optionName='genre'
-          className='h-full w-[12vw] rounded-lg'
+          optionName="genre"
+          className="h-full w-[12vw] rounded-lg"
           onValueChange={onCurrentGenreChange}
         />
       </div>
-      <div className="flex items-center gap-3 rounded-lg py-1.5 px-2.5 shadow-sm border">
+      <div className="flex items-center gap-3 rounded-lg border px-2.5 py-1.5 shadow-sm">
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <span className='text-sm font-medium'>Nhat Minh</span>
+        <span className="text-sm font-medium">Nhat Minh</span>
       </div>
     </header>
   );

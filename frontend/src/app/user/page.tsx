@@ -1,4 +1,5 @@
 'use client';
+
 import { BookCardProps } from '@/components/home/BookCard';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';

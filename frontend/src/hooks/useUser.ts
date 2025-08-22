@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import axiosInstance from '@/config/axiosConfig';
 
@@ -8,7 +8,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: "user" | "staff";
+  role: 'user' | 'staff';
 }
 
 const useUser = () => {
@@ -22,7 +22,6 @@ const useUser = () => {
     if (hasCheckedAuth.current) {
       return;
     }
-    hasCheckedAuth.current = true;
 
     try {
       // Check if we have a token in localStorage
@@ -31,6 +30,7 @@ const useUser = () => {
       if (response.data.success) {
         setUser(response.data.data);
         setIsAuthenticated(true);
+        hasCheckedAuth.current = true;
       } else {
         // Token is invalid
         localStorage.removeItem('accessToken');
@@ -75,7 +75,7 @@ const useUser = () => {
     loading,
     isAuthenticated,
     logout,
-    checkAuth
+    checkAuth,
   };
 };
 

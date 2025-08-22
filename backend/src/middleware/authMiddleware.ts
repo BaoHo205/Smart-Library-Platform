@@ -23,10 +23,10 @@ const verifyJWT = async (
   // const token = authHeader.split(' ')[1];
   const token = req.cookies?.accessToken;
   if (!token) {
-  return res
-    .status(401)
-    .json({ message: 'Authentication required. Please log in.' });
-}
+    return res
+      .status(401)
+      .json({ message: 'Authentication required. Please log in.' });
+  }
   try {
     const payload = await jwtService.verifyAccessToken(token);
     if (!payload) {

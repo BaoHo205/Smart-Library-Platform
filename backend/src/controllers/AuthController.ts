@@ -160,7 +160,7 @@ const logout = async (req: Request, res: Response) => {
       });
     }
 
-     // Clear all authentication cookies
+    // Clear all authentication cookies
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -177,7 +177,7 @@ const logout = async (req: Request, res: Response) => {
       sameSite: 'strict' as const,
       path: '/',
     };
-    
+
     res.clearCookie('userId', userDataCookieOptions);
     res.clearCookie('userRole', userDataCookieOptions);
 
