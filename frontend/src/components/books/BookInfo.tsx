@@ -7,8 +7,8 @@ import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
 import api from '@/api/api';
 import type { BookDetails, IReview } from '@/api/api';
-import useUser from '@/hooks/useUser';
 import toast from 'react-hot-toast';
+import { useAuth } from '../auth/useAuth';
 
 // Interface to match BookDetail component props
 interface BookDetailType {
@@ -70,24 +70,26 @@ const adaptReview = (review: IReview): Review => {
 
 // Helper function to generate due date (2 weeks from now)
 const generateDueDate = (): string => {
-  const today = new Date()
-  const dueDate = new Date(today)
-  dueDate.setDate(today.getDate() + 14) // 2 weeks from now
-  return dueDate.toISOString().split("T")[0] 
-}
+  const today = new Date();
+  const dueDate = new Date(today);
+  dueDate.setDate(today.getDate() + 14); // 2 weeks from now
+  return dueDate.toISOString().split('T')[0];
+};
 
 interface BookDetailPageProps {
   bookId: string;
 }
 
-export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a46e65e" }: BookDetailPageProps) {
-  const { user } = useUser() 
-  const [book, setBook] = useState<BookDetailType>()
-  const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [borrowing, setBorrowing] = useState(false)
-  const [isBorrowed, setIsBorrowed] = useState(false)
+export default function BookInfoPage({
+  bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
+}: BookDetailPageProps) {
+  const { user } = useAuth(); // User is guaranteed to be authenticated
+  const [book, setBook] = useState<BookDetailType | null>(null);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [borrowing, setBorrowing] = useState(false);
+  const [isBorrowed, setIsBorrowed] = useState(false);
 
   const fetchBookData = async () => {
     setLoading(true);
@@ -243,7 +245,13 @@ export default function BookInfoPage({ bookId = "0418ba35-d180-4c9c-8cca-b9b41a4
   return (
     <div className="mx-auto max-w-6xl space-y-12 p-6">
       {/* Book Detail Section */}
-      <BookDetail book={book} reviews={reviews} onBorrow={handleBorrow} borrowing={borrowing} isBorrowed={isBorrowed} />
+      <BookDetail
+        book={book}
+        reviews={reviews}
+        onBorrow={handleBorrow}
+        borrowing={borrowing}
+        isBorrowed={isBorrowed}
+      />
 
       {/* Reviews Section */}
       <BookReviews

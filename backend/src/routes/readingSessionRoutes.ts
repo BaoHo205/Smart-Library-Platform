@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import {
-    startReadingSession,
-    endReadingSession,
-    addPagesRead,
-    addHighlight,
-    getAverageSessionTime,
-    getMostHighlightedBooks,
-    getTopBooksByReadTime
+  startReadingSession,
+  endReadingSession,
+  addPagesRead,
+  addHighlight,
+  getAverageSessionTime,
+  getMostHighlightedBooks,
+  getTopBooksByReadTime,
 } from '../controllers/ReadingSessionController';
 
 const router = Router();
@@ -15,13 +15,13 @@ const router = Router();
 router.post('/start', startReadingSession);
 router.post('/end/:sessionId', endReadingSession);
 
-// data 
+// data
 router.post('/:sessionId/pages', addPagesRead);
 router.post('/:sessionId/highlights', addHighlight);
 
-// reporting 
+// reporting
 router.get('/avg-time', getAverageSessionTime);
 router.get('/most-highlighted', getMostHighlightedBooks);
 router.get('/top-books-time', getTopBooksByReadTime);
 
-export default router; 
+export default router;

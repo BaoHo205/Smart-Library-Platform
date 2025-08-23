@@ -67,7 +67,10 @@ const getTopActiveReaders = async (req: AuthRequest, res: Response) => {
   try {
     const limit = req.query.limit || '10'; // Default to 10 if not provided
     const monthsBack = Number(req.query.monthsBack) || 6; // Default to 6
-    const result = await StaffService.getTopActiveReaders(monthsBack, String(limit));
+    const result = await StaffService.getTopActiveReaders(
+      monthsBack,
+      String(limit)
+    );
     res.status(200).json({
       success: true,
       message: 'Top active readers retrieved successfully',
@@ -86,7 +89,9 @@ const getBooksWithLowAvailability = async (req: AuthRequest, res: Response) => {
   // #swagger.summary = 'Get books with low availability'
   // #swagger.description = 'Retrieve books that have low availability/stock levels. Staff access required.'
   try {
-    const response = await StaffService.getBooksWithLowAvailability(req.query.interval ? Number(req.query.interval) : 60);
+    const response = await StaffService.getBooksWithLowAvailability(
+      req.query.interval ? Number(req.query.interval) : 60
+    );
     res.status(200).json({
       success: true,
       message: 'Books with low availability retrieved successfully',

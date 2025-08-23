@@ -1,8 +1,8 @@
 import { NewBook } from '@/controllers/BookController';
 import pool from '@/database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
-import mysqlConnection from "@/database/mysql/connection";
-import { Book } from "@/models/mysql/Book";
+import mysqlConnection from '@/database/mysql/connection';
+import { Book } from '@/models/mysql/Book';
 
 export interface BookSearchFilters {
   q?: string; // general keyword -> title/publisher/author/genre
@@ -382,7 +382,7 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
 };
 
 /**
- * 
+ *
  * Retrieves all books from the database.
  * @returns {Promise<Book[]>} A promise that resolves to an array of Book objects.
  */
@@ -401,7 +401,7 @@ const getAllBooks = async (): Promise<Book[]> => {
       throw new Error(`Could not create book: ${String(error)}`);
     }
   }
-}
+};
 
 interface IdRow {
   id: string;
@@ -415,9 +415,13 @@ interface IdRow {
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<String>} A promise that resolves to the created Book object id.
  */
-const addNewBook = async (bookData: NewBook, staffId: string): Promise<string> => {
+const addNewBook = async (
+  bookData: NewBook,
+  staffId: string
+): Promise<string> => {
   try {
-    const procedure = 'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
+    const procedure =
+      'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
     const params = [
       bookData.title,
       bookData.thumbnailUrl || null,
@@ -430,14 +434,16 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<string> =
       bookData.status || 'available',
       bookData.authorIds,
       bookData.genreIds,
-      staffId
+      staffId,
     ];
 
     // Execute the stored procedure (returns OkPacket or similar)
     await pool.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const selectRows = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow;
+    const selectRows = (await pool.executeQuery(
+      'SELECT @new_book_id AS id'
+    )) as unknown as IdRow;
 
     if (!selectRows) {
       throw new Error('Failed to retrieve new book ID from procedure');
@@ -461,7 +467,11 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<string> =
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
  */
-const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
+const updateBookInventory = async (
+  bookId: string,
+  newQuantity: number,
+  staffId: string
+): Promise<boolean> => {
   try {
     const procedure = 'CALL UpdateBookInventory(?, ?, ?)';
     const params = [bookId, newQuantity, staffId];
@@ -473,7 +483,10 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
     // For now, we'll return true on successful execution.
     return true;
   } catch (error) {
-    console.error(`Error in bookService.updateBookInventory for ID ${bookId}:`, error);
+    console.error(
+      `Error in bookService.updateBookInventory for ID ${bookId}:`,
+      error
+    );
     if (error instanceof Error) {
       // Re-throw with a more descriptive message
       throw new Error(`Could not update book inventory: ${error.message}`);
@@ -481,7 +494,7 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
       throw new Error(`Could not update book inventory: ${String(error)}`);
     }
   }
-}
+};
 
 /**
  * Retires a book by calling the `RetireBook` stored procedure, which sets the status to 'unavailable'.
@@ -490,7 +503,10 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<boolean>} A promise that resolves to true if retired, false if book not found.
  */
-const retireBook = async (bookId: string, staffId: string): Promise<boolean> => {
+const retireBook = async (
+  bookId: string,
+  staffId: string
+): Promise<boolean> => {
   try {
     const procedure = 'CALL RetireBook(?, ?)';
     const params = [bookId, staffId];
@@ -505,10 +521,11 @@ const retireBook = async (bookId: string, staffId: string): Promise<boolean> => 
       throw new Error(`Could not retire book: ${String(error)}`);
     }
   }
-}
+};
 
-const getAllReviewsByBookId = async (bookId: string): Promise<ReviewWithUser[]> => {
-
+const getAllReviewsByBookId = async (
+  bookId: string
+): Promise<ReviewWithUser[]> => {
   try {
     const sql = `
       SELECT 
