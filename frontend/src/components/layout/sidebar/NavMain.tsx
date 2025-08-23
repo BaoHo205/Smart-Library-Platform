@@ -74,7 +74,7 @@ const staffData = {
     {
       title: 'My Inventory',
       icon: BookOpen,
-      url: '/inventory',
+      url: '/my-inventory',
     },
     {
       title: 'My Report',
@@ -116,7 +116,7 @@ export default function NavMain({ userRole }: NavMainProps) {
                       {item.items.map(subItem => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={subItem.url}>
+                            <Link href={`${userRole}${subItem.url}`}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -127,7 +127,7 @@ export default function NavMain({ userRole }: NavMainProps) {
                 </Collapsible>
               ) : (
                 <SidebarMenuButton asChild>
-                  <Link href={item.url}>
+                  <Link href={`${userRole}${item.url}`}>
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
                   </Link>
