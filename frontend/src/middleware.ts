@@ -25,44 +25,36 @@ export function middleware(request: NextRequest) {
 
   // If authenticated and trying to access login page
   if (isAuthenticated && pathname === '/login') {
-    const redirectUrl = userRole === 'staff' ? '/staff' : '/user';
+    const redirectUrl = '/';
     const dashboardUrl = new URL(redirectUrl, request.url);
     return NextResponse.redirect(dashboardUrl);
   }
 
-  // Role-based route protection
+// Role-based route protection
   if (isAuthenticated && userRole) {
-    const isStaffRoute = pathname.startsWith('/staff');
-    const isUserRoute = pathname.startsWith('/user');
+    // Define allowed paths for user
+    const userAllowedPaths: string[] = [
+      '/',
+      '/books',
+      '/me',
+      '/loans',
+      '/analytics',
+    ];
 
-    // Staff trying to access user routes
-    if (userRole === 'staff' && isUserRoute) {
-      const staffUrl = new URL('/staff', request.url);
-      return NextResponse.redirect(staffUrl);
-    }
+    const isUserAllowedPath = userAllowedPaths.includes(pathname);
 
-    // User trying to access staff routes
-    if (userRole === 'user' && isStaffRoute) {
-      const userUrl = new URL('/user', request.url);
+    // User trying to access paths not in their allowed list
+    if (userRole === 'user' && !isUserAllowedPath && !isPublicRoute) {
+      const userUrl = new URL('/', request.url);
       return NextResponse.redirect(userUrl);
-    }
-
-    // Redirect from root to appropriate dashboard
-    if (pathname === '/') {
-      const redirectUrl = userRole === 'staff' ? '/staff' : '/user';
-      const dashboardUrl = new URL(redirectUrl, request.url);
-      return NextResponse.redirect(dashboardUrl);
-    }
-
-    // If authenticated but not on a role-specific route and not on public route
-    if (!isStaffRoute && !isUserRoute && !isPublicRoute) {
-      const redirectUrl = userRole === 'staff' ? '/staff' : '/user';
-      const dashboardUrl = new URL(redirectUrl, request.url);
-      return NextResponse.redirect(dashboardUrl);
     }
   }
 
-  return NextResponse.next();
+    // Create response and add pathname header for layout to use
+  const response = NextResponse.next();
+  response.headers.set('x-pathname', pathname);
+  
+  return response;
 }
 
 export const config = {
@@ -73,8 +65,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - images (static image files)
-     * - public (other public files)
+     * - any file with common image extensions
      */
     '/((?!api|_next/static|_next/image|favicon.ico|images|public).*)',
   ],
