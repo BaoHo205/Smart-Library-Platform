@@ -139,61 +139,60 @@ CREATE TABLE IF NOT EXISTS Staff_Logs (
             );`;
 
 const initializeDatabaseAndTables = async () => {
-    try {
-        // Create connection without database selection for creating DB
-        const tempConnection = await mysql.createConnection({
-            host: MySQL_CONFIG.host,
-            port: MySQL_CONFIG.port,
-            user: MySQL_CONFIG.user,
-            password: MySQL_CONFIG.password,
-            database: MySQL_CONFIG.database
-        });
+  try {
+    // Create connection without database selection for creating DB
+    const tempConnection = await mysql.createConnection({
+      host: MySQL_CONFIG.host,
+      port: MySQL_CONFIG.port,
+      user: MySQL_CONFIG.user,
+      password: MySQL_CONFIG.password,
+      database: MySQL_CONFIG.database,
+    });
 
-        await tempConnection.execute(
-            `CREATE DATABASE IF NOT EXISTS \`${MySQL_CONFIG.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-        );
+    await tempConnection.execute(
+      `CREATE DATABASE IF NOT EXISTS \`${MySQL_CONFIG.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+    );
 
-        // await tempConnection.execute(
-        //     `USE ${MySQL_CONFIG.database}`
-        // );
+    // await tempConnection.execute(
+    //     `USE ${MySQL_CONFIG.database}`
+    // );
 
-        await tempConnection.execute(createPublisherTable);
-        console.log('✅ Table `Publisher` created/verified.');
+    await tempConnection.execute(createPublisherTable);
+    console.log('✅ Table `Publisher` created/verified.');
 
-        await tempConnection.execute(createAuthorTable);
-        console.log('✅ Table `Author` created/verified.');
+    await tempConnection.execute(createAuthorTable);
+    console.log('✅ Table `Author` created/verified.');
 
-        await tempConnection.execute(createUserTable);
-        console.log('✅ Table `User` created/verified.');
+    await tempConnection.execute(createUserTable);
+    console.log('✅ Table `User` created/verified.');
 
-        await tempConnection.execute(createCategoryTable);
-        console.log('✅ Table `Category` created/verified.');
+    await tempConnection.execute(createCategoryTable);
+    console.log('✅ Table `Category` created/verified.');
 
-        await tempConnection.execute(createBookTable);
-        console.log('✅ Table `Book` created/verified.');
+    await tempConnection.execute(createBookTable);
+    console.log('✅ Table `Book` created/verified.');
 
-        await tempConnection.execute(createBookAuthorTable);
-        console.log('✅ Table `Book_Author` created/verified.');
+    await tempConnection.execute(createBookAuthorTable);
+    console.log('✅ Table `Book_Author` created/verified.');
 
-        await tempConnection.execute(createBookCategoryTable);
-        console.log('✅ Table `Book_Category` created/verified.');
+    await tempConnection.execute(createBookCategoryTable);
+    console.log('✅ Table `Book_Category` created/verified.');
 
-        await tempConnection.execute(createCheckoutTable);
-        console.log('✅ Table `Checkout` created/verified.');
+    await tempConnection.execute(createCheckoutTable);
+    console.log('✅ Table `Checkout` created/verified.');
 
-        await tempConnection.execute(createReviewTable);
-        console.log('✅ Table `Review` created/verified.');
+    await tempConnection.execute(createReviewTable);
+    console.log('✅ Table `Review` created/verified.');
 
-        await tempConnection.execute(createStaffLogsTable);
-        console.log('✅ Table `Staff_Logs` created/verified.');
+    await tempConnection.execute(createStaffLogsTable);
+    console.log('✅ Table `Staff_Logs` created/verified.');
 
-        console.log(`✅ Database '${MySQL_CONFIG.database}' created/verified`);
-        await tempConnection.end();
-
-    } catch (error) {
-        console.error('❌ Error creating database:', error);
-        throw error;
-    }
+    console.log(`✅ Database '${MySQL_CONFIG.database}' created/verified`);
+    await tempConnection.end();
+  } catch (error) {
+    console.error('❌ Error creating database:', error);
+    throw error;
+  }
 };
 
 const connect = async () => {
@@ -220,7 +219,6 @@ const connect = async () => {
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
     }
-
   } catch (error) {
     console.error('❌ Error connecting to MySQL:', error);
     throw error;

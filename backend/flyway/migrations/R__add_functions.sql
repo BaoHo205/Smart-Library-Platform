@@ -1,6 +1,7 @@
 -- # Functions
 DROP FUNCTION IF EXISTS IsBookAvailable;
 DROP FUNCTION IF EXISTS IsReturnOnTime;
+DROP FUNCTION IF EXISTS CountBooksBorrowedInRange;
 
 -- Create function to check if a book is available
 DELIMITER //
@@ -39,6 +40,30 @@ BEGIN
     
     -- Return true if return date is on or before due date
     RETURN v_returnDate <= p_dueDate;
+END//
+
+DELIMITER ;
+
+-- Create function to count books borrowed within a given time range
+-- dung distinct neu muon specify book
+DELIMITER //
+
+CREATE FUNCTION CountBooksBorrowedInRange(
+    startDate DATE,
+    endDate DATE
+)
+RETURNS INT
+READS SQL DATA
+DETERMINISTIC
+BEGIN
+    DECLARE borrowCount INT;
+    
+    SELECT COUNT(*) INTO borrowCount
+    FROM checkouts
+    WHERE checkoutDate >= startDate 
+    AND checkoutDate <= endDate;
+    
+    RETURN borrowCount;
 END//
 
 DELIMITER ;

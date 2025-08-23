@@ -1,31 +1,32 @@
-'use client'
+'use client';
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import api from "@/api/api";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import api from '@/api/api';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: React.ComponentProps<'form'>) {
   const [formData, setFormData] = useState({
-    username: "",
-    password: ""
-  })
+    username: '',
+    password: '',
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-
     setFormData(prevData => ({
       ...prevData,
-      [id]: value
+      [id]: value,
     }));
 
     // Clear error when user starts typing
@@ -53,21 +54,26 @@ export function LoginForm({
       const response = await api.login(formData);
 
       if (response.success) {
-        router.push('/');
+        router.refresh(); // Reload to update auth state
+        toast.success('Login successfully!');
       } else {
         setError(response.message || 'Login failed');
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setError(error.message || 'An error occurred during login');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      setError('An error occurred during login');
     } finally {
       setLoading(false);
     }
   };
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn('flex flex-col gap-6', className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">Welcom to Ftech's Library</h1>
         <p className="text-muted-foreground text-sm text-balance">
           Enter your username below to login to your account
         </p>
@@ -75,7 +81,15 @@ export function LoginForm({
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="username">Username</Label>
-          <Input id="username" name='username' type="username" placeholder="johndoe" required onChange={handleChange} value={formData.username} />
+          <Input
+            id="username"
+            name="username"
+            type="username"
+            placeholder="johndoe"
+            required
+            onChange={handleChange}
+            value={formData.username}
+          />
         </div>
         <div className="grid gap-3">
           <div className="flex items-center">
@@ -87,15 +101,16 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required onChange={handleChange} value={formData.password} />
+          <Input
+            id="password"
+            type="password"
+            required
+            onChange={handleChange}
+            value={formData.password}
+          />
         </div>
-        {error && (
-          <div className="text-red-500 text-sm text-center">
-            {error}
-          </div>
-        )}
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+        <Button type="submit" className="w-full">
+          Login
         </Button>
       </div>
       <div className="text-center text-sm">

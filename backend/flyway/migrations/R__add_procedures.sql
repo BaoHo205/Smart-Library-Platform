@@ -5,6 +5,7 @@ DROP PROCEDURE IF EXISTS ReturnBook;
 DROP PROCEDURE IF EXISTS AddNewBook;
 DROP PROCEDURE IF EXISTS UpdateBookInventory;
 DROP PROCEDURE IF EXISTS RetireBook;
+DROP PROCEDURE IF EXISTS ReviewBook;
 
 -- Create stored procedure for borrowing a book
 DELIMITER //
@@ -384,6 +385,118 @@ END $$
 
 DELIMITER ;
 
+-- Create stored procedure for reviewing a book
+DELIMITER //
+
+CREATE PROCEDURE ReviewBook(
+    IN p_userId VARCHAR(36),
+    IN p_bookId VARCHAR(36),
+    IN p_rating INT,
+    IN p_comment TEXT,
+    OUT p_success BOOLEAN,
+    OUT p_message VARCHAR(500),
+    OUT p_reviewId VARCHAR(36)
+)
+proc: BEGIN
+    DECLARE v_user_exists INT DEFAULT 0;
+    DECLARE v_book_exists INT DEFAULT 0;
+    DECLARE v_has_borrowed INT DEFAULT 0;
+    DECLARE v_existing_review INT DEFAULT 0;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_success = FALSE;
+        SET p_message = 'db error occurred while processing review';
+        SET p_reviewId = NULL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Check user exists
+    SELECT COUNT(*) INTO v_user_exists
+    FROM users 
+    WHERE id = p_userId;
+    
+    IF v_user_exists = 0 THEN
+        SET p_success = FALSE;
+        SET p_message = 'User not found';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check book exists
+    SELECT COUNT(*) INTO v_book_exists
+    FROM books 
+    WHERE id = p_bookId;
+    
+    IF v_book_exists = 0 THEN
+        SET p_success = FALSE;
+        SET p_message = 'Book not found';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check user has borrowed this book before
+    SELECT COUNT(*) INTO v_has_borrowed
+    FROM checkouts 
+    WHERE userId = p_userId AND bookId = p_bookId;
+    
+    IF v_has_borrowed = 0 THEN
+        SET p_success = FALSE;
+        SET p_message = 'You can only review books you have borrowed';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check rating is within valid range
+    IF p_rating < 1 OR p_rating > 5 THEN
+        SET p_success = FALSE;
+        SET p_message = 'Rating must be between 1 and 5';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check user already reviewed this book
+    SELECT COUNT(*) INTO v_existing_review
+    FROM reviews
+    WHERE userId = p_userId AND bookId = p_bookId;
+    
+    -- Insert or update review based on whether it already exists
+    IF v_existing_review > 0 THEN
+        SELECT id INTO p_reviewId
+        FROM reviews
+        WHERE userId = p_userId AND bookId = p_bookId;
+        
+        UPDATE reviews
+        SET rating = p_rating,
+            comment = p_comment,
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE userId = p_userId AND bookId = p_bookId;
+        
+        SET p_success = TRUE;
+        SET p_message = 'Review updated successfully';
+    ELSE
+        SET p_reviewId = UUID();
+        INSERT INTO reviews (
+            id, userId, bookId, rating, comment
+        ) VALUES (
+            p_reviewId, p_userId, p_bookId, p_rating, p_comment
+        );
+        
+        SET p_success = TRUE;
+        SET p_message = 'Review submitted successfully';
+    END IF;
+    
+    COMMIT;
+END//
+
+DELIMITER ;
+
 -- Create stored procedure for returning a book with concurrency control
 DELIMITER //
 
@@ -462,3 +575,5 @@ proc: BEGIN
     
     COMMIT;
 END //
+
+DELIMITER ;

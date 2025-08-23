@@ -32,3 +32,26 @@ WHERE isbn IS NULL OR TRIM(isbn) = '';
 UPDATE books
 SET description = CONCAT('An engaging read: ', title, '. Placeholder description for development data.')
 WHERE description IS NULL OR TRIM(description) = '';
+
+-- Add avgRating column
+ALTER TABLE books
+ADD avgRating DECIMAL(2, 1);
+
+DROP PROCEDURE IF EXISTS CalculateAvgRating;
+DELIMITER //
+
+CREATE PROCEDURE CalculateAvgRating()
+BEGIN
+  UPDATE books bo
+  SET avgRating = COALESCE(
+    (SELECT AVG(r.rating)
+     FROM reviews r
+     WHERE r.bookId = bo.id), 
+    0
+  );
+END //
+
+DELIMITER ;
+
+SET SQL_SAFE_UPDATES = 0;
+call CalculateAvgRating();

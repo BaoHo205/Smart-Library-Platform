@@ -1,6 +1,6 @@
-import mysqlConnection from "../database/mysql/connection";
-import { v4 as uuidv4 } from "uuid";
-import { StaffLog } from "../models/StaffLogModel";
+import mysqlConnection from '../database/mysql/connection';
+import { v4 as uuidv4 } from 'uuid';
+import { StaffLog } from '../models/mysql/StaffLog';
 import { ResultSetHeader } from 'mysql2/promise';
 
 /**
@@ -9,44 +9,43 @@ import { ResultSetHeader } from 'mysql2/promise';
  * @returns {Promise<IStaffLog>} A promise that resolves to the created log object.
  */
 export const createStaffLog = async (
-    logData: Omit<StaffLog, 'id' | 'created_at' | 'updated_at'> // Omit auto-generated fields
+  logData: Omit<StaffLog, 'id' | 'createdAt' | 'updatedAt'> // Omit auto-generated fields
 ): Promise<StaffLog> => {
-    const logId = uuidv4(); // Generate a new UUID for the log entry
+  const logId = uuidv4(); // Generate a new UUID for the log entry
 
-    try {
-        const query = `
-            INSERT INTO Staff_Logs (id, staff_id, action_type, action_details)
-            VALUES (?, ?, ?, ?)
+  try {
+    const query = `
+            INSERT INTO staff_logs (id, userId, bookId, actionType, actionDetails, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
         `;
-        const params = [
-            logId,
-            logData.staff_id,
-            logData.action_type,
-            logData.action_details
-        ];
+    const params = [
+      logId,
+      logData.userId,
+      logData.bookId,
+      logData.actionType,
+      logData.actionDetails,
+    ];
 
-        const results = await mysqlConnection.executeQuery(query, params);
+    const results = await mysqlConnection.executeQuery(query, params);
 
-        // For INSERT, results is typically an OkPacket. We check affectedRows.
-        if ((results as ResultSetHeader).affectedRows === 0) {
-            throw new Error('Failed to create staff log: No rows affected.');
-        }
-
-        // Return the created log data, including the generated ID
-        return {
-            ...logData,
-            id: logId,
-            created_at: new Date().toISOString(), // Approximate, DB will set exact
-            updated_at: new Date().toISOString()  // Approximate, DB will set exact
-        };
-
-    } catch (error) {
-        console.error('Error in staffLogService.createStaffLog:', error);
-        if (error instanceof Error) {
-            throw new Error(`Could not create staff log: ${error.message}`);
-        } else {
-            throw new Error(`Could not create staff log: ${String(error)}`);
-        }
+    // For INSERT, results is typically an OkPacket. We check affectedRows.
+    if ((results as ResultSetHeader).affectedRows === 0) {
+      throw new Error('Failed to create staff log: No rows affected.');
     }
-}
 
+    // Return the created log data, including the generated ID
+    return {
+      ...logData,
+      id: logId,
+      createdAt: new Date(), // Approximate, DB will set exact
+      updatedAt: new Date(), // Approximate, DB will set exact
+    };
+  } catch (error) {
+    console.error('Error in staffLogService.createStaffLog:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not create staff log: ${error.message}`);
+    } else {
+      throw new Error(`Could not create staff log: ${String(error)}`);
+    }
+  }
+};

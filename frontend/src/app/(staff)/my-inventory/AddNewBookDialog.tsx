@@ -1,22 +1,20 @@
-// components/EditBookDialog.tsx
-"use client";
+// components/AddNewBookDialog.tsx
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -24,19 +22,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Plus, Minus } from "lucide-react";
-import { ComboboxWithCreate } from "./ComboboxWithCreate";
+} from '@/components/ui/form'; // Adjust this import path as needed
+import { Plus, Minus } from 'lucide-react';
+import { ComboboxWithCreate } from './ComboboxWithCreate';
 
-export interface BookShow {
-  thumbnail_url: string;
-  id: string;
-  title: string;
-  author: string;
-  publisher: string;
-  genre: [string];
-  quantity: number;
-}
 export interface Publisher {
   id?: string;
   name: string;
@@ -52,20 +41,18 @@ export interface Author {
 }
 
 const formSchema = z.object({
-  bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
+  bookTitle: z
+    .string()
+    .min(2, { message: 'Book title must be at least 2 characters.' }),
   isbn: z.string().optional(),
-  publisher: z.string().min(1, { message: "Publisher is required." }),
-  author: z.string().min(1, { message: "Author is required." }),
-  thumbnailLink: z.string().url({ message: "Invalid URL." }).optional(),
-  bookQuantity: z.number().min(0, { message: "Quantity cannot be negative." }),
+  publisher: z.string().min(1, { message: 'Publisher is required.' }),
+  author: z.string().min(1, { message: 'Author is required.' }),
+  thumbnailLink: z.string().url({ message: 'Invalid URL.' }).optional(),
+  bookQuantity: z.number().min(0, { message: 'Quantity cannot be negative.' }),
   description: z.string().optional(),
 });
 
-interface EditBookDialogProps {
-  book: BookShow;
-}
-
-export function EditBookDialog({ book }: EditBookDialogProps) {
+export function AddNewBookDialog() {
   const [open, setOpen] = useState(false);
   const [publisherList, setPublisherList] = useState<Publisher[]>([]);
   const [authorList, setAuthorList] = useState<Author[]>([]);
@@ -73,60 +60,87 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      bookTitle: book.title || "",
-      publisher: book.publisher || "",
-      author: book.author || "",
-      bookQuantity: book.quantity || 0,
-      thumbnailLink: book.thumbnail_url || "",
-      isbn: "",
-      description: "",
+      bookTitle: '',
+      isbn: '',
+      publisher: '',
+      author: '',
+      thumbnailLink: '',
+      bookQuantity: 0,
+      description: '',
     },
   });
 
   useEffect(() => {
     if (open) {
-      if (book.publisher) {
-        setPublisherList([{ id: book.publisher, name: book.publisher, createdAt: new Date(), updatedAt: new Date() }]);
-      } else {
-        setPublisherList([]);
-      }
-
-      if (book.author) {
-        const [firstName = '', ...lastNameParts] = book.author.split(' ');
-        const lastName = lastNameParts.join(' ');
-        setAuthorList([{ id: book.author, firstName, lastName, createdAt: new Date(), updatedAt: new Date() }]);
-      } else {
-        setAuthorList([]);
-      }
+      // Simulate fetching data from backend
+      setPublisherList([
+        {
+          id: 'pub1',
+          name: 'FTECH',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
+      setAuthorList([
+        {
+          id: 'auth1',
+          firstName: 'Robert',
+          lastName: 'Ludke',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
     }
-  }, [open, book]);
+  }, [open]);
 
   const handleNewPublisher = async (name: string) => {
-    console.log("Creating new publisher:", name);
+    console.log('Creating new publisher:', name);
+    // 1. Simulate API call and get the new publisher object
     const newPublisherId = `pub${Date.now()}`;
-    const newPublisher = { id: newPublisherId, name: name, createdAt: new Date(), updatedAt: new Date() };
+    const newPublisher = {
+      id: newPublisherId,
+      name: name,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // 2. Update the state with the new publisher
     setPublisherList([...publisherList, newPublisher]);
-    form.setValue("publisher", newPublisher.id as string);
+
+    // 3. Set the form value to the new publisher's ID
+    form.setValue('publisher', newPublisher.id as string);
   };
 
   const handleNewAuthor = async (fullName: string) => {
-    console.log("Creating new author:", fullName);
+    console.log('Creating new author:', fullName);
     const [firstName, ...lastNameParts] = fullName.split(' ');
     const lastName = lastNameParts.join(' ');
+
+    // 1. Simulate API call and get the new author object
     const newAuthorId = `auth${Date.now()}`;
-    const newAuthor = { id: newAuthorId, firstName: firstName, lastName: lastName, createdAt: new Date(), updatedAt: new Date() };
+    const newAuthor = {
+      id: newAuthorId,
+      firstName: firstName,
+      lastName: lastName,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // 2. Update the state with the new author
     setAuthorList([...authorList, newAuthor]);
-    form.setValue("author", newAuthor.id as string);
+
+    // 3. Set the form value to the new author's ID
+    form.setValue('author', newAuthor.id as string);
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Updated values:", { id: book.id, ...values });
+    console.log(values);
     setOpen(false);
   }
 
   const handleQuantityChange = (delta: number) => {
-    const currentQuantity = form.getValues("bookQuantity");
-    form.setValue("bookQuantity", Math.max(0, currentQuantity + delta));
+    const currentQuantity = form.getValues('bookQuantity');
+    form.setValue('bookQuantity', Math.max(0, currentQuantity + delta));
   };
 
   const publisherOptions = publisherList.map(p => ({
@@ -140,12 +154,10 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit</Button>
-      </DialogTrigger>
+      <Button onClick={() => setOpen(true)}>Add New Book</Button>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Edit Book: {book.title}</DialogTitle>
+          <DialogTitle>Add new Book</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -157,7 +169,7 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
                   <FormItem>
                     <FormLabel>Book Title</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Enter book title..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,7 +182,7 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
                   <FormItem>
                     <FormLabel>ISBN</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Enter ISBN..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -229,7 +241,7 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
                   <FormItem>
                     <FormLabel>Thumbnail Link</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Enter thumbnail link..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -238,7 +250,12 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="bookQuantity">Book Quantity</Label>
                 <div className="flex items-center space-x-2">
-                  <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(-1)}
+                  >
                     <Minus className="h-4 w-4" />
                   </Button>
                   <FormField
@@ -249,12 +266,17 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
                         id="bookQuantity"
                         type="number"
                         value={field.value}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={e => field.onChange(Number(e.target.value))}
                         className="w-16 text-center"
                       />
                     )}
                   />
-                  <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleQuantityChange(1)}
+                  >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -268,17 +290,24 @@ export function EditBookDialog({ book }: EditBookDialogProps) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea
+                      placeholder="Enter book description..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-2 mt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">Add new Book</Button>
             </div>
           </form>
         </Form>

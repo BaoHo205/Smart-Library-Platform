@@ -7,9 +7,9 @@ export interface ReadingSession {
   startTime: Date;
   endTime?: Date; // session might be ongoing
   device: DeviceType;
-  pagesRead: number[]; 
-  highlights: Highlight[]; 
-  sessionDuration?: number; 
+  pagesRead: number[];
+  highlights: Highlight[];
+  sessionDuration?: number;
   createdAt: Date;
   updatedAt: Date;
 }
