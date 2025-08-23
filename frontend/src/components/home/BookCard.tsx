@@ -1,10 +1,11 @@
 import Image from 'next/image';
-import { Card, CardHeader, CardFooter, CardContent } from '../ui/card';
+import { Card, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
 import axiosInstance from '@/config/axiosConfig';
 import useUserProfile from '@/hooks/useUserProfile';
+import { useRouter } from 'next/navigation';
 
 export interface BookCardProps {
   id: string;
@@ -13,6 +14,7 @@ export interface BookCardProps {
   authors: string;
   genres: string;
   avgRating: number | 4.5;
+  availableCopies: number;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
@@ -20,11 +22,12 @@ const BookCard: React.FC<BookCardProps> = ({
   title,
   authors,
   genres,
-  // thumbnailUrl,
+  thumbnailUrl,
   avgRating,
+  availableCopies,
 }) => {
-  const userId = localStorage.getItem('userId') as string;
-  const { checkouts, setCheckouts } = useUserProfile(userId);
+  const { checkouts, setCheckouts } = useUserProfile();
+  const router = useRouter();
 
   const handleBorrow = async () => {
     try {
@@ -49,45 +52,58 @@ const BookCard: React.FC<BookCardProps> = ({
     }
   };
 
+  const directToBookDetail = () => {
+    router.push(`/books/${id}`);
+  };
+
   return (
-    <Card className="w-full max-w-lg">
-      <CardHeader>
-        <h1 className="overflow-hidden text-xl font-bold text-nowrap text-ellipsis">
-          {title}
-        </h1>
-        <p className="text-muted-foreground overflow-hidden text-sm text-nowrap text-ellipsis">
-          {authors}
-        </p>
-        <div className="flex gap-2">
-          {/* {genres.map(genre => (
-            <Badge variant={'default'} key={genre}>
-              {genre}
-            </Badge>
-          ))} */}
-          {genres.split(',').map(genre => (
-            <Badge variant={'default'} key={genre}>
-              {genre.trim()}
-            </Badge>
-          ))}
-        </div>
-      </CardHeader>
+    <Card
+      onClick={directToBookDetail}
+      className="mx-auto w-full max-w-lg overflow-hidden pt-0 hover:cursor-pointer"
+    >
       <CardContent className="p-0">
         <Image
-          src={'/default-image.png'}
+          src={thumbnailUrl}
           width={100}
           height={100}
           alt={title}
-          className="aspect-[3/2] w-full rounded-none"
+          className="aspect-[5/6] w-full rounded-none"
         />
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="flex gap-1.5">
-          <Star size={18} />
-          <span className="text-xs font-bold">{avgRating}/5</span>
+      <CardFooter className="flex flex-col gap-4">
+        <div className="flex w-full max-w-full flex-col gap-1">
+          <div className="flex gap-2">
+            {genres.split(',').map(genre => (
+              <Badge variant={'default'} key={genre}>
+                {genre.trim()}
+              </Badge>
+            ))}
+          </div>
+          <h1 className="overflow-hidden text-xl font-bold text-nowrap text-ellipsis">
+            {title}
+          </h1>
+          <p className="text-muted-foreground overflow-hidden text-sm text-nowrap text-ellipsis">
+            {authors}
+          </p>
+        </div>
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <Star size={18} />
+            <span className="text-sm font-bold">{avgRating}</span>
+          </div>
+          <span className="text-muted-foreground text-sm">
+            {availableCopies > 0
+              ? `${availableCopies} ${availableCopies === 1 ? 'copy' : 'copies'} available`
+              : 'Out of stock'}
+          </span>
         </div>
         <Button
-          onClick={handleBorrow}
+          onClick={e => {
+            e.stopPropagation();
+            handleBorrow();
+          }}
           disabled={checkouts.some(checkout => checkout.bookId === id)}
+          className="w-full"
         >
           {checkouts.some(checkout => checkout.bookId === id)
             ? 'Borrowed'

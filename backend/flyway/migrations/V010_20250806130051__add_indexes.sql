@@ -36,9 +36,9 @@ CREATE INDEX idx_checkouts_date_user_covering ON checkouts(
 );
 
 -- For getBooksWithLowAvailability
-CREATE INDEX idx_books_low_availability ON books(
-  availableCopies, 
-  quantity, 
-  id, 
-  title
-) WHERE availableCopies <= quantity * 0.2 OR availableCopies = 0;
+-- CREATE INDEX idx_books_low_availability ON books(
+--   availableCopies, 
+--   quantity, 
+--   id, 
+--   title
+-- ) WHERE availableCopies <= quantity * 0.2 OR availableCopies = 0;

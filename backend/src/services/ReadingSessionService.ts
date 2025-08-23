@@ -32,7 +32,7 @@ export const endReadingSession = async (
   session.endTime = new Date();
 
   session.sessionDuration = Math.ceil(
-    (session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60) // minutes 
+    (session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60) // minutes
   );
 
   return await session.save();
@@ -78,29 +78,29 @@ export const getAverageSessionTime = async () => {
     { $match: { sessionDuration: { $exists: true, $ne: null } } },
     {
       $addFields: {
-        month: { $dateToString: { format: "%Y-%m", date: "$startTime" } },
-        dayOfYear: { $dayOfYear: "$startTime" }
-      }
+        month: { $dateToString: { format: '%Y-%m', date: '$startTime' } },
+        dayOfYear: { $dayOfYear: '$startTime' },
+      },
     },
     {
       $group: {
         _id: {
           userId: '$userId',
-          month: '$month'
+          month: '$month',
         },
         totalSessions: { $sum: 1 },
         totalDuration: { $sum: '$sessionDuration' },
         averageDuration: { $avg: '$sessionDuration' },
-        activeDays: { $addToSet: '$dayOfYear' }
+        activeDays: { $addToSet: '$dayOfYear' },
       },
     },
     {
       $addFields: {
         activeDaysCount: { $size: '$activeDays' },
         dailyAverage: {
-          $divide: ['$totalDuration', { $size: '$activeDays' }]
-        }
-      }
+          $divide: ['$totalDuration', { $size: '$activeDays' }],
+        },
+      },
     },
     {
       $group: {
@@ -112,12 +112,12 @@ export const getAverageSessionTime = async () => {
             totalDuration: '$totalDuration',
             averageDuration: '$averageDuration',
             activeDaysCount: '$activeDaysCount',
-            dailyAverage: '$dailyAverage'
-          }
+            dailyAverage: '$dailyAverage',
+          },
         },
         overallAverage: { $avg: '$averageDuration' },
-        overallDailyAverage: { $avg: '$dailyAverage' }
-      }
+        overallDailyAverage: { $avg: '$dailyAverage' },
+      },
     },
     {
       $project: {
@@ -141,16 +141,16 @@ export const getMostHighlightedBooks = async (limit: number = 5) => {
         totalHighlights: { $sum: { $size: '$highlights' } },
         uniqueReaders: { $addToSet: '$userId' },
         totalSessions: { $sum: 1 },
-        avgHighlightsPerSession: { $avg: { $size: '$highlights' } }
+        avgHighlightsPerSession: { $avg: { $size: '$highlights' } },
       },
     },
     {
       $addFields: {
         uniqueReadersCount: { $size: '$uniqueReaders' },
         highlightDensity: {
-          $divide: ['$totalHighlights', '$totalSessions']
-        }
-      }
+          $divide: ['$totalHighlights', '$totalSessions'],
+        },
+      },
     },
     {
       $project: {
@@ -159,11 +159,11 @@ export const getMostHighlightedBooks = async (limit: number = 5) => {
         uniqueReadersCount: 1,
         totalSessions: 1,
         avgHighlightsPerSession: { $round: ['$avgHighlightsPerSession', 1] },
-        highlightDensity: { $round: ['$highlightDensity', 1] }
+        highlightDensity: { $round: ['$highlightDensity', 1] },
       },
     },
     { $sort: { totalHighlights: -1 } },
-    { $limit: limit }
+    { $limit: limit },
   ]);
 };
 
@@ -179,7 +179,7 @@ export const getTopBooksByReadTime = async (limit: number = 10) => {
         uniqueReaders: { $addToSet: '$userId' },
         avgSessionDuration: { $avg: '$sessionDuration' },
         totalPages: { $sum: { $size: '$pagesRead' } },
-        totalHighlights: { $sum: { $size: '$highlights' } }
+        totalHighlights: { $sum: { $size: '$highlights' } },
       },
     },
     {
@@ -190,10 +190,10 @@ export const getTopBooksByReadTime = async (limit: number = 10) => {
             { $multiply: ['$totalReadingTime', 0.4] },
             { $multiply: ['$uniqueReadersCount', 0.3] },
             { $multiply: ['$totalHighlights', 0.2] },
-            { $multiply: ['$totalPages', 0.1] }
-          ]
-        }
-      }
+            { $multiply: ['$totalPages', 0.1] },
+          ],
+        },
+      },
     },
     {
       $project: {
@@ -204,7 +204,7 @@ export const getTopBooksByReadTime = async (limit: number = 10) => {
         avgSessionDuration: { $round: ['$avgSessionDuration', 1] },
         totalPages: 1,
         totalHighlights: 1,
-        engagementScore: { $round: ['$engagementScore', 1] }
+        engagementScore: { $round: ['$engagementScore', 1] },
       },
     },
     { $sort: { totalReadingTime: -1 } },
@@ -238,8 +238,8 @@ export const getReadingTrends = async (userId?: string, months: number = 6) => {
   const matchStage: any = {
     sessionDuration: { $exists: true, $ne: null },
     startTime: {
-      $gte: new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000)
-    }
+      $gte: new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000),
+    },
   };
 
   if (userId) {
@@ -252,31 +252,31 @@ export const getReadingTrends = async (userId?: string, months: number = 6) => {
       $group: {
         _id: {
           year: { $year: '$startTime' },
-          month: { $month: '$startTime' }
+          month: { $month: '$startTime' },
         },
         totalSessions: { $sum: 1 },
         totalDuration: { $sum: '$sessionDuration' },
         avgDuration: { $avg: '$sessionDuration' },
         uniqueBooks: { $addToSet: '$bookId' },
-        uniqueUsers: { $addToSet: '$userId' }
-      }
+        uniqueUsers: { $addToSet: '$userId' },
+      },
     },
     {
       $addFields: {
         monthLabel: {
           $dateToString: {
-            format: "%b",
+            format: '%b',
             date: {
               $dateFromParts: {
                 year: '$_id.year',
-                month: '$_id.month'
-              }
-            }
-          }
+                month: '$_id.month',
+              },
+            },
+          },
         },
         uniqueBooksCount: { $size: '$uniqueBooks' },
-        uniqueUsersCount: { $size: '$uniqueUsers' }
-      }
+        uniqueUsersCount: { $size: '$uniqueUsers' },
+      },
     },
     {
       $project: {
@@ -287,10 +287,10 @@ export const getReadingTrends = async (userId?: string, months: number = 6) => {
         totalDuration: 1,
         avgDuration: { $round: ['$avgDuration', 1] },
         uniqueBooksCount: 1,
-        uniqueUsersCount: 1
-      }
+        uniqueUsersCount: 1,
+      },
     },
-    { $sort: { '_id.year': 1, '_id.month': 1 } }
+    { $sort: { '_id.year': 1, '_id.month': 1 } },
   ]);
 };
 
@@ -303,13 +303,13 @@ export const getDeviceAnalytics = async () => {
         totalSessions: { $sum: 1 },
         totalDuration: { $sum: '$sessionDuration' },
         avgDuration: { $avg: '$sessionDuration' },
-        uniqueUsers: { $addToSet: '$userId' }
-      }
+        uniqueUsers: { $addToSet: '$userId' },
+      },
     },
     {
       $addFields: {
-        uniqueUsersCount: { $size: '$uniqueUsers' }
-      }
+        uniqueUsersCount: { $size: '$uniqueUsers' },
+      },
     },
     {
       $project: {
@@ -321,11 +321,11 @@ export const getDeviceAnalytics = async () => {
         percentage: {
           $multiply: [
             { $divide: ['$totalSessions', { $sum: '$totalSessions' }] },
-            100
-          ]
-        }
-      }
+            100,
+          ],
+        },
+      },
     },
-    { $sort: { totalSessions: -1 } }
+    { $sort: { totalSessions: -1 } },
   ]);
 };
