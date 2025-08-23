@@ -18,6 +18,7 @@ interface BookDetail {
   rating: number;
   totalReviews: number;
   offlineLocation?: string;
+  availableCopies: number;
 }
 
 interface BookDetailProps {
@@ -118,6 +119,11 @@ export default function BookDetail({
                   </span>
                   <span className="text-gray-600">{book.publisher}</span>
                 </div>
+                <span className="text-muted-foreground text-sm">
+                  {book.availableCopies > 0
+                    ? `${book.availableCopies} ${book.availableCopies === 1 ? 'copy' : 'copies'} available`
+                    : 'Out of stock'}
+                </span>
 
                 {book.offlineLocation && (
                   <div className="flex items-center gap-2">
