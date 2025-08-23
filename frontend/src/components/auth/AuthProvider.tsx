@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, ReactNode, createContext } from 'react';
 import axiosInstance from '@/config/axiosConfig';
+import { usePathname } from 'next/navigation';
 
 interface User {
   id: string;
@@ -32,15 +33,19 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const hasCheckedAuth = useRef(false);
+  const pathname = usePathname();
 
   const checkAuth = async () => {
-    // Prevent multiple simultaneous auth checks
+    if (pathname === '/login') {
+      setLoading(false);
+      return;
+    }
     if (hasCheckedAuth.current) {
       return;
     }
 
     try {
-      // Check if we have a token in localStorage
+      // Check if we have a token in cookie
       const response = await axiosInstance.get('/api/v1/user/profile');
 
       if (response.data.success) {
@@ -49,7 +54,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         hasCheckedAuth.current = true;
       } else {
         // Token is invalid
-        localStorage.removeItem('accessToken');
         setUser(null);
         setIsAuthenticated(false);
       }
@@ -81,7 +85,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    if (!hasCheckedAuth.current) {
+    if (!hasCheckedAuth.current && pathname !== '/login') {
       checkAuth();
     }
   }, []);

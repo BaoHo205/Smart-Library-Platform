@@ -12,15 +12,6 @@ const verifyJWT = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const authHeader = req.headers.authorization;
-
-  // if (!authHeader?.startsWith('Bearer ')) {
-  //   return res
-  //     .status(401)
-  //     .json({ message: 'Missing or malformed Authorization header' });
-  // }
-
-  // const token = authHeader.split(' ')[1];
   const token = req.cookies?.accessToken;
   if (!token) {
     return res
@@ -57,7 +48,6 @@ const verifyJWT = async (
 
 const verifyRole = (requiredRoles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    // const userRole = req.body.userRole;
     const userRole = req.userRole;
 
     if (!userRole) {
