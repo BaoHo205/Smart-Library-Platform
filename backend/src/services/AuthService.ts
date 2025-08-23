@@ -13,7 +13,7 @@ const register = async (registrationData: IRegistrationData) => {
     }
 
     const existingUser = (await mysql.executeQuery(
-      'SELECT * FROM users WHERE username = ? OR email = ?',
+      'SELECT * FROM users WHERE userName = ? OR email = ?',
       [registrationData.username, registrationData.email]
     )) as Array<IUser>;
 
@@ -34,7 +34,7 @@ const register = async (registrationData: IRegistrationData) => {
     const updatedAt = new Date();
 
     const query = `
-            INSERT INTO users (id, username, password, firstName, lastName, email, role, createdAt, updatedAt)
+            INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
     const params = [
@@ -68,7 +68,7 @@ const login = async (loginData: ILoginData) => {
     }
 
     const existingUser = (await mysql.executeQuery(
-      'SELECT * FROM users WHERE username = ?',
+      'SELECT * FROM users WHERE userName = ?',
       [loginData.username]
     )) as Array<{
       id: string;
@@ -130,12 +130,12 @@ const generateNewAccessToken = async (refreshToken: string) => {
 
     const newAccessToken = await jwtService.generateAccessToken({
       userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role,
     });
 
     const newRefreshToken = await jwtService.generateRefreshToken({
       userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role,
     });
 
     return {
@@ -144,9 +144,9 @@ const generateNewAccessToken = async (refreshToken: string) => {
       data: {
         newRefreshToken,
         newAccessToken,
-        userId: decoded.userId,  
-        role: decoded.role      
-      }
+        userId: decoded.userId,
+        role: decoded.role,
+      },
     };
   } catch (error) {
     throw new Error(

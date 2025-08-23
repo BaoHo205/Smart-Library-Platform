@@ -97,7 +97,7 @@ const updateReview = async (
       'SELECT * FROM reviews WHERE id = ?',
       [reviewId]
     )) as (IUpdateReviewData & RowDataPacket)[];
-    
+
     return { message: 'Review added successfully', res: res[0] };
   } catch (error) {
     throw new Error(
@@ -113,13 +113,14 @@ const getUserById = async (userId: string): Promise<UserProfile | null> => {
       FROM users 
       WHERE id = ?
     `;
-    
-    const result = (await mysql.executeQuery(query, [userId])) as (UserProfile & RowDataPacket)[];
-    
+
+    const result = (await mysql.executeQuery(query, [userId])) as (UserProfile &
+      RowDataPacket)[];
+
     if (result.length === 0) {
       return null;
     }
-    
+
     return result[0];
   } catch (error) {
     console.error('Error getting user by ID:', error);

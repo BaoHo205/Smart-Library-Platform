@@ -1,16 +1,16 @@
 'use client';
 
+import { useAuth } from '@/components/auth/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import useUser from '@/hooks/useUser';
 import { LogOut } from 'lucide-react';
 
 export default function NavFooter() {
-  const { logout } = useUser();
+  const { logout } = useAuth();
   const handleLogout = async () => {
     try {
       console.log('Logging out...');

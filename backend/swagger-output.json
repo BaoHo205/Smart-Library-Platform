@@ -997,7 +997,7 @@
       }
     },
     "/refresh": {
-      "get": {
+      "post": {
         "tags": [
           "Auth"
         ],
@@ -1017,7 +1017,7 @@
       }
     },
     "/logout": {
-      "get": {
+      "post": {
         "tags": [
           "Auth"
         ],

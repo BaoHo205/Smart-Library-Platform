@@ -45,7 +45,7 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
     ) AS genres ON genres.bookId = b.id
     WHERE c.userId = ?`,
     [userId]
-  ) as Checkout[];
+  )) as Checkout[];
   return rows;
 }
 

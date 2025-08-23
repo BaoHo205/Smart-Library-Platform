@@ -11,14 +11,14 @@ const getProfile = async (req: Request, res: Response) => {
   try {
     // Extract token from Authorization header
     const token = req.cookies?.accessToken;
-    
+
     // Verify token and get user ID
     const decoded = await JwtService.verifyAccessToken(token);
     const userId = decoded.userId;
 
     // Get user profile from database
     const userProfile = await UserService.getUserById(userId);
-    
+
     if (!userProfile) {
       return res.status(404).json({
         success: false,
@@ -32,7 +32,7 @@ const getProfile = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error getting user profile:', error);
-    
+
     // Handle JWT-specific errors
     if (error instanceof Error) {
       if (error.message.includes('expired')) {
@@ -64,9 +64,9 @@ const addReview = async (req: AuthRequest, res: Response) => {
     // Combine the request body with the userId from the authenticated request
     const reviewData = {
       ...req.body,
-      userId: req.userId
+      userId: req.userId,
     };
-    
+
     console.log('Received review data:', reviewData);
     if (!reviewData || Object.keys(reviewData).length === 0) {
       return res.status(400).json({
@@ -113,7 +113,7 @@ const updateReview = async (req: AuthRequest, res: Response) => {
 
     const updateData = {
       ...req.body,
-      userId: req.userId
+      userId: req.userId,
     };
     if (!updateData || Object.keys(updateData).length === 0) {
       return res.status(400).json({
