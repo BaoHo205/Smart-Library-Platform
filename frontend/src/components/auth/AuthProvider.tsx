@@ -1,60 +1,100 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import useUser from '@/hooks/useUser';
+import { useState, useEffect, useRef, ReactNode, createContext } from 'react';
+import axiosInstance from '@/config/axiosConfig';
 
-interface AuthProviderProps {
-  children: React.ReactNode;
+interface User {
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'user' | 'staff';
 }
 
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  isAuthenticated: boolean;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { isAuthenticated, loading, checkAuth } = useUser();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const hasCheckedAuth = useRef(false);
+
+  const checkAuth = async () => {
+    // Prevent multiple simultaneous auth checks
+    if (hasCheckedAuth.current) {
+      return;
+    }
+
+    try {
+      // Check if we have a token in localStorage
+      const response = await axiosInstance.get('/api/v1/user/profile');
+
+      if (response.data.success) {
+        setUser(response.data.data);
+        setIsAuthenticated(true);
+        hasCheckedAuth.current = true;
+      } else {
+        // Token is invalid
+        localStorage.removeItem('accessToken');
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      // Remove invalid token
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      // Call the logout API endpoint which will clear the cookies
+      await axiosInstance.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Update local state
+      setUser(null);
+      setIsAuthenticated(false);
+      hasCheckedAuth.current = false; // Reset for next login
+
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+  };
 
   useEffect(() => {
-    // Run auth check on initial load
-    const runInitialAuthCheck = async () => {
-      await checkAuth();
-      setInitialCheckDone(true);
-    };
-
-    runInitialAuthCheck();
-  }, [checkAuth]);
-
-  useEffect(() => {
-    // Don't redirect until we've done the initial auth check
-    if (!initialCheckDone || loading) {
-      return;
+    if (!hasCheckedAuth.current) {
+      checkAuth();
     }
+  }, []);
 
-    // Redirect authenticated users away from login page
-    if (isAuthenticated && pathname === '/login') {
-      router.replace('/');
-      return;
-    }
+  const contextValue = {
+    user,
+    loading,
+    isAuthenticated,
+    logout,
+    checkAuth,
+  };
 
-    // Redirect to login if not authenticated
-    if (!isAuthenticated && pathname !== '/login') {
-      router.replace('/login');
-      return;
-    }
-  }, [isAuthenticated, loading, pathname, router, initialCheckDone]);
-
-  // Show loading spinner while checking authentication
-  if (loading || !initialCheckDone) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
-  // Don't render protected content if not authenticated
-  if (!isAuthenticated && pathname !== '/login') {
-    return null;
-  }
-
-  return <>{children}</>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

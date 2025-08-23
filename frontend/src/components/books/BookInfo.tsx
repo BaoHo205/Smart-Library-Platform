@@ -7,8 +7,8 @@ import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
 import api from '@/api/api';
 import type { BookDetails, IReview } from '@/api/api';
-import useUser from '@/hooks/useUser';
 import toast from 'react-hot-toast';
+import { useAuth } from '../auth/useAuth';
 
 // Interface to match BookDetail component props
 interface BookDetailType {
@@ -83,7 +83,7 @@ interface BookDetailPageProps {
 export default function BookInfoPage({
   bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
 }: BookDetailPageProps) {
-  const { user } = useUser(); // User is guaranteed to be authenticated
+  const { user } = useAuth(); // User is guaranteed to be authenticated
   const [book, setBook] = useState<BookDetailType | null>(null);
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [loading, setLoading] = useState(false);
