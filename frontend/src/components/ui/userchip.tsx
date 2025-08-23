@@ -1,10 +1,20 @@
 'use client';
 
 import { Avatar } from '@/components/ui/avatar';
-import { UserProfile } from '@/lib/types';
+
+interface User {
+    id: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: 'user' | 'staff';
+    name?: string;
+    avatarUrl?: string | null;
+}
 
 interface UserChipProps {
-    user?: UserProfile | null;
+    user?: User | null;
     loading?: boolean;
 }
 

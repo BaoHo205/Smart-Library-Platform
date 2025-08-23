@@ -1,5 +1,4 @@
 import { NewBook } from '@/controllers/BookController';
-import pool from '@/database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
 import mysqlConnection from '@/database/mysql/connection';
 import { Book } from '@/models/mysql/Book';
@@ -219,10 +218,10 @@ async function searchBooks(
     ${whereSql}
   `;
 
-  const countResult = (await pool.executeQuery(countSql, params)) as CountRow[];
+  const countResult = (await mysqlConnection.executeQuery(countSql, params)) as CountRow[];
   const total = countResult[0]?.total ?? 0;
 
-  const rows = (await pool.executeQuery(sql, params)) as BookListItem[];
+  const rows = (await mysqlConnection.executeQuery(sql, params)) as BookListItem[];
 
   return {
     data: rows,
@@ -242,13 +241,13 @@ const borrowBook = async (
     const date = new Date(dueDate);
 
     // Call the stored procedure
-    await pool.executeQuery(
+    await mysqlConnection.executeQuery(
       'CALL BorrowBook(?, ?, ?, @checkoutId, @success, @message)',
       [userId, bookId, date]
     );
 
     // Get the output parameters
-    const outputResults = (await pool.executeQuery(
+    const outputResults = (await mysqlConnection.executeQuery(
       'SELECT @checkoutId as checkoutId, @success as success, @message as message'
     )) as BorrowBookOutput[];
 
@@ -274,7 +273,7 @@ const returnBook = async (
 ): Promise<ReturnBookResult> => {
   try {
     // Call the stored procedure
-    await pool.executeQuery(
+    await mysqlConnection.executeQuery(
       `
             CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
         `,
@@ -282,7 +281,7 @@ const returnBook = async (
     );
 
     // Get the output parameters
-    const outputResults = (await pool.executeQuery(`
+    const outputResults = (await mysqlConnection.executeQuery(`
             SELECT @p_success as success, @p_message as message, @p_isLate as isLate
         `)) as ReturnBookOutput[];
 
@@ -342,14 +341,15 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
       LEFT JOIN (
         SELECT 
           r.bookId,
-          COUNT(r.id) AS numberOfRatings
+          COUNT(r.id) AS numberOfRatings,
+          AVG(r.rating) AS avgRating
         FROM reviews r
         GROUP BY r.bookId
       ) AS reviews ON reviews.bookId = b.id
       WHERE b.id = ?
     `;
 
-    const results = (await pool.executeQuery(sql, [
+    const results = (await mysqlConnection.executeQuery(sql, [
       bookId,
     ])) as BookDetailsRaw[];
 
@@ -364,8 +364,8 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
       ...book,
       authors: book.authors
         ? book.authors
-            .split(', ')
-            .filter((author: string) => author.trim() !== '')
+          .split(', ')
+          .filter((author: string) => author.trim() !== '')
         : [],
       genres: book.genres
         ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '')
@@ -438,10 +438,10 @@ const addNewBook = async (
     ];
 
     // Execute the stored procedure (returns OkPacket or similar)
-    await pool.executeQuery(procedure, params);
+    await mysqlConnection.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const selectRows = (await pool.executeQuery(
+    const selectRows = (await mysqlConnection.executeQuery(
       'SELECT @new_book_id AS id'
     )) as unknown as IdRow;
 
@@ -544,7 +544,7 @@ const getAllReviewsByBookId = async (
       ORDER BY r.updatedAt DESC
     `;
 
-    const results = (await pool.executeQuery(sql, [
+    const results = (await mysqlConnection.executeQuery(sql, [
       bookId,
     ])) as (ReviewWithUser & RowDataPacket)[];
 
@@ -566,7 +566,7 @@ const isBookBorrowed = async (
       WHERE bookId = ? AND userId = ? AND returnDate IS NULL
     `;
 
-    const result = (await pool.executeQuery(query, [
+    const result = (await mysqlConnection.executeQuery(query, [
       bookId,
       userId,
     ])) as (boolean & RowDataPacket)[];

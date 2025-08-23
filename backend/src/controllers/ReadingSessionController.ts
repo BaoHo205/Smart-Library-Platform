@@ -254,10 +254,31 @@ export const getReadingTrends = async (req: Request, res: Response) => {
   // #swagger.description = 'Retrieve reading activity trends and patterns over a specified time period'
   // #swagger.parameters['userId'] = { description: 'User ID to filter trends (optional)', type: 'string', in: 'query' }
   // #swagger.parameters['months'] = { description: 'Number of months to analyze (default: 6)', type: 'integer', in: 'query' }
+  // #swagger.parameters['startDate'] = { description: 'Start date for custom range (optional)', type: 'string', in: 'query' }
+  // #swagger.parameters['endDate'] = { description: 'End date for custom range (optional)', type: 'string', in: 'query' }
   try {
     const userId = req.query.userId as string;
     const months = req.query.months ? parseInt(req.query.months as string) : 6;
-    const result = await readingSessionService.getReadingTrends(userId, months);
+    const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+    const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+    // Validate date parameters
+    if (startDate && endDate) {
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date format. Use ISO 8601 format (YYYY-MM-DD)',
+        });
+      }
+      if (startDate > endDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Start date must be before end date',
+        });
+      }
+    }
+
+    const result = await readingSessionService.getReadingTrends(userId, months, startDate, endDate);
 
     res.json({
       success: true,
