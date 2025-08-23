@@ -2,7 +2,11 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/components/auth/AuthProvider';
 import { Toaster } from 'react-hot-toast';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import AppSidebar from '@/components/layout/sidebar/AppSidebar';
 import { getUserRole } from '@/lib/cookies/auth';
 import { headers } from 'next/headers';
@@ -25,10 +29,12 @@ export default async function RootLayout({
   const userRole = await getUserRole();
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '';
-  
+
   // Pages where sidebar should be hidden
   const hideSidebarPages = ['/login'];
-  const shouldHideSidebar = hideSidebarPages.some(page => pathname.startsWith(page));
+  const shouldHideSidebar = hideSidebarPages.some(page =>
+    pathname.startsWith(page)
+  );
 
   return (
     <html lang="en">

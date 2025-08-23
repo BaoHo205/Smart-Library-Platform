@@ -30,7 +30,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(dashboardUrl);
   }
 
-// Role-based route protection
+  // Role-based route protection
   if (isAuthenticated && userRole) {
     // Define allowed paths for user
     const userAllowedPaths: string[] = [
@@ -50,10 +50,10 @@ export function middleware(request: NextRequest) {
     }
   }
 
-    // Create response and add pathname header for layout to use
+  // Create response and add pathname header for layout to use
   const response = NextResponse.next();
   response.headers.set('x-pathname', pathname);
-  
+
   return response;
 }
 
