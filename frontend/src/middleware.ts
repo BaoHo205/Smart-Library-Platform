@@ -41,7 +41,27 @@ export function middleware(request: NextRequest) {
       '/analytics',
     ];
 
-    const isUserAllowedPath = userAllowedPaths.includes(pathname);
+    // Helper function to check if path or its parent is allowed
+    const isPathAllowed = (
+      allowedPaths: string[],
+      currentPath: string
+    ): boolean => {
+      return allowedPaths.some(allowedPath => {
+        // Exact match
+        if (currentPath === allowedPath) return true;
+        // Check if current path starts with allowed path (for nested routes)
+        if (currentPath.startsWith(allowedPath + '/')) return true;
+        // Handle trailing slash differences
+        if (
+          currentPath === allowedPath + '/' ||
+          currentPath + '/' === allowedPath
+        )
+          return true;
+        return false;
+      });
+    };
+
+    const isUserAllowedPath = isPathAllowed(userAllowedPaths, pathname);
 
     // User trying to access paths not in their allowed list
     if (userRole === 'user' && !isUserAllowedPath && !isPublicRoute) {
@@ -65,8 +85,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - any file with common image extensions
+     * - static files with extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|images|public).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
   ],
 };
