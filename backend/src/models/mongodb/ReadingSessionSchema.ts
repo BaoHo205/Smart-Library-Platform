@@ -31,7 +31,7 @@ const ReadingSessionSchema = new Schema<ReadingSessionDocument>(
     },
     pagesRead: [{ type: Number, required: true }],
     highlights: [HighlightSchema],
-    sessionDuration: { type: Number, required: false }, // seconds
+    sessionDuration: { type: Number, required: false }, // minutes (rounded up)
   },
   {
     timestamps: true,
