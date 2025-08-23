@@ -41,4 +41,5 @@ CREATE INDEX idx_books_low_availability ON books(
   quantity, 
   id, 
   title
-) WHERE availableCopies <= quantity * 0.2 OR availableCopies = 0;
+);
+--  WHERE availableCopies <= quantity * 0.2 OR availableCopies = 0;
