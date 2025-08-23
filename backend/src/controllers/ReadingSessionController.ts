@@ -100,7 +100,8 @@ export const getAverageSessionTime = async (req: Request, res: Response) => {
 // GET /api/reading/most-highlighted - Get most highlighted books
 export const getMostHighlightedBooks = async (req: Request, res: Response) => {
   try {
-    const result = await readingSessionService.getMostHighlightedBooks();
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+    const result = await readingSessionService.getMostHighlightedBooks(limit);
 
     res.json({
       success: true,
@@ -116,10 +117,11 @@ export const getMostHighlightedBooks = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/reading/top-books-time - Get top 10 books by reading time
+// GET /api/reading/top-books-time - Get top books by reading time
 export const getTopBooksByReadTime = async (req: Request, res: Response) => {
   try {
-    const result = await readingSessionService.getTopBooksByReadTime();
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const result = await readingSessionService.getTopBooksByReadTime(limit);
 
     res.json({
       success: true,
@@ -209,6 +211,46 @@ export const addHighlight = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error adding highlight:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+// GET /api/reading/trends - Get reading trends over time
+export const getReadingTrends = async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.userId as string;
+    const months = req.query.months ? parseInt(req.query.months as string) : 6;
+    const result = await readingSessionService.getReadingTrends(userId, months);
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Reading trends retrieved successfully',
+    });
+  } catch (error) {
+    console.error('Error getting reading trends:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+// GET /api/reading/devices - Get device analytics
+export const getDeviceAnalytics = async (req: Request, res: Response) => {
+  try {
+    const result = await readingSessionService.getDeviceAnalytics();
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Device analytics retrieved successfully',
+    });
+  } catch (error) {
+    console.error('Error getting device analytics:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error',
