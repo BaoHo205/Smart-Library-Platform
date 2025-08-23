@@ -3,6 +3,7 @@ import ReadingSessionModel, {
 } from '../models/mongodb/ReadingSessionSchema';
 import { ReadingSession, Highlight } from '../models/mongodb/ReadingSession';
 import { DeviceType } from '../models/mongodb/enum/DeviceType';
+import BookService from './BookService';
 
 // new reading session
 export const startReadingSession = async (
@@ -328,4 +329,54 @@ export const getDeviceAnalytics = async () => {
     },
     { $sort: { totalSessions: -1 } }
   ]);
+};
+
+// Enhanced version of getMostHighlightedBooks with complete book data
+export const getMostHighlightedBooksWithDetails = async (limit: number = 5) => {
+  // Get reading session analytics
+  const sessionData = await getMostHighlightedBooks(limit);
+
+  // Fetch book details for each bookId
+  const booksWithDetails = await Promise.all(
+    sessionData.map(async (item: any) => {
+      const bookDetails = await BookService.getBookInfoById(item.bookId);
+      return {
+        bookId: item.bookId,
+        title: bookDetails?.title || 'Unknown Title',
+        author: bookDetails?.authors || 'Unknown Author',
+        coverUrl: bookDetails?.thumbnailUrl || null,
+        totalHighlights: item.totalHighlights,
+        uniqueReadersCount: item.uniqueReadersCount,
+        totalSessions: item.totalSessions,
+        avgHighlightsPerSession: item.avgHighlightsPerSession,
+        highlightDensity: item.highlightDensity
+      };
+    })
+  );
+
+  return booksWithDetails;
+};
+
+export const getTopBooksByReadTimeWithDetails = async (limit: number = 10) => {
+  const sessionData = await getTopBooksByReadTime(limit);
+  const booksWithDetails = await Promise.all(
+    sessionData.map(async (item: any) => {
+      const bookDetails = await BookService.getBookInfoById(item.bookId);
+      return {
+        bookId: item.bookId,
+        title: bookDetails?.title || 'Unknown Title',
+        author: bookDetails?.authors || 'Unknown Author',
+        coverUrl: bookDetails?.thumbnailUrl || null,
+        totalReadingTime: item.totalReadingTime,
+        totalSessions: item.totalSessions,
+        uniqueReadersCount: item.uniqueReadersCount,
+        avgSessionDuration: item.avgSessionDuration,
+        totalPages: item.totalPages,
+        totalHighlights: item.totalHighlights,
+        engagementScore: item.engagementScore
+      };
+    })
+  );
+
+  return booksWithDetails;
 };
