@@ -29,6 +29,10 @@ const doc = {
       name: 'Staff',
       description: 'Staff-related endpoints',
     },
+    {
+      name: 'Reading Sessions',
+      description: 'Reading-session endpoints',
+    },
   ],
   components: {},
 };
@@ -37,8 +41,6 @@ const outputFile = './swagger-output.json';
 const routes = [
   './routes/apiRoutes.ts',
   './routes/authRoutes.ts',
-  './routes/bookRoutes.ts',
-  './routes/readingSessionRoutes.ts',
 ];
 
 swaggerAutogen()(outputFile, routes, doc);
