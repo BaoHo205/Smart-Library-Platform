@@ -1,6 +1,6 @@
 import mysqlConnection from '../database/mysql/connection';
 import { v4 as uuidv4 } from 'uuid';
-import { StaffLog } from '../models/StaffLogModel';
+import { StaffLog } from '../models/mysql/StaffLog';
 import { ResultSetHeader } from 'mysql2/promise';
 
 /**
@@ -9,20 +9,21 @@ import { ResultSetHeader } from 'mysql2/promise';
  * @returns {Promise<IStaffLog>} A promise that resolves to the created log object.
  */
 export const createStaffLog = async (
-  logData: Omit<StaffLog, 'id' | 'created_at' | 'updated_at'> // Omit auto-generated fields
+  logData: Omit<StaffLog, 'id' | 'createdAt' | 'updatedAt'> // Omit auto-generated fields
 ): Promise<StaffLog> => {
   const logId = uuidv4(); // Generate a new UUID for the log entry
 
   try {
     const query = `
-            INSERT INTO Staff_Logs (id, staff_id, action_type, action_details)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO staff_logs (id, userId, bookId, actionType, actionDetails, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
         `;
     const params = [
       logId,
-      logData.staff_id,
-      logData.action_type,
-      logData.action_details,
+      logData.userId,
+      logData.bookId,
+      logData.actionType,
+      logData.actionDetails,
     ];
 
     const results = await mysqlConnection.executeQuery(query, params);
@@ -36,8 +37,8 @@ export const createStaffLog = async (
     return {
       ...logData,
       id: logId,
-      created_at: new Date().toISOString(), // Approximate, DB will set exact
-      updated_at: new Date().toISOString(), // Approximate, DB will set exact
+      createdAt: new Date(), // Approximate, DB will set exact
+      updatedAt: new Date(), // Approximate, DB will set exact
     };
   } catch (error) {
     console.error('Error in staffLogService.createStaffLog:', error);

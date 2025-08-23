@@ -45,6 +45,7 @@ END//
 
 DELIMITER ;
 
+-- Trigger to automatically update book rating when a review is inserted
 DELIMITER //
 
 CREATE TRIGGER after_review_insert
