@@ -102,7 +102,7 @@ const login = async (loginData: ILoginData) => {
     const refreshToken = await jwtService.generateRefreshToken(payload);
 
     return {
-      message: 'Login successful',
+      message: 'Login successfully!',
       data: {
         userId: existingUser[0].id,
         userName: existingUser[0].userName,

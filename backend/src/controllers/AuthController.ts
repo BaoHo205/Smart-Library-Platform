@@ -58,18 +58,8 @@ const login = async (req: Request, res: Response) => {
     }
     res.cookie('refreshToken', result.data.refreshToken, refreshCookieOptions);
     res.cookie('accessToken', result.data.accessToken, accessCookieOptions);
-    res.cookie('userId', result.data.userId, {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
-    res.cookie('userRole', result.data.role, {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
+    res.cookie('userId', result.data.userId, accessCookieOptions);
+    res.cookie('userRole', result.data.role, accessCookieOptions);
 
     // Return response
     return res.status(200).json({
@@ -103,19 +93,11 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
     }
 
     const tokenResult = await authService.generateNewAccessToken(refreshToken);
+
     if (!tokenResult) {
       return res
         .status(401)
         .json({ success: false, message: 'Invalid refresh token' });
-    }
-
-    // Update token cookies
-    if (tokenResult.data.newRefreshToken) {
-      res.cookie(
-        'refreshToken',
-        tokenResult.data.newRefreshToken,
-        refreshCookieOptions
-      );
     }
 
     res.cookie(
@@ -123,15 +105,17 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
       tokenResult.data.newAccessToken,
       accessCookieOptions
     );
-
-    if (tokenResult.data.userId) {
-      res.cookie('userId', tokenResult.data.userId, {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: '/',
-      });
+    if (tokenResult.data.newRefreshToken) {
+      res.cookie(
+        'refreshToken',
+        tokenResult.data.newRefreshToken,
+        refreshCookieOptions
+      );
     }
+    if (tokenResult.data.userId) {
+      res.cookie('userId', tokenResult.data.userId, accessCookieOptions);
+    }
+
     return res.status(200).json({
       success: true,
       message: tokenResult.message,
@@ -160,7 +144,6 @@ const logout = async (req: Request, res: Response) => {
       });
     }
 
-    // Clear all authentication cookies
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -168,24 +151,18 @@ const logout = async (req: Request, res: Response) => {
       path: '/',
     };
 
+    // Clear all authentication cookies
     res.clearCookie('refreshToken', cookieOptions);
     res.clearCookie('accessToken', cookieOptions);
 
     // Clear user data cookies
-    const userDataCookieOptions = {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict' as const,
-      path: '/',
-    };
-
-    res.clearCookie('userId', userDataCookieOptions);
-    res.clearCookie('userRole', userDataCookieOptions);
+    res.clearCookie('userId', cookieOptions);
+    res.clearCookie('userRole', cookieOptions);
 
     res.status(200).json({
       success: true,
       message: 'User logged out successfully',
     });
-    console.log('User logged out successfully');
   } catch (error) {
     res.status(500).json({
       success: false,

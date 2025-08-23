@@ -9,7 +9,6 @@ const getProfile = async (req: Request, res: Response) => {
   // #swagger.description = 'Get current user profile information using JWT token.'
   // #swagger.security = [{ "bearerAuth": [] }]
   try {
-    // Extract token from Authorization header
     const token = req.cookies?.accessToken;
 
     // Verify token and get user ID

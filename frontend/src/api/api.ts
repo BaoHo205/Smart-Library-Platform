@@ -91,7 +91,7 @@ const login = async (loginData: LoginData): Promise<AuthResponse> => {
       data: response.data || {},
     };
   } catch (error) {
-    console.error('Login failed:', error);
+    // console.error('Login failed:', error);
     throw new Error('Login failed.');
   }
 };
@@ -181,9 +181,7 @@ const borrowBook = async (
   try {
     const response = await axiosInstance.post(
       `/api/v1/books/borrow/${bookId}`,
-      {
-        dueDate,
-      }
+      { dueDate }
     );
 
     return response.data;
