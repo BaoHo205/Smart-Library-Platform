@@ -171,48 +171,150 @@
         "description": "Search and retrieve books based on query parameters such as title, author, and genre.",
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "authorIds": {
+                  "example": "any"
+                },
+                "genreIds": {
+                  "example": "any"
+                },
+                "publisherId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/{id}/inventory": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
             "type": "string"
           },
           {
-            "name": "pageSize",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "quantity": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
-          {
-            "name": "sort",
-            "in": "query",
-            "type": "string"
+          "400": {
+            "description": "Bad Request"
           },
-          {
-            "name": "order",
-            "in": "query",
-            "type": "string"
+          "404": {
+            "description": "Not Found"
           },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/{id}/status": {
+      "put": {
+        "description": "",
+        "parameters": [
           {
-            "name": "q",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
-          {
-            "name": "title",
-            "in": "query",
-            "type": "string"
+          "404": {
+            "description": "Not Found"
           },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/start": {
+      "post": {
+        "description": "",
+        "parameters": [
           {
-            "name": "author",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "bookId": {
+                  "example": "any"
+                },
+                "device": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           },
-          {
-            "name": "genre",
-            "in": "query",
-            "type": "string"
+          "400": {
+            "description": "Bad Request"
           },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/end/{sessionId}": {
+      "post": {
+        "description": "",
+        "parameters": [
           {
-            "name": "publisher",
-            "in": "query",
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -222,6 +324,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -293,11 +398,10 @@
         "description": "Borrow a specific book by its ID. Requires user authentication.",
         "parameters": [
           {
-            "name": "bookId",
+            "name": "sessionId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "description": "Book ID to borrow"
+            "type": "string"
           },
           {
             "name": "body",
@@ -305,7 +409,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "dueDate": {
+                "pages": {
                   "example": "any"
                 }
               }
@@ -319,8 +423,8 @@
           "400": {
             "description": "Bad Request"
           },
-          "401": {
-            "description": "Unauthorized"
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -351,6 +455,87 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/{sessionId}/highlights": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageNumber": {
+                  "example": "any"
+                },
+                "text": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/avg-time": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/most-highlighted": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reading-sessions/top-books-time": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"

@@ -70,11 +70,11 @@ const adaptReview = (review: IReview): Review => {
 
 // Helper function to generate due date (2 weeks from now)
 const generateDueDate = (): string => {
-  const today = new Date();
-  const dueDate = new Date(today);
-  dueDate.setDate(today.getDate() + 14); // 2 weeks from now
-  return dueDate.toISOString().split('T')[0]; // Format: yyyy-mm-dd
-};
+  const today = new Date()
+  const dueDate = new Date(today)
+  dueDate.setDate(today.getDate() + 14) // 2 weeks from now
+  return dueDate.toISOString().split("T")[0] 
+}
 
 interface BookDetailPageProps {
   bookId: string;
@@ -245,12 +245,7 @@ export default function BookInfoPage({
   return (
     <div className="mx-auto max-w-6xl space-y-12 p-6">
       {/* Book Detail Section */}
-      <BookDetail
-        book={book}
-        onBorrow={handleBorrow}
-        borrowing={borrowing}
-        isBorrowed={isBorrowed}
-      />
+      <BookDetail book={book} reviews={reviews} onBorrow={handleBorrow} borrowing={borrowing} isBorrowed={isBorrowed} />
 
       {/* Reviews Section */}
       <BookReviews

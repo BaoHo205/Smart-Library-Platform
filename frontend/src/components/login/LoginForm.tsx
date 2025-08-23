@@ -24,7 +24,6 @@ export function LoginForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-
     setFormData(prevData => ({
       ...prevData,
       [id]: value,
@@ -36,8 +35,6 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('Form submitted with data:', formData); // Debug log
 
     // Validate form data
     if (!formData.username.trim()) {
