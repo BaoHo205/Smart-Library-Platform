@@ -196,16 +196,7 @@ export function AverageSessionChart({ data, loading = false, dailyAverage }: Ave
                                 stroke: "#ffffff",
                                 filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.15))"
                             }}
-                        >
-                            <LabelList
-                                position="top"
-                                offset={12}
-                                className="fill-gray-700"
-                                fontSize={11}
-                                fontWeight={500}
-                                formatter={(value: number) => `${value}m`}
-                            />
-                        </Line>
+                        />
                     </LineChart>
                 </ChartContainer>
             </CardContent>
