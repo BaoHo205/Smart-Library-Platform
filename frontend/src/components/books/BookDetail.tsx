@@ -21,7 +21,7 @@ interface BookDetail {
 
 interface BookDetailProps {
   book: BookDetail
-  reviews: Review[] | []
+  reviews: Review[] | null
   onBorrow: () => void
   borrowing: boolean
   isBorrowed: boolean
