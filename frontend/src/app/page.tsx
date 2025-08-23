@@ -45,7 +45,7 @@ export default function Home() {
   const fetchBooks = async (): Promise<void> => {
     try {
       const response = await axiosInstance.get(
-        `api/v1/books?pageSize=9&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
+        `api/v1/books?pageSize=12&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
       );
       setBooks(response.data.data.data || []);
       setPages(Math.ceil(response.data.data.total / 9));

@@ -22,6 +22,7 @@ interface BookDetailType {
   rating: number;
   totalReviews: number;
   offlineLocation?: string;
+  availableCopies: number;
 }
 
 // Interface to match Review component props
@@ -51,6 +52,7 @@ const adaptBookDetails = (book: BookDetails): BookDetailType => {
     rating: book.avgRating,
     totalReviews: book.numberOfRatings,
     offlineLocation: undefined, // We don't have this in the API
+    availableCopies: book.availableCopies || 0, // Default to 0 if not provided
   };
 };
 

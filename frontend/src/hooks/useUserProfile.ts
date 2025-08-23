@@ -1,5 +1,5 @@
 import axiosInstance from '@/config/axiosConfig';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface CheckOut {
   bookId: string;
@@ -11,11 +11,11 @@ interface CheckOut {
   isLate: boolean;
 }
 
-const useUserProfile = (userId: string) => {
+const useUserProfile = () => {
   const [checkouts, setCheckouts] = useState<CheckOut[]>([]);
-  const getAllCheckoutByUserId = async (userId: string) => {
+  const getAllCheckoutByUserId = async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/checkouts/${userId}`);
+      const response = await axiosInstance.get(`/api/v1/checkouts/`);
       setCheckouts(response.data);
     } catch (error) {
       console.error('Error fetching checkouts:', error);
@@ -24,8 +24,8 @@ const useUserProfile = (userId: string) => {
   };
 
   useEffect(() => {
-    getAllCheckoutByUserId(userId);
-  }, [userId]);
+    getAllCheckoutByUserId();
+  }, []);
 
   return { checkouts, setCheckouts };
 };
