@@ -452,7 +452,7 @@ const addNewBook = async (
     await mysqlConnection.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const selectRows = (await mysqlConnection.executeQuery(
+    const result = (await mysqlConnection.executeQuery(
       'SELECT @new_book_id AS id'
     )) as unknown as IdRow;
 
@@ -460,12 +460,12 @@ const addNewBook = async (
       throw new Error('Failed to retrieve new book ID from procedure');
     }
 
-    console.log(result[0].id)
+    console.log(result.id)
 
-    const book = await getBookById(result[0].id);
+    const book = await getBookInfoById(result.id);
     console.log(book)
 
-    return result[0].id;
+    return result.id;
   } catch (error) {
     console.error('Error in bookService.addNewBook:', error);
     if (error instanceof Error) {

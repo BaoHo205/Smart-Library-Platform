@@ -5,7 +5,6 @@ import bookRouter from './bookRoutes';
 import authorRouter from './authorRoutes';
 import publisherRouter from './publisherRoutes';
 import genreRouter from './genreRoutes';
-import genreRouter from './genreRoutes';
 import checkoutRouter from './checkoutRoutes';
 import readingSessionRouter from './readingSessionRoutes';
 

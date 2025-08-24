@@ -1,21 +1,22 @@
 // components/EditBookDialog.tsx
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -23,7 +24,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
 } from "@/components/ui/form";
 import { Plus, Minus } from "lucide-react";
 import { ComboboxWithCreate } from "./ComboboxWithCreate";
@@ -31,11 +31,6 @@ import { BookShow } from "./columns";
 import { toast } from "sonner"
 import axiosInstance from "@/config/axiosConfig";
 import { useDataStore } from "@/lib/useDataStore";
-=======
-} from '@/components/ui/form';
-import { Plus, Minus } from 'lucide-react';
-import { ComboboxWithCreate } from './ComboboxWithCreate';
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
 
 export interface Publisher {
   id?: string;
@@ -48,21 +43,12 @@ export interface Author {
 }
 
 const formSchema = z.object({
-  bookTitle: z
-    .string()
-    .min(2, { message: 'Book title must be at least 2 characters.' }),
+  bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
   isbn: z.string().optional(),
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
   publisher: z.string().min(1, { message: "Publisher is required." }),
   author: z.array(z.string()).min(1, { message: "Author(s) required." }),
   thumbnailLink: z.string().url({ message: "Invalid URL." }).optional(),
   bookQuantity: z.number().min(0, { message: "Quantity cannot be negative." }),
-=======
-  publisher: z.string().min(1, { message: 'Publisher is required.' }),
-  author: z.string().min(1, { message: 'Author is required.' }),
-  thumbnailLink: z.string().url({ message: 'Invalid URL.' }).optional(),
-  bookQuantity: z.number().min(0, { message: 'Quantity cannot be negative.' }),
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
   description: z.string().optional(),
 });
 
@@ -84,7 +70,6 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
       bookTitle: book.title || "",
       isbn: book.isbn || "",
       publisher: "",
@@ -92,21 +77,11 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
       thumbnailLink: book.thumbnailUrl || "",
       bookQuantity: book.quantity || 0,
       description: book.description || "",
-=======
-      bookTitle: book.title || '',
-      publisher: book.publisher || '',
-      author: book.author || '',
-      bookQuantity: book.quantity || 0,
-      thumbnailLink: book.thumbnail_url || '',
-      isbn: '',
-      description: '',
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
     },
   });
 
   useEffect(() => {
     if (open) {
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
       // Find the publisher ID from the Zustand store list
       const publisher = publisherList.find(p => p.name === book.publisherName);
       if (publisher) {
@@ -121,40 +96,9 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
       }).filter(Boolean) as string[];
 
       form.setValue("author", authorIds);
-=======
-      if (book.publisher) {
-        setPublisherList([
-          {
-            id: book.publisher,
-            name: book.publisher,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-      } else {
-        setPublisherList([]);
-      }
-
-      if (book.author) {
-        const [firstName = '', ...lastNameParts] = book.author.split(' ');
-        const lastName = lastNameParts.join(' ');
-        setAuthorList([
-          {
-            id: book.author,
-            firstName,
-            lastName,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-      } else {
-        setAuthorList([]);
-      }
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
     }
   }, [open, book, publisherList, authorList, form]);
 
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
   const handleCreatePublisher = async (name: string) => {
     try {
       const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
@@ -186,53 +130,18 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
     } catch (error) {
       toast.error("Failed to create author: " + error);
     }
-=======
-  const handleNewPublisher = async (name: string) => {
-    console.log('Creating new publisher:', name);
-    const newPublisherId = `pub${Date.now()}`;
-    const newPublisher = {
-      id: newPublisherId,
-      name: name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setPublisherList([...publisherList, newPublisher]);
-    form.setValue('publisher', newPublisher.id as string);
-  };
-
-  const handleNewAuthor = async (fullName: string) => {
-    console.log('Creating new author:', fullName);
-    const [firstName, ...lastNameParts] = fullName.split(' ');
-    const lastName = lastNameParts.join(' ');
-    const newAuthorId = `auth${Date.now()}`;
-    const newAuthor = {
-      id: newAuthorId,
-      firstName: firstName,
-      lastName: lastName,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setAuthorList([...authorList, newAuthor]);
-    form.setValue('author', newAuthor.id as string);
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Updated values:', { id: book.id, ...values });
+    console.log("Updated values:", { id: book.id, ...values });
     setOpen(false);
   }
 
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
   const handleQuantityChange = async (delta: number) => {
     const currentQuantity = form.getValues("bookQuantity");
     const updateQuantity = Math.max(0, currentQuantity + delta)
 
     form.setValue("bookQuantity", updateQuantity);
-=======
-  const handleQuantityChange = (delta: number) => {
-    const currentQuantity = form.getValues('bookQuantity');
-    form.setValue('bookQuantity', Math.max(0, currentQuantity + delta));
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
   };
 
   const handleRetireBook = async () => {
@@ -377,12 +286,7 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="bookQuantity">Book Quantity</Label>
                 <div className="flex items-center space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleQuantityChange(-1)}
-                  >
+                  <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)}>
                     <Minus className="h-4 w-4" />
                   </Button>
                   <FormField
@@ -393,17 +297,12 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
                         id="bookQuantity"
                         type="number"
                         value={field.value}
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
                         className="w-16 text-center"
                       />
                     )}
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleQuantityChange(1)}
-                  >
+                  <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -423,17 +322,8 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
                 </FormItem>
               )}
             />
-<<<<<<< HEAD:frontend/src/app/admin/EditBookDialog.tsx
             <div className="flex justify-between mt-4">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-=======
-            <div className="mt-4 flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
->>>>>>> dev:frontend/src/app/(staff)/my-inventory/EditBookDialog.tsx
                 Cancel
               </Button>
               <div className="flex flex-row gap-2">
