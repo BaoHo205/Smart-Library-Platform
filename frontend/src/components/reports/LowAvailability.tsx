@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AverageSessionChart } from './AverageSessionChart';
+// import { AverageSessionChart } from './AverageSessionChart';
 import { BookAvailability, ReadingTrend } from '@/lib/types';
 
 interface LowAvailabilityProps {
@@ -108,7 +108,7 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                             {dailyAverage} minutes/day
                         </p>
                     </div>
-                    <AverageSessionChart data={chartData} />
+                    {/* <AverageSessionChart data={chartData} /> */}
                 </div>
             </CardContent>
         </Card>

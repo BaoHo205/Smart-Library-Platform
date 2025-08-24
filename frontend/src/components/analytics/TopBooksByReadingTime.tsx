@@ -63,22 +63,38 @@ export function TopBooksByReadingTime({ books, loading, limit = 10 }: TopBooksBy
                         </p>
                     </div>
                 ) : (
-                    <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                         <style jsx>{`
                             div::-webkit-scrollbar {
                                 display: none;
                             }
+                            .truncate {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                max-width: 100%;
+                            }
+                            .min-w-0 {
+                                min-width: 0;
+                            }
+                            table {
+                                table-layout: fixed;
+                            }
+                            td, th {
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                            }
                         `}</style>
-                        <Table>
+                        <Table className="table-fixed w-full border-collapse" style={{ tableLayout: 'fixed' }}>
                             <TableHeader className="sticky top-0 bg-white z-10">
                                 <TableRow className="border-b border-gray-200">
-                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-16">
+                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-[15%] overflow-hidden">
                                         Rank
                                     </TableHead>
-                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3">
+                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-[65%] overflow-hidden">
                                         Book Name
                                     </TableHead>
-                                    <TableHead className="text-right font-medium text-gray-700 px-4 py-3 w-24">
+                                    <TableHead className="text-right font-medium text-gray-700 px-4 py-3 w-[20%] overflow-hidden">
                                         Time
                                     </TableHead>
                                 </TableRow>
@@ -92,20 +108,20 @@ export function TopBooksByReadingTime({ books, loading, limit = 10 }: TopBooksBy
                                             window.open(`/books/${book.bookId}`, '_blank');
                                         }}
                                     >
-                                        <TableCell className="px-4 py-4 text-sm font-medium text-gray-900">
+                                        <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 w-[15%] overflow-hidden">
                                             #{index + 1}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4">
-                                            <div className="space-y-1">
-                                                <p className="line-clamp-1 text-sm font-medium text-gray-900">
+                                        <TableCell className="px-4 py-4 w-[65%] overflow-hidden">
+                                            <div className="space-y-1 min-w-0">
+                                                <p className="text-sm font-medium text-gray-900 truncate" title={book.title}>
                                                     {book.title}
                                                 </p>
-                                                <p className="text-xs text-gray-500 line-clamp-1">
+                                                <p className="text-xs text-gray-500 truncate" title={`by ${book.author}`}>
                                                     by {book.author}
                                                 </p>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-right">
+                                        <TableCell className="px-4 py-4 text-right w-[20%] overflow-hidden">
                                             <div className="space-y-1">
                                                 <p className="text-sm font-medium text-gray-900">
                                                     {formatReadingTime(book.totalReadingTime)}
