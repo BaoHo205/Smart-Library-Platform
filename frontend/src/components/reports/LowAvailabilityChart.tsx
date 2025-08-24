@@ -1,20 +1,17 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-// import { AverageSessionChart } from './AverageSessionChart';
-import { BookAvailability, ReadingTrend } from '@/lib/types';
+import { BookAvailability } from '@/lib/types';
 import { AlertTriangleIcon } from 'lucide-react';
 
-interface LowAvailabilityProps {
+interface LowAvailabilityChartProps {
     books: BookAvailability[];
-    chartData: ReadingTrend[];
     loading: boolean;
-    dailyAverage: number;
+    interval: number;
 }
 
-export function LowAvailability({ books, chartData, loading, dailyAverage }: LowAvailabilityProps) {
+export function LowAvailabilityChart({ books, loading, interval }: LowAvailabilityChartProps) {
     if (loading) {
         return (
             <Card className="h-fit">
@@ -22,9 +19,8 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                     <Skeleton className="h-6 w-48 rounded" />
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {/* Low availability books skeleton */}
                     <div className="space-y-4">
-                        {Array.from({ length: 3 }).map((_, i) => (
+                        {Array.from({ length: 5 }).map((_, i) => (
                             <div
                                 key={i}
                                 className="flex items-center justify-between py-2"
@@ -40,7 +36,6 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
 
                     <hr className="border-gray-200" />
 
-                    {/* Chart skeleton */}
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Skeleton className="h-5 w-32 rounded" />
@@ -53,6 +48,14 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
         );
     }
 
+    const getAvailabilityColor = (percentage: number) => {
+        if (percentage <= 20) return 'bg-red-500';
+        if (percentage <= 40) return 'bg-orange-500';
+        if (percentage <= 60) return 'bg-yellow-500';
+        if (percentage <= 80) return 'bg-blue-500';
+        return 'bg-green-500';
+    };
+
     const getAvailabilityIconColor = (percentage: number) => {
         if (percentage <= 20) return 'text-red-500';
         if (percentage <= 40) return 'text-orange-500';
@@ -60,6 +63,26 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
         if (percentage <= 80) return 'text-blue-500';
         return 'text-green-500';
     };
+
+    const getRankingLabel = (index: number) => {
+        const rank = index + 1;
+        if (rank === 1) return '1st';
+        if (rank === 2) return '2nd';
+        if (rank === 3) return '3rd';
+        return `${rank}th`;
+    };
+
+    const getRankingColor = (index: number) => {
+        const rank = index + 1;
+        if (rank === 1) return 'bg-orange-500';
+        if (rank === 2) return 'bg-teal-500';
+        if (rank === 3) return 'bg-blue-600';
+        if (rank === 4) return 'bg-yellow-500';
+        return 'bg-orange-400';
+    };
+
+    const top5Books = books.slice(0, 5);
+    const maxPercentage = Math.max(...top5Books.map(book => book.availability_percentage), 100);
 
     return (
         <Card className="h-fit">
@@ -78,7 +101,7 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                             </p>
                         </div>
                     ) : (
-                        books.slice(0, 5).map((book, index) => (
+                        top5Books.map((book, index) => (
                             <div
                                 key={book.bookId}
                                 className="flex items-center justify-between py-2"
@@ -96,12 +119,14 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                                         </p>
                                     </div>
                                 </div>
-                                <Badge
-                                    variant={book.availability_percentage === 0 ? 'destructive' : 'secondary'}
-                                    className="ml-2"
-                                >
-                                    {book.availability_percentage}%
-                                </Badge>
+                                <div className="text-right">
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        {book.availability_percentage}%
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Unavailability
+                                    </div>
+                                </div>
                             </div>
                         ))
                     )}
@@ -109,17 +134,39 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
 
                 <hr className="border-gray-200" />
 
-                {/* Average Session Time Chart */}
+                {/* Bar Chart */}
                 <div className="space-y-4">
                     <div>
                         <h3 className="text-sm font-medium text-gray-900">
-                            Average Session Time
+                            Top 5 Low Availability Books
                         </h3>
-                        <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {dailyAverage} minutes/day
+                        <p className="text-xs text-gray-500 mt-1">
+                            Last {interval} days
                         </p>
                     </div>
-                    {/* <AverageSessionChart data={chartData} /> */}
+
+                    <div className="space-y-3">
+                        {top5Books.map((book, index) => (
+                            <div key={`${book.title}-${index}`} className="space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="font-medium text-gray-700">
+                                        {getRankingLabel(index)}
+                                    </span>
+                                    <span className="text-gray-500">
+                                        {book.availability_percentage}%
+                                    </span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                    <div
+                                        className={`h-3 rounded-full transition-all duration-300 ${getRankingColor(index)}`}
+                                        style={{
+                                            width: `${(book.availability_percentage / maxPercentage) * 100}%`
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </CardContent>
         </Card>

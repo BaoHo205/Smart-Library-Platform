@@ -3,7 +3,7 @@ import mysql from '../database/mysql/connection';
 const getMostBorrowedBooks = async (startDate: string, endDate: string) => {
   try {
     const query = `
-      SELECT b.title, 
+      SELECT b.id, b.title, 
              GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') as authors,
              COUNT(DISTINCT c.id) AS total_checkouts,
              b.availableCopies,
@@ -57,7 +57,7 @@ const getTopActiveReaders = async (
 const getBooksWithLowAvailability = async (interval: number) => {
   try {
     const query = `
-            SELECT b.title, b.availableCopies, b.quantity,
+            SELECT b.id, b.title, b.availableCopies, b.quantity,
                    ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
                    COUNT(c.id) as recent_checkouts
             FROM books b
