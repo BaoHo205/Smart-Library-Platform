@@ -1,19 +1,3 @@
--- Update new field - available copies
-UPDATE books b
-LEFT JOIN (
-  SELECT bookId, COUNT(*) AS activeCheckouts
-  FROM checkouts
-  WHERE isReturned = FALSE
-  GROUP BY bookId
-) co ON co.bookId = b.id
-SET
-  b.availableCopies = GREATEST(0, LEAST(b.quantity, b.quantity - IFNULL(co.activeCheckouts, 0))),
-  b.status = CASE
-               WHEN GREATEST(0, LEAST(b.quantity, b.quantity - IFNULL(co.activeCheckouts, 0))) > 0
-                 THEN 'available'
-               ELSE 'unavailable'
-             END;
-
 -- Fix pageCount = 0 -> set to > 100
 UPDATE books
 SET pageCount = 120
@@ -32,6 +16,20 @@ WHERE isbn IS NULL OR TRIM(isbn) = '';
 UPDATE books
 SET description = CONCAT('An engaging read: ', title, '. Placeholder description for development data.')
 WHERE description IS NULL OR TRIM(description) = '';
+
+-- Update book quantity and available copies
+update books b
+set quantity = 
+(select count(*) 
+from books_copies bc
+where bc.bookId = b.id);
+
+update books b
+set availableCopies = 
+(select count(*) 
+from books_copies bc
+where bc.bookId = b.id
+and bc.isBorrowed = false);
 
 -- Add avgRating column
 ALTER TABLE books

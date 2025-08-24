@@ -17,14 +17,14 @@ CREATE INDEX idx_book_genres_genre ON book_genres (genreId);
 CREATE UNIQUE INDEX uq_book_genre ON book_genres (bookId, genreId);
 
 -- Checkouts (to compute availability quickly)
-CREATE INDEX idx_checkouts_active ON checkouts (bookId, isReturned, returnDate);
+CREATE INDEX idx_checkouts_active ON checkouts (copyId, isReturned, returnDate);
 
  
 -- REPORT 
 -- For getMostBorrowedBooks - covering index
 CREATE INDEX idx_checkouts_date_book_covering ON checkouts(
   checkoutDate, 
-  bookId, 
+  copyId, 
   id
 );
 

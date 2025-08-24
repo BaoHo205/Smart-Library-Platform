@@ -15,7 +15,7 @@ BEGIN
     IF NEW.isReturned = FALSE THEN
         UPDATE books 
         SET availableCopies = availableCopies - 1
-        WHERE id = NEW.bookId AND availableCopies > 0;
+        WHERE id = NEW.copyId AND availableCopies > 0;
     END IF;
 END//
 
@@ -32,14 +32,14 @@ BEGIN
     IF OLD.isReturned = FALSE AND NEW.isReturned = TRUE THEN
         UPDATE books 
         SET availableCopies = availableCopies + 1
-        WHERE id = NEW.bookId;
+        WHERE id = NEW.copyId;
     END IF;
     
     -- If the book was un-returned (isReturned changed from TRUE to FALSE)
     IF OLD.isReturned = TRUE AND NEW.isReturned = FALSE THEN
         UPDATE books 
         SET availableCopies = availableCopies - 1
-        WHERE id = NEW.bookId AND availableCopies > 0;
+        WHERE id = NEW.copyId AND availableCopies > 0;
     END IF;
 END//
 
@@ -56,10 +56,12 @@ BEGIN
 	SET avgRating = COALESCE(
 		(SELECT AVG(r.rating)
 		FROM reviews r
-		WHERE r.bookId = NEW.bookId), 
+        JOIN books_copies bc 
+        ON r.copyId = bc.id
+		WHERE bc.bookId = NEW.bookId), 
 	0
     ) WHERE b.id = NEW.bookId;
-    
+
 END//
 
 DELIMITER ;
