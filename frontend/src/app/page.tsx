@@ -47,9 +47,9 @@ export default function Home() {
       const response = await axiosInstance.get(
         `api/v1/books?pageSize=12&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
       );
-      setBooks(response.data.data.data || []);
-      setPages(Math.ceil(response.data.data.total / 9));
-      console.log('Books fetched:', response.data.data.data);
+      setBooks(response.data.result.data || []);
+      setPages(Math.ceil(response.data.result.total / 9));
+      console.log('Books fetched:', response.data.result.data);
       console.log('Current genre:', currentGenre);
     } catch (error) {
       console.error('Failed to fetch books:', error);

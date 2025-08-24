@@ -60,8 +60,8 @@ const Header: React.FC<HeaderProps> = ({
 
   const fetchGenres = async (): Promise<void> => {
     try {
-      const response = await axiosInstance.get<Options[]>('api/v1/genres');
-      setGenres(response.data);
+      const response = await axiosInstance.get('api/v1/genres');
+      setGenres(response.data.data as Options[]);
     } catch (error) {
       console.error('Failed to fetch genres:', error);
       setGenres([]); // Set empty array on error
