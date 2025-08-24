@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Filter, Clock, MonitorSpeaker, Target, Search, X, ChevronDown, ChevronUp, User, Settings, Calendar } from 'lucide-react';
+import { Filter, Clock, MonitorSpeaker, Target, X, ChevronDown, ChevronUp, User, Settings, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,11 +13,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import { cn } from '@/lib/utils';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+
 import { AnalyticsFiltersState, DeviceType } from '@/lib/types';
 import { useUserSearch, UserSearchResult } from '@/hooks/useUserSearch';
-import { useDebounce } from '@/hooks/useDebounce';
+
 import { DateRange } from 'react-day-picker';
 import toast from 'react-hot-toast';
 
@@ -38,7 +38,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
     const [localHighlightedLimit, setLocalHighlightedLimit] = useState(filters.highlightedBooksLimit.toString());
     const [localTopBooksLimit, setLocalTopBooksLimit] = useState(filters.topBooksLimit.toString());
 
-    const debouncedFilters = useDebounce(filters, 300);
+
     const { users, loading: usersLoading } = useUserSearch(viewMode === 'platform' ? userSearchInput : '');
 
     useEffect(() => {
@@ -216,7 +216,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
 
     const handleQuickLimitChange = (type: 'highlighted' | 'topBooks', value: string) => {
         if (value === 'max') {
-            const limit = 9999; 
+            const limit = 9999;
             onFiltersChange({
                 [type === 'highlighted' ? 'highlightedBooksLimit' : 'topBooksLimit']: limit
             });
@@ -530,11 +530,15 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                                     Custom Date Range
                                                 </Label>
                                             </div>
-                                            <DatePickerWithRange
-                                                className="w-full"
-                                                date={dateRange}
-                                                onDateChange={handleDateRangeChange}
-                                            />
+                                            <div className="w-full">
+                                                <DateRangePicker
+                                                    initialDateFrom={dateRange?.from}
+                                                    initialDateTo={dateRange?.to}
+                                                    onUpdate={(values) => handleDateRangeChange(values.range)}
+                                                    align="start"
+                                                    showCompare={false}
+                                                />
+                                            </div>
                                             <p className="text-xs text-gray-500 mt-3">
                                                 Override the time range with a specific date range
                                             </p>
