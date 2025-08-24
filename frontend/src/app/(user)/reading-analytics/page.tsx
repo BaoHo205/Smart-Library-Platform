@@ -68,7 +68,7 @@ export default function ReadingAnalyticsPage() {
 
     const fillMissingMonths = (
         data: ReadingTrend[],
-        months: number,
+        months: number | 'all',
         dateRange?: { from: Date | undefined; to: Date | undefined }
     ): ReadingTrend[] => {
         if (data.length === 0) {
@@ -79,14 +79,14 @@ export default function ReadingAnalyticsPage() {
             if (dateRange?.from && dateRange?.to) {
                 startDate = new Date(dateRange.from);
                 endDate = new Date(dateRange.to);
-            } else if (months === 999) {
+            } else if (months === 'all') {
                 // Max option - use a reasonable default range (last 12 months)
                 const currentDate = new Date();
                 startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11, 1);
                 endDate = currentDate;
             } else {
                 const currentDate = new Date();
-                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - months + 1, 1);
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - (months as number) + 1, 1);
                 endDate = currentDate;
             }
 
@@ -116,7 +116,7 @@ export default function ReadingAnalyticsPage() {
         if (dateRange?.from && dateRange?.to) {
             startDate = new Date(dateRange.from);
             endDate = new Date(dateRange.to);
-        } else if (months === 999) {
+        } else if (months === 'all') {
             if (data.length === 0) return data;
 
             const sortedData = [...data].sort((a, b) => {
@@ -132,7 +132,7 @@ export default function ReadingAnalyticsPage() {
         } else {
             // Use months back from current date, not from the data
             const currentDate = new Date();
-            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - months + 1, 1);
+            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - (months as number) + 1, 1);
             endDate = currentDate;
         }
 
@@ -182,7 +182,7 @@ export default function ReadingAnalyticsPage() {
                     api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
                     api.getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
-                        filters.months,
+                        filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange
                     )
                 ]);
@@ -238,7 +238,7 @@ export default function ReadingAnalyticsPage() {
                     api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
                     api.getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
-                        filters.months,
+                        filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange
                     )
                 ]);
