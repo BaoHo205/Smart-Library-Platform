@@ -52,13 +52,13 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
 
     // Update local state when filters change externally
     useEffect(() => {
-        if (filters.highlightedBooksLimit === 50) {
+        if (filters.highlightedBooksLimit === 9999) {
             setLocalHighlightedLimit('max');
         } else {
             setLocalHighlightedLimit(filters.highlightedBooksLimit.toString());
         }
 
-        if (filters.topBooksLimit === 100) {
+        if (filters.topBooksLimit === 9999) {
             setLocalTopBooksLimit('max');
         } else {
             setLocalTopBooksLimit(filters.topBooksLimit.toString());
@@ -76,7 +76,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
     const handleMonthsChange = (value: string) => {
         if (value === 'max') {
             // Set a special value to represent "all time" - backend will handle this
-            onFiltersChange({ months: 999, dateRange: undefined });
+            onFiltersChange({ months: 'all', dateRange: undefined });
             toast.success('Time range set to all time', {
                 duration: 2000,
                 icon: '⏰',
@@ -216,14 +216,14 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
 
     const handleQuickLimitChange = (type: 'highlighted' | 'topBooks', value: string) => {
         if (value === 'max') {
-            const limit = type === 'highlighted' ? 50 : 100;
+            const limit = 9999; 
             onFiltersChange({
                 [type === 'highlighted' ? 'highlightedBooksLimit' : 'topBooksLimit']: limit
             });
             // Keep "max" in local state for display purposes
             if (type === 'highlighted') {
                 setLocalHighlightedLimit('max');
-                toast.success('Showing all highlighted books (max 50)', {
+                toast.success('Showing all highlighted books', {
                     duration: 2000,
                     icon: '📚',
                     style: {
@@ -235,7 +235,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                 });
             } else {
                 setLocalTopBooksLimit('max');
-                toast.success('Showing all books by reading time (max 100)', {
+                toast.success('Showing all books by reading time', {
                     duration: 2000,
                     icon: '⏱️',
                     style: {
@@ -410,7 +410,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                     <Clock className="h-4 w-4" />
                                     Time Range
                                 </Label>
-                                <Select value={filters.months === 999 ? "max" : (filters.months?.toString() || "6")} onValueChange={handleMonthsChange}>
+                                <Select value={filters.months === 'all' ? "max" : (filters.months?.toString() || "6")} onValueChange={handleMonthsChange}>
                                     <SelectTrigger className="bg-white border-gray-200 hover:border-gray-300 transition-colors">
                                         <SelectValue />
                                     </SelectTrigger>
@@ -424,7 +424,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                     </SelectContent>
                                 </Select>
                                 <p className="text-xs text-gray-500">
-                                    {filters.months === 999 ? 'Reading data from first to last available' : `Reading data from the last ${filters.months || 6} months`}
+                                    {filters.months === 'all' ? 'Reading data from first to last available' : `Reading data from the last ${filters.months || 6} months`}
                                 </p>
                             </div>
 
@@ -654,8 +654,8 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                                     <Input
                                                         type="number"
                                                         min="1"
-                                                        max="100"
-                                                        value={localHighlightedLimit}
+                                                        max="9999"
+                                                        value={localHighlightedLimit === 'max' ? '' : localHighlightedLimit}
                                                         onChange={(e) => setLocalHighlightedLimit(e.target.value)}
                                                         onBlur={() => handleHighlightedLimitChange(localHighlightedLimit)}
                                                         onKeyDown={(e) => {
@@ -664,7 +664,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                                             }
                                                         }}
                                                         className="bg-white border-gray-200 h-9 hover:border-gray-300 transition-colors"
-                                                        placeholder="Enter number (1-100)"
+                                                        placeholder="Enter number or 'max' for all"
                                                     />
                                                 </div>
                                                 <div>
@@ -672,8 +672,8 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                                     <Input
                                                         type="number"
                                                         min="1"
-                                                        max="100"
-                                                        value={localTopBooksLimit}
+                                                        max="9999"
+                                                        value={localTopBooksLimit === 'max' ? '' : localTopBooksLimit}
                                                         onChange={(e) => setLocalTopBooksLimit(e.target.value)}
                                                         onBlur={() => handleTopBooksLimitChange(localTopBooksLimit)}
                                                         onKeyDown={(e) => {
@@ -682,7 +682,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                                             }
                                                         }}
                                                         className="bg-white border-gray-200 h-9 hover:border-gray-300 transition-colors"
-                                                        placeholder="Enter number (1-100)"
+                                                        placeholder="Enter number or 'max' for all"
                                                     />
                                                 </div>
                                             </div>
@@ -703,7 +703,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                 <span className="text-sm font-medium text-gray-700">Active filters:</span>
                                 {filters.months !== 6 && filters.months !== undefined && (
                                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors">
-                                        {filters.months === 999 ? 'Max' : `${filters.months} months`}
+                                        {filters.months === 'all' ? 'Max' : `${filters.months} months`}
                                     </Badge>
                                 )}
                                 {filters.dateRange && (
@@ -723,12 +723,12 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false, vi
                                 )}
                                 {filters.highlightedBooksLimit !== 5 && (
                                     <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 transition-colors">
-                                        Top {filters.highlightedBooksLimit === 50 ? 'Max' : filters.highlightedBooksLimit} highlighted
+                                        Top {filters.highlightedBooksLimit === 9999 ? 'Max' : filters.highlightedBooksLimit} highlighted
                                     </Badge>
                                 )}
                                 {filters.topBooksLimit !== 10 && (
                                     <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-blue-100 transition-colors">
-                                        Top {filters.topBooksLimit === 100 ? 'Max' : filters.topBooksLimit} by time
+                                        Top {filters.topBooksLimit === 9999 ? 'Max' : filters.topBooksLimit} by time
                                     </Badge>
                                 )}
                             </div>

@@ -147,7 +147,7 @@ export const getAverageSessionTime = async () => {
 
 // most highlighted books with detailed analytics
 export const getMostHighlightedBooks = async (limit: number = 5) => {
-  return await ReadingSessionModel.aggregate([
+  const pipeline: any[] = [
     { $match: { highlights: { $exists: true, $ne: [] } } },
     {
       $addFields: {
@@ -190,13 +190,18 @@ export const getMostHighlightedBooks = async (limit: number = 5) => {
       },
     },
     { $sort: { totalHighlights: -1 } },
-    { $limit: limit },
-  ]);
+  ];
+
+  if (limit !== 9999) {
+    pipeline.push({ $limit: limit });
+  }
+
+  return await ReadingSessionModel.aggregate(pipeline);
 };
 
 // top books by total reading time with engagement metrics
 export const getTopBooksByReadTime = async (limit: number = 10) => {
-  return await ReadingSessionModel.aggregate([
+  const pipeline: any[] = [
     { $match: { sessionDuration: { $exists: true, $ne: null } } },
     {
       $addFields: {
@@ -246,8 +251,14 @@ export const getTopBooksByReadTime = async (limit: number = 10) => {
       },
     },
     { $sort: { totalReadingTime: -1 } },
-    { $limit: limit },
-  ]);
+  ];
+
+  // Only add limit if it's not 9999 (which means "show all")
+  if (limit !== 9999) {
+    pipeline.push({ $limit: limit });
+  }
+
+  return await ReadingSessionModel.aggregate(pipeline);
 };
 
 // session by ID
@@ -272,26 +283,24 @@ export const getSessionsByBook = async (
 };
 
 // get reading trends over time (for chart data)
-export const getReadingTrends = async (userId?: string, months: number = 6, startDate?: Date, endDate?: Date) => {
+export const getReadingTrends = async (userId?: string, months: number | 'all' = 6, startDate?: Date, endDate?: Date) => {
   const matchStage: any = {
     sessionDuration: { $exists: true, $ne: null }
   };
 
   if (startDate && endDate) {
-    // Use custom date range
     matchStage.$or = [
       { startTime: { $gte: startDate, $lte: endDate } },
       { startTime: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } }
     ];
-  } else if (months !== 999) {
-    // Use months parameter (but not if it's 999 which means "all time")
+  } else if (months !== 'all' && typeof months === 'number') {
     const dateThreshold = new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000);
     matchStage.$or = [
       { startTime: { $gte: dateThreshold } }, // Date objects
       { startTime: { $gte: dateThreshold.toISOString() } } // String dates
     ];
   }
-  // If months === 999, don't add any date filter (get all data)
+  // If months === 'all', don't add any date filter (get all data)
 
   if (userId) {
     matchStage.userId = userId;

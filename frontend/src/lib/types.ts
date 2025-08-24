@@ -2,20 +2,20 @@ export interface ReadingSession {
     id?: string;
     userId: string;
     bookId: string;
-    startTime: string; 
-    endTime?: string; 
+    startTime: string;
+    endTime?: string;
     device: DeviceType;
     pagesRead: number[];
     highlights: Highlight[];
-    sessionDuration?: number; 
-    createdAt: string; 
-    updatedAt: string; 
+    sessionDuration?: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Highlight {
     pageNumber: number;
     text: string;
-    timestamp: string; 
+    timestamp: string;
 }
 
 export enum DeviceType {
@@ -31,9 +31,9 @@ export interface UserProfile {
     lastName: string;
     email: string;
     role: 'user' | 'staff';
-    createdAt: string; 
-    updatedAt: string; 
-    displayName?: string; 
+    createdAt: string;
+    updatedAt: string;
+    displayName?: string;
     avatarUrl?: string | null;
 }
 
@@ -47,11 +47,11 @@ export interface Book {
     publisherId: string;
     description: string;
     status: 'available' | 'unavailable';
-    createdAt: string; 
-    updatedAt: string; 
-    authors?: string[]; 
-    genres?: string[]; 
-    publisherName?: string; 
+    createdAt: string;
+    updatedAt: string;
+    authors?: string[];
+    genres?: string[];
+    publisherName?: string;
 }
 
 export interface BookAnalytics {
@@ -60,7 +60,7 @@ export interface BookAnalytics {
     author: string;
     coverUrl?: string | null;
     totalHighlights: number;
-    totalReadingTime: number; 
+    totalReadingTime: number;
 }
 
 // ===== ANALYTICS TYPES =====
@@ -81,10 +81,10 @@ export interface TopBookByReadingTime {
     title: string;
     author: string;
     coverUrl?: string | null;
-    totalReadingTime: number; 
+    totalReadingTime: number;
     totalSessions: number;
     uniqueReadersCount: number;
-    avgSessionDuration: number; 
+    avgSessionDuration: number;
     totalPages: number;
     totalHighlights: number;
     engagementScore: number;
@@ -100,7 +100,7 @@ export interface BookAvailability {
 }
 
 export interface AverageSessionTimeData {
-    dailyAverage: number; 
+    dailyAverage: number;
     monthlyData: MonthlySessionData[];
     activeDaysCount: number;
     totalSessions: number;
@@ -131,8 +131,8 @@ export interface ReadingTrend {
 export interface DeviceAnalytics {
     device: DeviceType;
     totalSessions: number;
-    totalDuration: number; 
-    avgSessionDuration: number; 
+    totalDuration: number;
+    avgSessionDuration: number;
     uniqueUsersCount: number;
     percentage: number;
 }
@@ -180,15 +180,15 @@ export interface ComponentState<T> {
 // ===== ANALYTICS FILTERS =====
 
 export interface AnalyticsFiltersState {
-    months: number; 
+    months: number | 'all';
     dateRange?: {
         from: Date | undefined;
         to: Date | undefined;
     } | undefined;
     deviceType: 'all' | DeviceType;
-    userId?: string; 
-    highlightedBooksLimit: number; 
-    topBooksLimit: number; 
+    userId?: string;
+    highlightedBooksLimit: number;
+    topBooksLimit: number;
 }
 
 export interface AuthUser {

@@ -49,14 +49,14 @@ export function MostHighlightedBooks({ books, loading, onBookClick, limit = 5, o
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">
-                    {limit === books.length ? `All ${books.length}` : `Top ${limit}`} Most Highlighted Books
+                    {limit === 9999 ? 'Top All Most Highlighted Books' : `Top ${limit} Most Highlighted Books`}
                 </h2>
                 {onShowAll && (
                     <button
                         onClick={onShowAll}
                         className="text-sm text-blue-600 hover:text-blue-900 font-medium transition-colors"
                     >
-                        Show all
+                        See All Details
                     </button>
                 )}
             </div>

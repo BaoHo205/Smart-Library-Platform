@@ -298,7 +298,7 @@ const getAverageSessionTime = async (): Promise<AverageSessionTimeResponse[]> =>
   }
 };
 
-const getReadingTrends = async (userId?: string, months: number = 6, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<ReadingTrendResponse[]> => {
+const getReadingTrends = async (userId?: string, months: number | 'all' = 6, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<ReadingTrendResponse[]> => {
   try {
     const params = new URLSearchParams();
     if (userId) params.append('userId', userId);
