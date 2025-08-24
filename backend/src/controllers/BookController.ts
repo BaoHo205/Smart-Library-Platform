@@ -10,9 +10,6 @@ const getBooks = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // #swagger.tags = ['Books']
-  // #swagger.summary = 'Get books'
-  // #swagger.description = 'Search and retrieve books based on query parameters such as title, author, and genre.'
   try {
     // Validate pagination parameters
     const page = req.query.page ? Number(req.query.page) : undefined;
@@ -92,10 +89,6 @@ const getBooks = async (
 };
 
 const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
-  // #swagger.tags = ['Books']
-  // #swagger.summary = 'Borrow a book'
-  // #swagger.description = 'Borrow a specific book by its ID. Requires user authentication.'
-  // #swagger.parameters['bookId'] = { description: 'Book ID to borrow', type: 'string' }
   try {
     const { bookId } = req.params;
     const { dueDate } = req.body;
@@ -175,10 +168,6 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
 };
 
 const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
-  // #swagger.tags = ['Books']
-  // #swagger.summary = 'Return a book'
-  // #swagger.description = 'Return a borrowed book by its ID. Requires user authentication.'
-  // #swagger.parameters['bookId'] = { description: 'Book ID to return', type: 'string' }
   try {
     const { bookId } = req.params;
     const userId = req.userId;
@@ -220,120 +209,6 @@ const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
-const getBookInfoById = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
-  // #swagger.tags = ['Books']
-  // #swagger.summary = 'Get book information by ID'
-  // #swagger.description = 'Retrieve detailed information about a specific book by its ID.'
-  // #swagger.parameters['bookId'] = { description: 'Book ID to retrieve information for', type: 'string' }
-  try {
-    const { bookId } = req.params;
-
-    if (!bookId) {
-      res.status(400).json({
-        success: false,
-        message: 'Book ID is required',
-      });
-      return;
-    }
-
-    const bookInfo = await BookService.getBookInfoById(bookId);
-
-    if (!bookInfo) {
-      res.status(404).json({
-        success: false,
-        message: 'Book not found',
-      });
-      return;
-    }
-
-    res.status(200).json({
-      success: true,
-      data: bookInfo,
-    });
-  } catch (error) {
-    console.error('Error retrieving book info:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while retrieving book info',
-    });
-  }
-};
-
-const getAllReviewsByBookId = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
-  // #swagger.tags = ['Books']
-  // #swagger.summary = 'Get all reviews for a specific book'
-  // #swagger.description = 'Retrieve all reviews for a specific book by its ID with user information.'
-  // #swagger.parameters['bookId'] = { description: 'Book ID to retrieve reviews for', type: 'string', in: 'path' }
-  try {
-    const { bookId } = req.params;
-
-    if (!bookId) {
-      res.status(400).json({
-        success: false,
-        message: 'Book ID is required',
-      });
-      return;
-    }
-
-    const reviews = await BookService.getAllReviewsByBookId(bookId);
-
-    res.status(200).json({
-      success: true,
-      data: reviews,
-      total: reviews.length,
-    });
-  } catch (error) {
-    console.error('Error retrieving book reviews:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while retrieving book reviews',
-    });
-  }
-};
-
-const isBookBorrowed = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
-  try {
-    const { bookId } = req.params;
-    const userId = req.userId;
-
-    if (!bookId) {
-      res.status(400).json({
-        success: false,
-        message: 'Book ID is required',
-      });
-      return;
-    }
-
-    if (!userId) {
-      res.status(400).json({
-        success: false,
-        message: 'User ID is required',
-      });
-      return;
-    }
-
-    const result = await BookService.isBookBorrowed(bookId, userId);
-    res.status(200).json({
-      success: true,
-      isBorrowed: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: `Error checking borrow status: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    });
-  }
-};
-
 export interface NewBook {
   title: string;
   thumbnailUrl: string;
@@ -343,14 +218,11 @@ export interface NewBook {
   publisherId: string;
   description: string;
   status: BookStatus;
-  authorIds: string;
-  genreIds: string;
+  authorIds: string,
+  genreIds: string
 }
 
-export const addNewBook = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+const addNewBook = async (req: Request, res: Response): Promise<void> => {
   const bookData: NewBook = req.body;
 
   if (!bookData.title) {
@@ -359,53 +231,30 @@ export const addNewBook = async (
   }
 
   // Validate that all required fields are present
-  if (
-    !bookData.title ||
-    !bookData.authorIds ||
-    !bookData.genreIds ||
-    !bookData.publisherId
-  ) {
-    res.status(400).json({
-      message:
-        'Book title, author IDs, genre IDs, and publisher ID are required',
-    });
+  if (!bookData.title || !bookData.authorIds || !bookData.genreIds || !bookData.publisherId) {
+    res.status(400).json({ message: 'Book title, author IDs, genre IDs, and publisher ID are required' });
     return;
   }
 
   try {
-    const addedBook = await BookService.addNewBook(
-      bookData,
-      PLACEHOLDER_STAFF_ID
-    );
-    res
-      .status(201)
-      .json({ message: 'Book created successfully', book: addedBook });
+    const addedBook = await BookService.addNewBook(bookData, PLACEHOLDER_STAFF_ID);
+    res.status(201).json({ message: 'Book created successfully', book: addedBook });
   } catch (error: unknown) {
     console.error('Error in bookController.createBook:', error);
     if (error instanceof Error) {
       // Check for specific MySQL errors like foreign key constraints or duplicates
       if (error.message.includes('Duplicate entry')) {
-        res.status(409).json({
-          message: 'Conflict: A book with this ID or ISBN already exists.',
-          error: error.message,
-        });
+        res.status(409).json({ message: 'Conflict: A book with this ID or ISBN already exists.', error: error.message });
       } else if (error.message.includes('Foreign key constraint failed')) {
-        res.status(400).json({
-          message: 'Bad request: Invalid author, genre, or publisher ID.',
-          error: error.message,
-        });
+        res.status(400).json({ message: 'Bad request: Invalid author, genre, or publisher ID.', error: error.message });
       } else {
-        res
-          .status(500)
-          .json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({ message: 'Internal server error', error: error.message });
       }
     } else {
-      res
-        .status(500)
-        .json({ message: 'Internal server error', error: String(error) });
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
     }
   }
-};
+}
 
 /**
  * Handles PUT /api/books/:id/inventory requests to update book quantity.
@@ -413,51 +262,32 @@ export const addNewBook = async (
  * @param {Request} req The Express request object.
  * @param {Response} res The Express response object.
  */
-export const updateBookInventory = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+const updateBookInventory = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params; // Book ID from URL
   const { quantity } = req.body; // New quantity from request body
 
   // Basic validation
   if (typeof quantity !== 'number' || quantity < 0) {
-    res.status(400).json({
-      message:
-        'Invalid quantity provided. Quantity must be a non-negative number.',
-    });
+    res.status(400).json({ message: 'Invalid quantity provided. Quantity must be a non-negative number.' });
     return;
   }
 
   try {
-    const updated = await BookService.updateBookInventory(
-      id,
-      quantity,
-      PLACEHOLDER_STAFF_ID
-    );
+    const updated = await BookService.updateBookInventory(id, quantity, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res.status(200).json({
-        message: `Book ${id} inventory updated successfully to ${quantity}.`,
-      });
+      res.status(200).json({ message: `Book ${id} inventory updated successfully to ${quantity}.` });
     } else {
       res.status(404).json({ message: `Book with ID ${id} not found.` });
     }
   } catch (error: unknown) {
-    console.error(
-      `Error in bookController.updateBookInventoryController for ID ${id}:`,
-      error
-    );
+    console.error(`Error in bookController.updateBookInventoryController for ID ${id}:`, error);
     if (error instanceof Error) {
-      res
-        .status(500)
-        .json({ message: 'Internal server error', error: error.message });
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     } else {
-      res
-        .status(500)
-        .json({ message: 'Internal server error', error: String(error) });
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
     }
   }
-};
+}
 
 /**
  * Handles PUT /api/books/:id/status requests to retire/change book status.
@@ -465,10 +295,7 @@ export const updateBookInventory = async (
  * @param {Request} req The Express request object.
  * @param {Response} res The Express response object.
  */
-export const retireBook = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+const retireBook = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params; // Book ID from URL
   //const { status } = req.body; // New status from request body
 
@@ -482,37 +309,22 @@ export const retireBook = async (
   try {
     const updated = await BookService.retireBook(id, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res.status(200).json({
-        message: `Book ${id} status updated successfully to 'unavailable'.`,
-      });
+      res.status(200).json({ message: `Book ${id} status updated successfully to 'unavailable'.` });
     } else {
       res.status(404).json({ message: `Book with ID ${id} not found.` });
     }
   } catch (error: unknown) {
-    console.error(
-      `Error in bookController.retireBookController for ID ${id}:`,
-      error
-    );
+    console.error(`Error in bookController.retireBookController for ID ${id}:`, error);
     if (error instanceof Error) {
-      res
-        .status(500)
-        .json({ message: 'Internal server error', error: error.message });
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     } else {
-      res
-        .status(500)
-        .json({ message: 'Internal server error', error: String(error) });
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
     }
   }
-};
+}
 
-export default {
-  borrowBook,
-  returnBook,
-  getBooks,
-  addNewBook,
-  updateBookInventory,
-  retireBook,
-  getBookInfoById,
-  getAllReviewsByBookId,
-  isBookBorrowed,
-};
+const updateBook = async (req: Request, res: Response) => {
+
+}
+
+export default { borrowBook, returnBook, getBooks, addNewBook, updateBookInventory, retireBook };
