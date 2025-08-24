@@ -515,3 +515,105 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateBook(
+    IN p_bookId VARCHAR(36),
+    IN p_title VARCHAR(500),
+    IN p_thumbnailUrl TEXT,
+    IN p_isbn VARCHAR(20),
+    IN p_quantity INT,
+    IN p_pageCount INT,
+    IN p_publisherId VARCHAR(36),
+    IN p_description TEXT,
+    IN p_status ENUM('available', 'unavailable', 'retired'),
+    IN p_authorIds TEXT,
+    IN p_genreIds TEXT,
+    IN p_staffId VARCHAR(36)
+)
+BEGIN
+    DECLARE v_authorId VARCHAR(36);
+    DECLARE v_genreId VARCHAR(36);
+    DECLARE v_pos INT DEFAULT 1;
+    DECLARE v_len INT DEFAULT 0;
+
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred during book update';
+    END;
+
+    -- Start a transaction to ensure all updates are applied atomically
+    START TRANSACTION;
+    
+    -- Validate required inputs
+    IF p_bookId IS NULL OR p_bookId = '' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID is a required field';
+    END IF;
+
+    -- Update the main book record using IFNULL for partial updates
+    UPDATE books
+    SET
+        title = IFNULL(p_title, title),
+        thumbnailUrl = IFNULL(p_thumbnailUrl, thumbnailUrl),
+        isbn = IFNULL(p_isbn, isbn),
+        quantity = IFNULL(p_quantity, quantity),
+        pageCount = IFNULL(p_pageCount, pageCount),
+        publisherId = IFNULL(p_publisherId, publisherId),
+        description = IFNULL(p_description, description),
+        status = IFNULL(p_status, status),
+        updatedAt = CURRENT_TIMESTAMP
+    WHERE id = p_bookId;
+
+    -- Update author associations only if new author IDs are provided
+    IF p_authorIds IS NOT NULL AND p_authorIds <> '' THEN
+        -- Delete existing author associations and insert the new ones
+        DELETE FROM book_authors WHERE bookId = p_bookId;
+        
+        SET p_authorIds = CONCAT(p_authorIds, ',');
+        SET v_pos = 1;
+        SET v_len = LOCATE(',', p_authorIds, v_pos);
+        WHILE v_len > 0 DO
+            SET v_authorId = TRIM(SUBSTRING(p_authorIds, v_pos, v_len - v_pos));
+            IF v_authorId <> '' THEN
+                INSERT INTO book_authors (bookId, authorId, createdAt, updatedAt)
+                VALUES (p_bookId, v_authorId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            END IF;
+            SET v_pos = v_len + 1;
+            SET v_len = LOCATE(',', p_authorIds, v_pos);
+        END WHILE;
+    END IF;
+
+    -- Update genre associations only if new genre IDs are provided
+    IF p_genreIds IS NOT NULL AND p_genreIds <> '' THEN
+        -- Delete existing genre associations and insert the new ones
+        DELETE FROM book_genres WHERE bookId = p_bookId;
+
+        SET p_genreIds = CONCAT(p_genreIds, ',');
+        SET v_pos = 1;
+        SET v_len = LOCATE(',', p_genreIds, v_pos);
+        WHILE v_len > 0 DO
+            SET v_genreId = TRIM(SUBSTRING(p_genreIds, v_pos, v_len - v_pos));
+            IF v_genreId <> '' THEN
+                INSERT INTO book_genres (bookId, genreId, createdAt, updatedAt)
+                VALUES (p_bookId, v_genreId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            END IF;
+            SET v_pos = v_len + 1;
+            SET v_len = LOCATE(',', p_genreIds, v_pos);
+        END WHILE;
+    END IF;
+    
+    -- Log the staff action
+    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Updated book: "', p_title, '" (ID: ', p_bookId, ')'));
+    
+    -- Commit the transaction
+    COMMIT;
+
+END $$
+
+DELIMITER ;
