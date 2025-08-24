@@ -3,6 +3,6 @@ import { handleGetAllCheckoutsByUserId } from '../controllers/CheckoutController
 
 const checkoutRouter = Router();
 
-checkoutRouter.get('/:userId', handleGetAllCheckoutsByUserId);
+checkoutRouter.get('/', handleGetAllCheckoutsByUserId);
 
 export default checkoutRouter;

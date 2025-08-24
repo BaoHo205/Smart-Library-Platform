@@ -144,8 +144,59 @@ const updateReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const getAllUsers = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Get all users for search'
+  // #swagger.description = 'Get all users for search and filtering purposes. Staff only.'
+  try {
+    const users = await UserService.getAllUsers();
+
+    res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+const searchUsers = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Users']
+  // #swagger.summary = 'Search users'
+  // #swagger.description = 'Search users by query string. Staff only.'
+  try {
+    const { query } = req.query;
+
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter is required',
+      });
+    }
+
+    const users = await UserService.searchUsers(query);
+
+    res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 export default {
   addReview,
   updateReview,
   getProfile,
+  getAllUsers,
+  searchUsers,
 };

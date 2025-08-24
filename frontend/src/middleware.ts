@@ -39,6 +39,7 @@ export function middleware(request: NextRequest) {
       '/me',
       '/loans',
       '/analytics',
+      '/reading-analytics',
     ];
 
     // Helper function to check if path or its parent is allowed
