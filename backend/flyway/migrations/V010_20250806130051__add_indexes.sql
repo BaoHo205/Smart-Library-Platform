@@ -18,3 +18,31 @@ CREATE UNIQUE INDEX uq_book_genre ON book_genres (bookId, genreId);
 
 -- Checkouts (to compute availability quickly)
 CREATE INDEX idx_checkouts_active ON checkouts (bookId, isReturned, returnDate);
+
+ 
+-- REPORT 
+-- For getMostBorrowedBooks - covering index
+CREATE INDEX idx_checkouts_date_book_covering ON checkouts(
+  checkoutDate, 
+  bookId, 
+  id
+);
+
+-- For getTopActiveReaders - covering index
+CREATE INDEX idx_checkouts_date_user_covering ON checkouts(
+  checkoutDate, 
+  userId, 
+  id
+);
+
+-- For getBooksWithLowAvailability
+-- tui nho la mysql k support where clause trong create index
+-- CREATE INDEX idx_books_low_availability ON books(
+--   availableCopies, 
+--   quantity, 
+--   id, 
+--   title
+-- ) WHERE availableCopies <= quantity * 0.2 OR availableCopies = 0;
+
+-- k co where clause nhe
+CREATE INDEX idx_books_low_availability ON books(availableCopies, quantity, id, title);

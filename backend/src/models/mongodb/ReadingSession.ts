@@ -5,11 +5,17 @@ export interface ReadingSession {
   userId: string;
   bookId: string;
   startTime: Date;
-  endTime: Date;
+  endTime?: Date; // session might be ongoing
   device: DeviceType;
   pagesRead: number[];
-  highlights: number[];
-  sessionDuration: number; // in seconds
+  highlights: Highlight[];
+  sessionDuration?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface Highlight {
+  pageNumber: number;
+  text: string;
+  timestamp: Date;
 }

@@ -1,9 +1,7 @@
 import { NewBook } from '@/controllers/BookController';
-import pool from '@/database/mysql/connection';
 import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
-import mysqlConnection from "@/database/mysql/connection";
-import { Book } from "@/models/mysql/Book";
-// import { RowDataPacket } from 'mysql2';
+import mysqlConnection from '@/database/mysql/connection';
+import { Book } from '@/models/mysql/Book';
 
 export interface BookSearchFilters {
   q?: string; // general keyword -> title/publisher/author/genre
@@ -25,6 +23,7 @@ export interface BookListItem {
   pageCount: number | null;
   quantity: number;
   availableCopies: number;
+  avgRating: number | null;
   publisherName: string;
   authors: string;
   genres: string;
@@ -38,13 +37,34 @@ export interface BookDetails {
   quantity: number;
   availableCopies: number;
   pageCount: number;
-  publisherId: string;
   description: string | null;
   status: 'available' | 'unavailable';
   createdAt: Date;
   updatedAt: Date;
+  avgRating: number;
+  numberOfRatings: number;
+  authors: string[];
+  genres: string[];
   publisherName: string;
 }
+
+export interface ReviewWithUser {
+  id: string;
+  userId: string;
+  bookId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userName: string;
+  name: string;
+}
+
+// Raw database result type - extends BookDetails but overrides authors/genres as strings
+type BookDetailsRaw = Omit<BookDetails, 'authors' | 'genres'> & {
+  authors: string;
+  genres: string;
+} & RowDataPacket;
 
 export interface UserCheckout {
   id: string;
@@ -190,6 +210,7 @@ async function searchBooks(
       b.pageCount,
       b.quantity,
       b.availableCopies,
+      b.avgRating,
       b.status,
       b.description,
       p.name AS publisherName,
@@ -208,10 +229,10 @@ async function searchBooks(
     ${whereSql}
   `;
 
-  const countResult = (await pool.executeQuery(countSql, params)) as CountRow[];
+  const countResult = (await mysqlConnection.executeQuery(countSql, params)) as CountRow[];
   const total = countResult[0]?.total ?? 0;
 
-  const rows = (await pool.executeQuery(sql, params)) as BookListItem[];
+  const rows = (await mysqlConnection.executeQuery(sql, params)) as BookListItem[];
 
   return {
     data: rows,
@@ -231,13 +252,13 @@ const borrowBook = async (
     const date = new Date(dueDate);
 
     // Call the stored procedure
-    await pool.executeQuery(
+    await mysqlConnection.executeQuery(
       'CALL BorrowBook(?, ?, ?, @checkoutId, @success, @message)',
       [userId, bookId, date]
     );
 
     // Get the output parameters
-    const outputResults = (await pool.executeQuery(
+    const outputResults = (await mysqlConnection.executeQuery(
       'SELECT @checkoutId as checkoutId, @success as success, @message as message'
     )) as BorrowBookOutput[];
 
@@ -263,7 +284,7 @@ const returnBook = async (
 ): Promise<ReturnBookResult> => {
   try {
     // Call the stored procedure
-    await pool.executeQuery(
+    await mysqlConnection.executeQuery(
       `
             CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
         `,
@@ -271,7 +292,7 @@ const returnBook = async (
     );
 
     // Get the output parameters
-    const outputResults = (await pool.executeQuery(`
+    const outputResults = (await mysqlConnection.executeQuery(`
             SELECT @p_success as success, @p_message as message, @p_isLate as isLate
         `)) as ReturnBookOutput[];
 
@@ -291,52 +312,80 @@ const returnBook = async (
   }
 };
 
-const getBookById = async (bookId: string): Promise<BookListItem | null> => {
+const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
   try {
-    // Define clause for a specific book ID
-    const where: string[] = ['b.id = ?'];
-    const params: SqlParam[] = [bookId];
-
-    // Where clause
-    const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
-    // Base FROM clause
-    const baseFrom = `
-    FROM books b
-    JOIN publishers p ON p.id = b.publisherId
-    LEFT JOIN (
-      SELECT ba.bookId, GROUP_CONCAT(CONCAT(a.firstName, ' ', a.lastName) ORDER BY a.lastName SEPARATOR ', ') AS authors
-      FROM book_authors ba
-      JOIN authors a ON a.id = ba.authorId
-      GROUP BY ba.bookId
-    ) AS authors ON authors.bookId = b.id
-    LEFT JOIN (
-      SELECT bg.bookId, GROUP_CONCAT(g.name ORDER BY g.name SEPARATOR ', ') AS genres
-      FROM book_genres bg
-      JOIN genres g ON g.id = bg.genreId
-      GROUP BY bg.bookId
-    ) AS genres ON genres.bookId = b.id
-  `;
-
-    // Main query
     const sql = `
-    SELECT
-      b.id,
-      b.title,
-      b.thumbnailUrl,
-      b.isbn,
-      b.pageCount,
-      b.quantity,
-      b.availableCopies,
-      p.name AS publisherName,
-      COALESCE(authors.authors, '') AS authors,
-      COALESCE(genres.genres, '') AS genres
-    ${baseFrom}
-    ${whereSql}
-    LIMIT 1
-  `;
-    const result = (await pool.executeQuery(sql, params)) as BookListItem[];
+      SELECT 
+        b.id,
+        b.title,
+        b.thumbnailUrl,
+        b.isbn,
+        b.quantity,
+        b.availableCopies,
+        b.pageCount,
+        b.description,
+        CASE 
+          WHEN b.availableCopies > 0 THEN 'available'
+          ELSE 'unavailable'
+        END AS status,
+        b.createdAt,
+        b.updatedAt,
+        p.name AS publisherName,
+        COALESCE(authors.authors, '') AS authors,
+        COALESCE(genres.genres, '') AS genres,
+        COALESCE(b.avgRating, 0) AS avgRating,
+        COALESCE(reviews.numberOfRatings, 0) AS numberOfRatings
+      FROM books b
+      JOIN publishers p ON p.id = b.publisherId
+      LEFT JOIN (
+        SELECT ba.bookId, GROUP_CONCAT(CONCAT(a.firstName, ' ', a.lastName) ORDER BY a.lastName SEPARATOR ', ') AS authors
+        FROM book_authors ba
+        JOIN authors a ON a.id = ba.authorId
+        GROUP BY ba.bookId
+      ) AS authors ON authors.bookId = b.id
+      LEFT JOIN (
+        SELECT bg.bookId, GROUP_CONCAT(g.name ORDER BY g.name SEPARATOR ', ') AS genres
+        FROM book_genres bg
+        JOIN genres g ON g.id = bg.genreId
+        GROUP BY bg.bookId
+      ) AS genres ON genres.bookId = b.id
+      LEFT JOIN (
+        SELECT 
+          r.bookId,
+          COUNT(r.id) AS numberOfRatings,
+          AVG(r.rating) AS avgRating
+        FROM reviews r
+        GROUP BY r.bookId
+      ) AS reviews ON reviews.bookId = b.id
+      WHERE b.id = ?
+    `;
 
-    return result[0] || null;
+    const results = (await mysqlConnection.executeQuery(sql, [
+      bookId,
+    ])) as BookDetailsRaw[];
+
+    if (results.length === 0) {
+      return null;
+    }
+
+    const book = results[0];
+
+    // Convert authors and genres from comma-separated strings to arrays
+    const bookDetails: BookDetails = {
+      ...book,
+      authors: book.authors
+        ? book.authors
+          .split(', ')
+          .filter((author: string) => author.trim() !== '')
+        : [],
+      genres: book.genres
+        ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '')
+        : [],
+      avgRating: Number(book.avgRating) || 0,
+      numberOfRatings: Number(book.numberOfRatings) || 0,
+    };
+
+    return bookDetails;
   } catch (error) {
     console.error('Error getting book by ID:', error);
     return null;
@@ -344,7 +393,7 @@ const getBookById = async (bookId: string): Promise<BookListItem | null> => {
 };
 
 /**
- * 
+ *
  * Retrieves all books from the database.
  * @returns {Promise<Book[]>} A promise that resolves to an array of Book objects.
  */
@@ -363,7 +412,7 @@ const getAllBooks = async (): Promise<Book[]> => {
       throw new Error(`Could not create book: ${String(error)}`);
     }
   }
-}
+};
 
 interface IdRow {
   id: string;
@@ -377,9 +426,13 @@ interface IdRow {
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<String>} A promise that resolves to the created Book object id.
  */
-const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> => {
+const addNewBook = async (
+  bookData: NewBook,
+  staffId: string
+): Promise<string> => {
   try {
-    const procedure = 'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
+    const procedure =
+      'CALL AddNewBook(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @new_book_id)';
     const params = [
       bookData.title,
       bookData.thumbnailUrl || null,
@@ -392,14 +445,16 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> =
       bookData.status || 'available',
       bookData.authorIds,
       bookData.genreIds,
-      staffId
+      staffId,
     ];
 
     // Execute the stored procedure (returns OkPacket or similar)
-    await pool.executeQuery(procedure, params);
+    await mysqlConnection.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const result = await pool.executeQuery('SELECT @new_book_id AS id') as unknown as IdRow[];
+    const selectRows = (await mysqlConnection.executeQuery(
+      'SELECT @new_book_id AS id'
+    )) as unknown as IdRow;
 
     if (!result) {
       throw new Error('Failed to retrieve new book ID from procedure');
@@ -429,7 +484,11 @@ const addNewBook = async (bookData: NewBook, staffId: string): Promise<String> =
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<boolean>} A promise that resolves to true if updated, false if book not found.
  */
-const updateBookInventory = async (bookId: string, newQuantity: number, staffId: string): Promise<boolean> => {
+const updateBookInventory = async (
+  bookId: string,
+  newQuantity: number,
+  staffId: string
+): Promise<boolean> => {
   try {
     const procedure = 'CALL UpdateBookInventory(?, ?, ?)';
     const params = [bookId, newQuantity, staffId];
@@ -438,7 +497,10 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
 
     return true;
   } catch (error) {
-    console.error(`Error in bookService.updateBookInventory for ID ${bookId}:`, error);
+    console.error(
+      `Error in bookService.updateBookInventory for ID ${bookId}:`,
+      error
+    );
     if (error instanceof Error) {
       // Re-throw with a more descriptive message
       throw new Error(`Could not update book inventory: ${error.message}`);
@@ -446,7 +508,7 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
       throw new Error(`Could not update book inventory: ${String(error)}`);
     }
   }
-}
+};
 
 /**
  * Retires a book by calling the `RetireBook` stored procedure, which sets the status to 'unavailable'.
@@ -455,7 +517,10 @@ const updateBookInventory = async (bookId: string, newQuantity: number, staffId:
  * @param {string} staffId The ID of the staff user performing the action.
  * @returns {Promise<boolean>} A promise that resolves to true if retired, false if book not found.
  */
-const retireBook = async (bookId: string, staffId: string): Promise<boolean> => {
+const retireBook = async (
+  bookId: string,
+  staffId: string
+): Promise<boolean> => {
   try {
     const procedure = 'CALL RetireBook(?, ?)';
     const params = [bookId, staffId];
@@ -470,16 +535,72 @@ const retireBook = async (bookId: string, staffId: string): Promise<boolean> => 
       throw new Error(`Could not retire book: ${String(error)}`);
     }
   }
-}
+};
 
-export { searchBooks, getAllBooks, addNewBook, updateBookInventory, retireBook }
+const getAllReviewsByBookId = async (
+  bookId: string
+): Promise<ReviewWithUser[]> => {
+  try {
+    const sql = `
+      SELECT 
+        r.id,
+        r.userId,
+        r.bookId,
+        r.rating,
+        r.comment,
+        r.createdAt,
+        r.updatedAt,
+        u.userName,
+        CONCAT(u.firstName, ' ', u.lastName) AS name
+      FROM reviews r
+      JOIN users u ON u.id = r.userId
+      WHERE r.bookId = ?
+      ORDER BY r.updatedAt DESC
+    `;
+
+    const results = (await mysqlConnection.executeQuery(sql, [
+      bookId,
+    ])) as (ReviewWithUser & RowDataPacket)[];
+
+    return results;
+  } catch (error) {
+    console.error('Error getting reviews by book ID:', error);
+    return [];
+  }
+};
+
+const isBookBorrowed = async (
+  bookId: string,
+  userId: string
+): Promise<boolean> => {
+  try {
+    const query = `
+      SELECT COUNT(*) as count
+      FROM checkouts
+      WHERE bookId = ? AND userId = ? AND returnDate IS NULL
+    `;
+
+    const result = (await mysqlConnection.executeQuery(query, [
+      bookId,
+      userId,
+    ])) as (boolean & RowDataPacket)[];
+    const isBookBorrowed = result[0].count > 0;
+    return isBookBorrowed;
+  } catch (error) {
+    console.error('Error checking if book is borrowed:', error);
+    return false;
+  }
+};
 
 export default {
   searchBooks,
   borrowBook,
   returnBook,
-  getBookById,
+  getBookInfoById,
+  getAllBooks,
   addNewBook,
   updateBookInventory,
-  retireBook
+  retireBook,
+  getAllReviewsByBookId,
+  isBookBorrowed,
 };

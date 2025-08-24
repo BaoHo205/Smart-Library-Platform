@@ -2,6 +2,7 @@
 
 DROP TRIGGER IF EXISTS after_checkout_insert;
 DROP TRIGGER IF EXISTS after_checkout_update;
+DROP TRIGGER IF EXISTS after_review_insert;
 
 -- Trigger to automatically update book availability when a book is borrowed
 DELIMITER //
@@ -40,6 +41,25 @@ BEGIN
         SET availableCopies = availableCopies - 1
         WHERE id = NEW.bookId AND availableCopies > 0;
     END IF;
+END//
+
+DELIMITER ;
+
+-- Trigger to automatically update book rating when a review is inserted
+DELIMITER //
+
+CREATE TRIGGER after_review_insert
+AFTER INSERT ON reviews
+FOR EACH ROW
+BEGIN
+    UPDATE books b
+	SET avgRating = COALESCE(
+		(SELECT AVG(r.rating)
+		FROM reviews r
+		WHERE r.bookId = NEW.bookId), 
+	0
+    ) WHERE b.id = NEW.bookId;
+    
 END//
 
 DELIMITER ;

@@ -13,11 +13,14 @@ const accessCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
-  maxAge: 30 * 60 * 1000, // 30 minutes
+  maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',
 };
 
 const register = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Register new user'
+  // #swagger.description = 'Create a new user account with email and password'
   try {
     const registrationData = req.body;
     const result = await authService.register(registrationData);
@@ -41,25 +44,31 @@ const register = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'User login'
+  // #swagger.description = 'Authenticate user and return access and refresh tokens'
   try {
     const loginData = req.body;
-    console.log('Login data:', loginData);
     const result = await authService.login(loginData);
+
     if (!result) {
       return res
         .status(401)
         .json({ success: false, message: 'Invalid credentials' });
     }
-
-    // Set cookies
     res.cookie('refreshToken', result.data.refreshToken, refreshCookieOptions);
     res.cookie('accessToken', result.data.accessToken, accessCookieOptions);
+    res.cookie('userId', result.data.userId, accessCookieOptions);
+    res.cookie('userRole', result.data.role, accessCookieOptions);
 
-    // Return consistent shape
+    // Return response
     return res.status(200).json({
       success: true,
       message: result.message,
       data: {
+        id: result.data.userId,
+        name: result.data.userName,
+        role: result.data.role,
         accessToken: result.data.accessToken,
       },
     });
@@ -72,6 +81,9 @@ const login = async (req: Request, res: Response) => {
 };
 
 const generateNewAccessToken = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Refresh access token'
+  // #swagger.description = 'Generate a new access token using refresh token'
   try {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
@@ -81,18 +93,11 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
     }
 
     const tokenResult = await authService.generateNewAccessToken(refreshToken);
+
     if (!tokenResult) {
       return res
         .status(401)
         .json({ success: false, message: 'Invalid refresh token' });
-    }
-
-    if (tokenResult.data.refreshToken) {
-      res.cookie(
-        'refreshToken',
-        tokenResult.data.refreshToken,
-        refreshCookieOptions
-      );
     }
 
     res.cookie(
@@ -100,6 +105,17 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
       tokenResult.data.newAccessToken,
       accessCookieOptions
     );
+    if (tokenResult.data.newRefreshToken) {
+      res.cookie(
+        'refreshToken',
+        tokenResult.data.newRefreshToken,
+        refreshCookieOptions
+      );
+    }
+    if (tokenResult.data.userId) {
+      res.cookie('userId', tokenResult.data.userId, accessCookieOptions);
+    }
+
     return res.status(200).json({
       success: true,
       message: tokenResult.message,
@@ -115,25 +131,38 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
 };
 
 const logout = async (req: Request, res: Response) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'User logout'
+  // #swagger.description = 'Logout user and invalidate tokens'
   try {
     const cookies = req.cookies;
 
     if (!cookies?.refreshToken) {
-      return res.sendStatus(204);
+      return res.status(204).json({
+        success: false,
+        message: 'No refresh token found',
+      });
     }
 
-    res.clearCookie('refreshToken', {
+    const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict' as const,
+      path: '/',
+    };
+
+    // Clear all authentication cookies
+    res.clearCookie('refreshToken', cookieOptions);
+    res.clearCookie('accessToken', cookieOptions);
+
+    // Clear user data cookies
+    res.clearCookie('userId', cookieOptions);
+    res.clearCookie('userRole', cookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: 'User logged out successfully',
     });
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-    res.sendStatus(204);
-    console.log('User logged out successfully');
   } catch (error) {
     res.status(500).json({
       success: false,

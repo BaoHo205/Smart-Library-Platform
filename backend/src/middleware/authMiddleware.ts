@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwtService from '@/services/JwtServices';
+import jwtService from '../services/JwtServices';
 import { UserRole } from '../types';
 
 export interface AuthRequest extends Request {
@@ -12,15 +12,12 @@ const verifyJWT = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader?.startsWith('Bearer ')) {
+  const token = req.cookies?.accessToken;
+  if (!token) {
     return res
       .status(401)
-      .json({ message: 'Missing or malformed Authorization header' });
+      .json({ message: 'Authentication required. Please log in.' });
   }
-
-  const token = authHeader.split(' ')[1];
   try {
     const payload = await jwtService.verifyAccessToken(token);
     if (!payload) {
@@ -50,8 +47,8 @@ const verifyJWT = async (
 };
 
 const verifyRole = (requiredRoles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const userRole = req.body.userRole;
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    const userRole = req.userRole;
 
     if (!userRole) {
       return res

@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import mysql from '../database/mysql/connection';
+import { RowDataPacket } from 'mysql2';
+import { UserRole } from '@/types';
+
 interface IReviewData {
   bookId: string;
   userId: string;
@@ -12,6 +15,15 @@ interface IUpdateReviewData {
   userId: string;
   rating?: number;
   comment?: string;
+}
+
+interface UserProfile {
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
 }
 
 const addReview = async (reviewData: IReviewData) => {
@@ -59,7 +71,6 @@ const updateReview = async (
   updateData: IUpdateReviewData
 ) => {
   try {
-    console.log('Update review by user:', updateData.userId);
     const existingReview = (await mysql.executeQuery(
       'SELECT * FROM reviews WHERE id = ?',
       [reviewId]
@@ -67,9 +78,6 @@ const updateReview = async (
     if (!existingReview || existingReview.length === 0) {
       throw new Error('User not found');
     }
-
-    console.log(existingReview);
-
     const updatedAt = new Date();
     const query = `
         UPDATE reviews
@@ -83,8 +91,14 @@ const updateReview = async (
       reviewId,
       updateData.userId,
     ];
-    const res = await mysql.executeQuery(query, params);
-    return { message: 'Review added successfully', res };
+    await mysql.executeQuery(query, params);
+
+    const res = (await mysql.executeQuery(
+      'SELECT * FROM reviews WHERE id = ?',
+      [reviewId]
+    )) as (IUpdateReviewData & RowDataPacket)[];
+
+    return { message: 'Review added successfully', res: res[0] };
   } catch (error) {
     throw new Error(
       `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -92,7 +106,60 @@ const updateReview = async (
   }
 };
 
+const getUserById = async (userId: string): Promise<UserProfile | null> => {
+  try {
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
+      WHERE id = ?
+    `;
+
+    const result = await mysql.executeQuery(sql, [userId]) as UserProfile[];
+    return result[0] || null;
+  } catch (error) {
+    console.error('Error getting user by ID:', error);
+    throw error;
+  }
+};
+
+const getAllUsers = async (): Promise<UserProfile[]> => {
+  try {
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
+      ORDER BY userName ASC
+    `;
+
+    const result = await mysql.executeQuery(sql) as UserProfile[];
+    return result;
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    throw error;
+  }
+};
+
+const searchUsers = async (query: string): Promise<UserProfile[]> => {
+  try {
+    const searchTerm = `%${query}%`;
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
+      WHERE userName LIKE ? OR firstName LIKE ? OR lastName LIKE ? OR email LIKE ?
+      ORDER BY userName ASC
+    `;
+
+    const result = await mysql.executeQuery(sql, [searchTerm, searchTerm, searchTerm, searchTerm]) as UserProfile[];
+    return result;
+  } catch (error) {
+    console.error('Error searching users:', error);
+    throw error;
+  }
+};
+
 export default {
   addReview,
   updateReview,
+  getUserById,
+  getAllUsers,
+  searchUsers,
 };
