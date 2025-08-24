@@ -4,19 +4,20 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
+import { returnBook } from '@/api/checkout.api';
 
-const LoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
+const LoanCard = ({ checkout, setCheckouts }: { checkout: CheckoutItem; setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>> }) => {
   const formatDateDMY = (iso?: string | null) => {
-  if (!iso) return '—';
-  try {
-    const d = parseISO(iso);
-    if (!isValid(d)) return 'Invalid date';
-    return format(d, 'dd/MM/yyyy');
-  } catch {
-    return 'Invalid date';
-  }
+    if (!iso) return '—';
+    try {
+      const d = parseISO(iso);
+      if (!isValid(d)) return 'Invalid date';
+      return format(d, 'dd/MM/yyyy');
+    } catch {
+      return 'Invalid date';
+    }
   };
-  
+
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
@@ -43,7 +44,7 @@ const LoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
         <div className="flex gap-1.5">
           <span className="text-xs font-bold">{`Due by ${formatDateDMY(checkout.dueDate)}`}</span>
         </div>
-        <Button disabled={false}>Return</Button>
+        <Button onClick={() => { returnBook(checkout.bookId); setCheckouts((prev) => prev.filter((c) => c.bookId !== checkout.bookId)); }} disabled={false}>Return</Button>
       </CardFooter>
     </Card>
   );

@@ -6,7 +6,7 @@ export interface Book {
   isbn: string;
   description: string;
   publishedDate: string;
-  coverImage: string;
+  thumbnailUrl: string;
   availableCopies: number;
   totalCopies: number;
   avgRating: number;

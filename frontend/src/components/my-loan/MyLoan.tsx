@@ -5,8 +5,9 @@ import LoanCard from './LoanCard';
 import type { CheckoutItem } from '@/types/checkout.type';
 
 const MyLoan: React.FC = () => {
-  const userId = localStorage.getItem('userId') || '';
-  const { checkouts = [] } = useUserProfile(userId);
+  const { checkouts, setCheckouts }: { checkouts: CheckoutItem[]; setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>> } = useUserProfile();
+  const activeCheckouts: CheckoutItem[] = checkouts.filter((checkout) => !checkout.isReturned);
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6">
@@ -14,8 +15,8 @@ const MyLoan: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {checkouts.length > 0 ? (
-          checkouts.map((checkout: CheckoutItem) => <LoanCard key={checkout.bookId} checkout={checkout} />)
+        {activeCheckouts.length > 0 ? (
+          activeCheckouts.map((checkout) => <LoanCard key={checkout.bookId} checkout={checkout} setCheckouts={setCheckouts} />)
         ) : (
           <div className="col-span-full text-center py-12">
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">

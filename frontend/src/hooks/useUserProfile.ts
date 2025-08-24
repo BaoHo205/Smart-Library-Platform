@@ -1,18 +1,9 @@
 import axiosInstance from '@/config/axiosConfig';
 import { useEffect, useState } from 'react';
-
-interface CheckOut {
-  bookId: string;
-  bookName: string;
-  checkoutDate: Date;
-  dueDate: Date;
-  returnDate: Date | null;
-  isReturned: boolean;
-  isLate: boolean;
-}
+import { CheckoutItem } from '@/types/checkout.type';
 
 const useUserProfile = () => {
-  const [checkouts, setCheckouts] = useState<CheckOut[]>([]);
+  const [checkouts, setCheckouts] = useState<CheckoutItem[]>([]);
   const getAllCheckoutByUserId = async () => {
     try {
       const response = await axiosInstance.get(`/api/v1/checkouts/`);

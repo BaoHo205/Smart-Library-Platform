@@ -3,21 +3,13 @@ import { Card, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
-import axiosInstance from '@/config/axiosConfig';
 import useUserProfile from '@/hooks/useUserProfile';
 import { useRouter } from 'next/navigation';
+import { CheckoutItem } from '../../types/checkout.type';
+import { Book } from '@/types/book.type';
+import { borrowBook } from '@/api/checkout.api';
 
-export interface BookCardProps {
-  id: string,
-  title: string,
-  coverImage: string,
-  authors: string,
-  genres: string,
-  avgRating: number | 4.5;
-  availableCopies: number;
-}
-
-const BookCard: React.FC<BookCardProps> = ({
+const BookCard: React.FC<Book> = ({
   id,
   title,
   authors,
@@ -31,22 +23,22 @@ const BookCard: React.FC<BookCardProps> = ({
 
   const handleBorrow = async () => {
     try {
-      const response = await axiosInstance.post(`/api/v1/books/borrow/${id}`, {
-        dueDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
-      });
+      await borrowBook(id);
       setCheckouts(prevCheckouts => [
         ...prevCheckouts,
         {
           bookId: id,
           bookName: title,
-          checkoutDate: new Date(),
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          bookAuthors: authors,
+          bookGenres: genres,
+          checkoutDate: new Date().toISOString(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           returnDate: null,
           isReturned: 0,
           isLate: 0,
         } as CheckoutItem,
       ]);
-      console.log('Book borrowed successfully:', response.data);
+      console.log('Book borrowed successfully');
     } catch (error) {
       console.error('Error borrowing book:', error);
     }
@@ -102,10 +94,10 @@ const BookCard: React.FC<BookCardProps> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={checkouts.some(checkout => checkout.bookId === id)}
+          disabled={checkouts.some(checkout => checkout.bookId === id && !checkout.isReturned)}
           className="w-full"
         >
-          {checkouts.some(checkout => checkout.bookId === id)
+          {checkouts.some(checkout => checkout.bookId === id && !checkout.isReturned)
             ? 'Borrowed'
             : 'Borrow'}
         </Button>
