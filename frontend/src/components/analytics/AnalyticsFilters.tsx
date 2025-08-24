@@ -25,49 +25,53 @@ interface AnalyticsFiltersProps {
     filters: AnalyticsFiltersState;
     onFiltersChange: (filters: Partial<AnalyticsFiltersState>) => void;
     loading?: boolean;
+    viewMode?: 'personal' | 'platform';
 }
 
-export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: AnalyticsFiltersProps) {
+export function AnalyticsFilters({ filters, onFiltersChange, loading = false, viewMode = 'personal' }: AnalyticsFiltersProps) {
     const [userSearchInput, setUserSearchInput] = useState('');
     const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
     const [userSearchOpen, setUserSearchOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(filters.dateRange);
 
-    // Local state for number inputs to prevent immediate API calls
     const [localHighlightedLimit, setLocalHighlightedLimit] = useState(filters.highlightedBooksLimit.toString());
     const [localTopBooksLimit, setLocalTopBooksLimit] = useState(filters.topBooksLimit.toString());
 
-    // Debounce the filters change to optimize performance
     const debouncedFilters = useDebounce(filters, 300);
-    const { users, loading: usersLoading } = useUserSearch(userSearchInput);
+    const { users, loading: usersLoading } = useUserSearch(viewMode === 'platform' ? userSearchInput : '');
 
-    // Find selected user based on current userId filter
     useEffect(() => {
-        if (filters.userId && !selectedUser) {
+        if (viewMode === 'platform' && filters.userId && !selectedUser) {
             const user = users.find(u => u.id === filters.userId);
             if (user) {
                 setSelectedUser(user);
             }
         }
-    }, [filters.userId, users, selectedUser]);
+    }, [filters.userId, users, selectedUser, viewMode]);
 
     // Update local state when filters change externally
     useEffect(() => {
-        // Check if the highlighted books limit corresponds to max (50)
         if (filters.highlightedBooksLimit === 50) {
             setLocalHighlightedLimit('max');
         } else {
             setLocalHighlightedLimit(filters.highlightedBooksLimit.toString());
         }
 
-        // Check if the top books limit corresponds to max (100)
         if (filters.topBooksLimit === 100) {
             setLocalTopBooksLimit('max');
         } else {
             setLocalTopBooksLimit(filters.topBooksLimit.toString());
         }
     }, [filters.highlightedBooksLimit, filters.topBooksLimit]);
+
+    useEffect(() => {
+        if (viewMode === 'personal' && filters.userId) {
+            onFiltersChange({ userId: undefined });
+            setSelectedUser(null);
+            setUserSearchInput('');
+        }
+    }, [viewMode, filters.userId, onFiltersChange]);
 
     const handleMonthsChange = (value: string) => {
         if (value === 'max') {
@@ -139,6 +143,11 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: 
     };
 
     const handleUserSelect = (user: UserSearchResult | null) => {
+        // Only allow user selection in platform mode
+        if (viewMode !== 'platform') {
+            return;
+        }
+
         setSelectedUser(user);
         onFiltersChange({ userId: user?.id });
         setUserSearchOpen(false);
@@ -299,10 +308,10 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: 
 
     const getActiveFiltersCount = () => {
         let count = 0;
-        if (filters.months !== 6) count++;
+        if (filters.months !== 6 && filters.months !== undefined) count++;
         if (filters.dateRange) count++;
         if (filters.deviceType !== 'all') count++;
-        if (filters.userId) count++;
+        if (filters.userId && viewMode === 'platform') count++;
         if (filters.highlightedBooksLimit !== 5) count++;
         if (filters.topBooksLimit !== 10) count++;
         return count;
@@ -532,99 +541,101 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: 
                                         </CardContent>
                                     </Card>
 
-                                    {/* Advanced User Search */}
-                                    <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-white flex-1">
-                                        <CardContent className="p-4">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="p-2 bg-purple-100 rounded-lg">
-                                                    <User className="h-4 w-4 text-purple-600" />
+                                    {/* user search - for platform analytics */}
+                                    {viewMode === 'platform' && (
+                                        <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-white flex-1">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <div className="p-2 bg-purple-100 rounded-lg">
+                                                        <User className="h-4 w-4 text-purple-600" />
+                                                    </div>
+                                                    <Label className="text-sm font-semibold text-gray-800">
+                                                        Specific User Filter
+                                                    </Label>
                                                 </div>
-                                                <Label className="text-sm font-semibold text-gray-800">
-                                                    Specific User Filter
-                                                </Label>
-                                            </div>
 
-                                            <Popover open={userSearchOpen} onOpenChange={setUserSearchOpen}>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        role="combobox"
-                                                        aria-expanded={userSearchOpen}
-                                                        className="w-full justify-between bg-white hover:bg-gray-50 transition-colors"
-                                                    >
-                                                        {selectedUser ? (
-                                                            <div className="flex items-center gap-2">
-                                                                <Avatar className="h-5 w-5">
-                                                                    <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
-                                                                        {selectedUser.firstName[0]}{selectedUser.lastName[0]}
-                                                                    </div>
-                                                                </Avatar>
-                                                                <span className="truncate">{selectedUser.userName}</span>
-                                                            </div>
-                                                        ) : (
-                                                            <span className="text-gray-500">Select user...</span>
-                                                        )}
-                                                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-80 p-0" side="bottom" align="start">
-                                                    <Command>
-                                                        <CommandInput
-                                                            placeholder="Search users by name, username, or ID..."
-                                                            value={userSearchInput}
-                                                            onValueChange={setUserSearchInput}
-                                                        />
-                                                        <CommandList>
-                                                            <CommandEmpty>
-                                                                {usersLoading ? "Loading users..." : "No users found."}
-                                                            </CommandEmpty>
-                                                            {!usersLoading && (
-                                                                <CommandGroup>
-                                                                    <CommandItem
-                                                                        key="clear"
-                                                                        onSelect={() => handleUserSelect(null)}
-                                                                        className="cursor-pointer"
-                                                                    >
-                                                                        <X className="mr-2 h-4 w-4" />
-                                                                        Clear selection
-                                                                    </CommandItem>
-                                                                    <Separator className="my-1" />
-                                                                    {users.map((user) => (
+                                                <Popover open={userSearchOpen} onOpenChange={setUserSearchOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            aria-expanded={userSearchOpen}
+                                                            className="w-full justify-between bg-white hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            {selectedUser ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Avatar className="h-5 w-5">
+                                                                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                                                                            {selectedUser.firstName[0]}{selectedUser.lastName[0]}
+                                                                        </div>
+                                                                    </Avatar>
+                                                                    <span className="truncate">{selectedUser.userName}</span>
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-gray-500">Select user...</span>
+                                                            )}
+                                                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-80 p-0" side="bottom" align="start">
+                                                        <Command>
+                                                            <CommandInput
+                                                                placeholder="Search users by name, username, or ID..."
+                                                                value={userSearchInput}
+                                                                onValueChange={setUserSearchInput}
+                                                            />
+                                                            <CommandList>
+                                                                <CommandEmpty>
+                                                                    {usersLoading ? "Loading users..." : "No users found."}
+                                                                </CommandEmpty>
+                                                                {!usersLoading && (
+                                                                    <CommandGroup>
                                                                         <CommandItem
-                                                                            key={user.id}
-                                                                            value={`${user.userName} ${user.firstName} ${user.lastName} ${user.email} ${user.id}`}
-                                                                            onSelect={() => handleUserSelect(user)}
+                                                                            key="clear"
+                                                                            onSelect={() => handleUserSelect(null)}
                                                                             className="cursor-pointer"
                                                                         >
-                                                                            <div className="flex items-center gap-3 w-full">
-                                                                                <Avatar className="h-8 w-8">
-                                                                                    <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-xs font-medium text-white">
-                                                                                        {user.firstName[0]}{user.lastName[0]}
-                                                                                    </div>
-                                                                                </Avatar>
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                                                                        {user.displayName}
-                                                                                    </p>
-                                                                                    <p className="text-xs text-gray-500 truncate">
-                                                                                        @{user.userName} • {user.email}
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
+                                                                            <X className="mr-2 h-4 w-4" />
+                                                                            Clear selection
                                                                         </CommandItem>
-                                                                    ))}
-                                                                </CommandGroup>
-                                                            )}
-                                                        </CommandList>
-                                                    </Command>
-                                                </PopoverContent>
-                                            </Popover>
+                                                                        <Separator className="my-1" />
+                                                                        {users.map((user) => (
+                                                                            <CommandItem
+                                                                                key={user.id}
+                                                                                value={`${user.userName} ${user.firstName} ${user.lastName} ${user.email} ${user.id}`}
+                                                                                onSelect={() => handleUserSelect(user)}
+                                                                                className="cursor-pointer"
+                                                                            >
+                                                                                <div className="flex items-center gap-3 w-full">
+                                                                                    <Avatar className="h-8 w-8">
+                                                                                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-xs font-medium text-white">
+                                                                                            {user.firstName[0]}{user.lastName[0]}
+                                                                                        </div>
+                                                                                    </Avatar>
+                                                                                    <div className="flex-1 min-w-0">
+                                                                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                                                                            {user.displayName}
+                                                                                        </p>
+                                                                                        <p className="text-xs text-gray-500 truncate">
+                                                                                            @{user.userName} • {user.email}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </CommandItem>
+                                                                        ))}
+                                                                    </CommandGroup>
+                                                                )}
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
 
-                                            <p className="text-xs text-gray-500 mt-3">
-                                                Filter analytics for a specific user (staff only)
-                                            </p>
-                                        </CardContent>
-                                    </Card>
+                                                <p className="text-xs text-gray-500 mt-3">
+                                                    Filter analytics for a specific user (staff only)
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    )}
 
                                     {/* Advanced Result Limits */}
                                     <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-white flex-1">
@@ -685,12 +696,12 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: 
                         </CardContent>
                     </CollapsibleContent>
 
-                    {/* Active Filters Summary */}
+                    {/* active filters summary */}
                     {activeFiltersCount > 0 && (
                         <CardContent className="pt-4 pb-6 border-t border-gray-100">
                             <div className="flex items-center gap-3 flex-wrap">
                                 <span className="text-sm font-medium text-gray-700">Active filters:</span>
-                                {filters.months !== 6 && (
+                                {filters.months !== 6 && filters.months !== undefined && (
                                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors">
                                         {filters.months === 999 ? 'Max' : `${filters.months} months`}
                                     </Badge>
@@ -705,7 +716,7 @@ export function AnalyticsFilters({ filters, onFiltersChange, loading = false }: 
                                         {filters.deviceType} device
                                     </Badge>
                                 )}
-                                {selectedUser && (
+                                {selectedUser && viewMode === 'platform' && (
                                     <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors">
                                         User: {selectedUser.userName}
                                     </Badge>
