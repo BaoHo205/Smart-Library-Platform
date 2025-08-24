@@ -1,4 +1,5 @@
-import BookCard, { BookCardProps } from './BookCard';
+import BookCard from './BookCard';
+import { Book } from '@/types/book.type';
 import {
   Pagination,
   PaginationContent,
@@ -10,7 +11,7 @@ import {
 } from '../ui/pagination';
 
 interface BookCardListProps {
-  books: BookCardProps[];
+  books: Book[];
   pages?: number;
   currentPage?: number;
   onNextPage?: () => void;
