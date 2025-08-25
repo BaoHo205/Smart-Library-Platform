@@ -145,25 +145,51 @@ const updateReview = async (
 
 const getUserById = async (userId: string): Promise<UserProfile | null> => {
   try {
-    const query = `
-      SELECT id, userName, firstName, lastName, email, role
-      FROM users 
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
       WHERE id = ?
     `;
 
-    const result = (await mysql.executeQuery(query, [userId])) as (UserProfile &
-      RowDataPacket)[];
-
-    if (result.length === 0) {
-      return null;
-    }
-
-    return result[0];
+    const result = await mysql.executeQuery(sql, [userId]) as UserProfile[];
+    return result[0] || null;
   } catch (error) {
     console.error('Error getting user by ID:', error);
-    throw new Error(
-      `Failed to get user: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    throw error;
+  }
+};
+
+const getAllUsers = async (): Promise<UserProfile[]> => {
+  try {
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
+      ORDER BY userName ASC
+    `;
+
+    const result = await mysql.executeQuery(sql) as UserProfile[];
+    return result;
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    throw error;
+  }
+};
+
+const searchUsers = async (query: string): Promise<UserProfile[]> => {
+  try {
+    const searchTerm = `%${query}%`;
+    const sql = `
+      SELECT id, userName, firstName, lastName, email, role, createdAt, updatedAt
+      FROM users
+      WHERE userName LIKE ? OR firstName LIKE ? OR lastName LIKE ? OR email LIKE ?
+      ORDER BY userName ASC
+    `;
+
+    const result = await mysql.executeQuery(sql, [searchTerm, searchTerm, searchTerm, searchTerm]) as UserProfile[];
+    return result;
+  } catch (error) {
+    console.error('Error searching users:', error);
+    throw error;
   }
 };
 
@@ -171,4 +197,6 @@ export default {
   addReview,
   updateReview,
   getUserById,
+  getAllUsers,
+  searchUsers,
 };

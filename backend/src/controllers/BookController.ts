@@ -365,12 +365,10 @@ export const addNewBook = async (
     !bookData.genreIds ||
     !bookData.publisherId
   ) {
-    res
-      .status(400)
-      .json({
-        message:
-          'Book title, author IDs, genre IDs, and publisher ID are required',
-      });
+    res.status(400).json({
+      message:
+        'Book title, author IDs, genre IDs, and publisher ID are required',
+    });
     return;
   }
 
@@ -387,19 +385,15 @@ export const addNewBook = async (
     if (error instanceof Error) {
       // Check for specific MySQL errors like foreign key constraints or duplicates
       if (error.message.includes('Duplicate entry')) {
-        res
-          .status(409)
-          .json({
-            message: 'Conflict: A book with this ID or ISBN already exists.',
-            error: error.message,
-          });
+        res.status(409).json({
+          message: 'Conflict: A book with this ID or ISBN already exists.',
+          error: error.message,
+        });
       } else if (error.message.includes('Foreign key constraint failed')) {
-        res
-          .status(400)
-          .json({
-            message: 'Bad request: Invalid author, genre, or publisher ID.',
-            error: error.message,
-          });
+        res.status(400).json({
+          message: 'Bad request: Invalid author, genre, or publisher ID.',
+          error: error.message,
+        });
       } else {
         res
           .status(500)
@@ -428,12 +422,10 @@ export const updateBookInventory = async (
 
   // Basic validation
   if (typeof quantity !== 'number' || quantity < 0) {
-    res
-      .status(400)
-      .json({
-        message:
-          'Invalid quantity provided. Quantity must be a non-negative number.',
-      });
+    res.status(400).json({
+      message:
+        'Invalid quantity provided. Quantity must be a non-negative number.',
+    });
     return;
   }
 
@@ -444,11 +436,9 @@ export const updateBookInventory = async (
       PLACEHOLDER_STAFF_ID
     );
     if (updated) {
-      res
-        .status(200)
-        .json({
-          message: `Book ${id} inventory updated successfully to ${quantity}.`,
-        });
+      res.status(200).json({
+        message: `Book ${id} inventory updated successfully to ${quantity}.`,
+      });
     } else {
       res.status(404).json({ message: `Book with ID ${id} not found.` });
     }
@@ -492,11 +482,9 @@ export const retireBook = async (
   try {
     const updated = await BookService.retireBook(id, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res
-        .status(200)
-        .json({
-          message: `Book ${id} status updated successfully to 'unavailable'.`,
-        });
+      res.status(200).json({
+        message: `Book ${id} status updated successfully to 'unavailable'.`,
+      });
     } else {
       res.status(404).json({ message: `Book with ID ${id} not found.` });
     }

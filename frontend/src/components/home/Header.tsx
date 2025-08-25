@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+import { UserChip } from '../ui/userchip';
 import { Input } from '../ui/input';
 import Combobox from './ComboBox';
 import axiosInstance from '@/config/axiosConfig';
 import debounce from 'lodash.debounce';
+import { useAuth } from '../auth/useAuth';
 import {
   Select,
   SelectContent,
@@ -49,6 +50,7 @@ const Header: React.FC<HeaderProps> = ({
   searchParam,
   searchInput,
 }) => {
+  const { user, loading: authLoading } = useAuth();
   const [genres, setGenres] = useState<Options[]>([]);
   const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
   const debouncedSearchInputChange = useCallback(
@@ -104,11 +106,7 @@ const Header: React.FC<HeaderProps> = ({
         />
       </div>
       <div className="flex items-center gap-3 rounded-lg border px-2.5 py-1.5 shadow-sm">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <span className="text-sm font-medium">Nhat Minh</span>
+        <UserChip user={user} loading={authLoading} />
       </div>
     </header>
   );

@@ -1,17 +1,16 @@
-'use client';
-
-import { BookCardProps } from '@/components/home/BookCard';
+'use client'
+import { Book } from '@/types/book.type';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import axiosInstance from '@/config/axiosConfig';
+import { getAllBooks } from '@/api/book.api';
 
-export default function Home() {
-  const [currentGenre, setCurrentGenre] = useState<string>('');
+const HomePage = () => {
+  const [currentGenre, setCurrentGenre] = useState<string>("");
   const [searchParam, setSearchParam] = useState<string>('title');
   const [searchInput, setSearchInput] = useState<string>('');
-  const [books, setBooks] = useState<BookCardProps[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -45,12 +44,10 @@ export default function Home() {
 
   const fetchBooks = async (): Promise<void> => {
     try {
-      const response = await axiosInstance.get(
-        `api/v1/books?pageSize=9&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
-      );
-      setBooks(response.data.data.data || []);
-      setPages(Math.ceil(response.data.data.total / 9));
-      console.log('Books fetched:', response.data.data.data);
+      const bookResponse = await getAllBooks(currentGenre, currentPage, searchParam, searchInput);
+      setBooks(bookResponse.data);
+      setPages(Math.ceil(bookResponse.total / 9));
+      console.log('Books fetched:', bookResponse);
       console.log('Current genre:', currentGenre);
     } catch (error) {
       console.error('Failed to fetch books:', error);
@@ -93,3 +90,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default HomePage;

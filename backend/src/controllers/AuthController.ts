@@ -17,7 +17,6 @@ const accessCookieOptions: CookieOptions = {
   path: '/',
 };
 
-
 const register = async (req: Request, res: Response) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Register new user'
@@ -101,9 +100,17 @@ const generateNewAccessToken = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Invalid refresh token' });
     }
 
-    res.cookie('accessToken', tokenResult.data.newAccessToken, accessCookieOptions);
+    res.cookie(
+      'accessToken',
+      tokenResult.data.newAccessToken,
+      accessCookieOptions
+    );
     if (tokenResult.data.newRefreshToken) {
-      res.cookie('refreshToken', tokenResult.data.newRefreshToken, refreshCookieOptions);
+      res.cookie(
+        'refreshToken',
+        tokenResult.data.newRefreshToken,
+        refreshCookieOptions
+      );
     }
     if (tokenResult.data.userId) {
       res.cookie('userId', tokenResult.data.userId, accessCookieOptions);
@@ -137,7 +144,6 @@ const logout = async (req: Request, res: Response) => {
       });
     }
 
-
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -157,7 +163,6 @@ const logout = async (req: Request, res: Response) => {
       success: true,
       message: 'User logged out successfully',
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,

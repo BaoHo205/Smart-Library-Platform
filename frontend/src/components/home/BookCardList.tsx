@@ -1,4 +1,5 @@
-import BookCard, { BookCardProps } from './BookCard';
+import BookCard from './BookCard';
+import { Book } from '@/types/book.type';
 import {
   Pagination,
   PaginationContent,
@@ -10,7 +11,7 @@ import {
 } from '../ui/pagination';
 
 interface BookCardListProps {
-  books: BookCardProps[];
+  books: Book[];
   pages?: number;
   currentPage?: number;
   onNextPage?: () => void;
@@ -99,7 +100,7 @@ const BookCardList: React.FC<BookCardListProps> = ({
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {books.length > 0 ? (
           books.map(book => <BookCard key={book.id} {...book} />)
         ) : (
