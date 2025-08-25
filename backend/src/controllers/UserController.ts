@@ -58,40 +58,73 @@ const getProfile = async (req: Request, res: Response) => {
 const addReview = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Users']
   // #swagger.summary = 'Add book review'
-  // #swagger.description = 'Add a review for a book. Requires user or staff authentication.'
+  // #swagger.description = 'Add a review for a book. User must have borrowed the book first.'
   try {
-    // Combine the request body with the userId from the authenticated request
     const reviewData = {
       ...req.body,
       userId: req.userId,
     };
 
-    console.log('Received review data:', reviewData);
-    if (!reviewData || Object.keys(reviewData).length === 0) {
+    // Validate required fields
+    if (!reviewData.bookId || !reviewData.rating || !reviewData.comment) {
       return res.status(400).json({
         success: false,
-        message: 'Review data is required',
+        message: 'Book ID, rating, and comment are required',
       });
     }
-    console.log('Adding review with userId:', req.userId);
+
+    // Validate rating range
+    if (reviewData.rating < 1 || reviewData.rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be between 1 and 5',
+      });
+    }
 
     const result = await UserService.addReview(reviewData);
-    if (result) {
-      res.status(201).json({
-        success: true,
-        message: result.message,
-        data: result.res,
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Failed to add review',
-      });
-    }
+    
+    res.status(201).json({
+      success: true,
+      message: result.message,
+      data: result.res,
+    });
   } catch (error) {
+    console.error('Error adding review:', error);
+
+    // Handle specific error codes
+    if (error instanceof Error) {
+      const errorCode = (error as any).code;
+
+      switch (errorCode) {
+        case 'BOOK_NOT_FOUND':
+          return res.status(404).json({
+            success: false,
+            message: 'Book not found',
+          });
+
+        case 'PERMISSION_DENIED':
+          return res.status(403).json({
+            success: false,
+            message: 'You can only review books you have borrowed',
+          });
+
+        case 'REVIEW_EXISTS':
+          return res.status(409).json({
+            success: false,
+            message: 'You have already reviewed this book',
+          });
+
+        default:
+          return res.status(500).json({
+            success: false,
+            message: error.message || 'Internal server error',
+          });
+      }
+    }
+
     return res.status(500).json({
       success: false,
-      message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: 'Internal server error',
     });
   }
 };

@@ -26,28 +26,66 @@ interface UserProfile {
   role: UserRole;
 }
 
+interface CustomError extends Error {
+  code?: string;
+}
+
+const createCustomError = (message: string, code: string): CustomError => {
+  const error = new Error(message) as CustomError;
+  error.code = code;
+  return error;
+};
+
 const addReview = async (reviewData: IReviewData) => {
   try {
     if (!reviewData) {
       throw new Error('Review data is required');
     }
 
-    // NOTE: Uncomment the following lines when the books table is available
-
+    // Check if book exists
     const existingBook = (await mysql.executeQuery(
       'SELECT * FROM books WHERE id = ?',
       [reviewData.bookId]
     )) as Array<{ bookId: string }>;
+    
     if (!existingBook || existingBook.length === 0) {
-      throw new Error('Book not found');
+      // Create a custom error for book not found
+      const error = new Error('Book not found');
+      (error as any).code = 'BOOK_NOT_FOUND';
+      throw error;
+    }
+
+    // Check if user has borrowed this book
+    const existingCheckout = (await mysql.executeQuery(
+      'SELECT * FROM checkouts WHERE bookId = ? AND userId = ?',
+      [reviewData.bookId, reviewData.userId]
+    )) as Array<{ id: string }>;
+    
+    if (!existingCheckout || existingCheckout.length === 0) {
+      // Create a custom error for permission denied
+      const error = new Error('You can only review books you have borrowed');
+      (error as any).code = 'PERMISSION_DENIED';
+      throw error;
+    }
+
+    // Check if user has already reviewed this book
+    const existingReview = (await mysql.executeQuery(
+      'SELECT * FROM reviews WHERE bookId = ? AND userId = ?',
+      [reviewData.bookId, reviewData.userId]
+    )) as Array<{ id: string }>;
+    
+    if (existingReview && existingReview.length > 0) {
+      const error = new Error('You have already reviewed this book');
+      (error as any).code = 'REVIEW_EXISTS';
+      throw error;
     }
 
     const reviewId = uuidv4();
     const create_at = new Date();
     const updated_at = new Date();
     const query = `
-        INSERT INTO reviews (id, userId, bookId, rating, comment, createdAt, updatedAt) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      INSERT INTO reviews (id, userId, bookId, rating, comment, createdAt, updatedAt) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const params = [
       reviewId,
       reviewData.userId,
@@ -60,9 +98,8 @@ const addReview = async (reviewData: IReviewData) => {
     const res = await mysql.executeQuery(query, params);
     return { message: 'Review added successfully', res };
   } catch (error) {
-    throw new Error(
-      `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    // Re-throw with the custom error code preserved
+    throw error;
   }
 };
 
