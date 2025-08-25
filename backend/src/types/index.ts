@@ -74,3 +74,29 @@ export interface ILoginData {
 //     }
 //   }
 // }
+
+
+// Review interfaces
+export interface IReviewData {
+  userId: string;
+  bookId: string;
+  rating: number;
+  comment: string;
+}
+
+export interface INewReviewData extends Omit<IReviewData, 'userId'> {
+  userId?: string;
+}
+
+export interface IUpdateReviewData {
+  reviewId: string;
+  userId: string;
+  rating?: number;
+  comment?: string;
+}
+
+export interface IUpdateReviewResponse {
+  id: string;
+  rating: number;
+  comment: string;
+}

@@ -1,21 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import mysql from '../database/mysql/connection';
-import { RowDataPacket } from 'mysql2';
-import { UserRole } from '@/types';
+import { ResultSetHeader } from 'mysql2';
+import { IUpdateReviewData, IUpdateReviewResponse, UserRole } from '@/types';
+import { IReviewData } from '@/types/index';
+import { AppError, ForbiddenError, NotFoundError, ValidationError } from '@/types/errors';
 
-interface IReviewData {
-  bookId: string;
-  userId: string;
-  rating: number;
-  comment: string;
-}
-
-interface IUpdateReviewData {
-  bookId: string;
-  userId: string;
-  rating?: number;
-  comment?: string;
-}
 
 interface UserProfile {
   id: string;
@@ -26,120 +15,204 @@ interface UserProfile {
   role: UserRole;
 }
 
-interface CustomError extends Error {
-  code?: string;
-}
+// Helper functions for review operations
+const createReview = async (reviewData: IReviewData): Promise<string> => {
+  const reviewId = uuidv4();
+  const now = new Date();
 
-const createCustomError = (message: string, code: string): CustomError => {
-  const error = new Error(message) as CustomError;
-  error.code = code;
-  return error;
+  const query = `
+    INSERT INTO reviews (id, userId, bookId, rating, comment, createdAt, updatedAt) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const params = [
+    reviewId,
+    reviewData.userId,
+    reviewData.bookId,
+    reviewData.rating,
+    reviewData.comment.trim(),
+    now,
+    now,
+  ];
+
+  await mysql.executeQuery(query, params);
+  return reviewId;
 };
 
-const addReview = async (reviewData: IReviewData) => {
-  try {
-    if (!reviewData) {
-      throw new Error('Review data is required');
-    }
+const performReviewUpdate = async (updateData: IUpdateReviewData): Promise<IUpdateReviewResponse> => {
+  const updatedAt = new Date();
+  
+  // Build dynamic query based on provided fields
+  const updateFields: string[] = [];
+  const params: unknown[] = [];
 
-    // Check if book exists
-    const existingBook = (await mysql.executeQuery(
-      'SELECT * FROM books WHERE id = ?',
-      [reviewData.bookId]
-    )) as Array<{ bookId: string }>;
-    
-    if (!existingBook || existingBook.length === 0) {
-      // Create a custom error for book not found
-      const error = new Error('Book not found');
-      (error as any).code = 'BOOK_NOT_FOUND';
-      throw error;
-    }
+  if (updateData.rating !== undefined) {
+    updateFields.push('rating = ?');
+    params.push(updateData.rating);
+  }
 
-    // Check if user has borrowed this book
-    const existingCheckout = (await mysql.executeQuery(
-      'SELECT * FROM checkouts WHERE bookId = ? AND userId = ?',
-      [reviewData.bookId, reviewData.userId]
-    )) as Array<{ id: string }>;
-    
-    if (!existingCheckout || existingCheckout.length === 0) {
-      // Create a custom error for permission denied
-      const error = new Error('You can only review books you have borrowed');
-      (error as any).code = 'PERMISSION_DENIED';
-      throw error;
-    }
+  if (updateData.comment !== undefined) {
+    updateFields.push('comment = ?');
+    params.push(updateData.comment.trim());
+  }
 
-    // Check if user has already reviewed this book
-    const existingReview = (await mysql.executeQuery(
-      'SELECT * FROM reviews WHERE bookId = ? AND userId = ?',
-      [reviewData.bookId, reviewData.userId]
-    )) as Array<{ id: string }>;
-    
-    if (existingReview && existingReview.length > 0) {
-      const error = new Error('You have already reviewed this book');
-      (error as any).code = 'REVIEW_EXISTS';
-      throw error;
-    }
+  updateFields.push('updatedAt = ?');
+  params.push(updatedAt);
 
-    const reviewId = uuidv4();
-    const create_at = new Date();
-    const updated_at = new Date();
-    const query = `
-      INSERT INTO reviews (id, userId, bookId, rating, comment, createdAt, updatedAt) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const params = [
-      reviewId,
-      reviewData.userId,
-      reviewData.bookId,
-      reviewData.rating,
-      reviewData.comment,
-      create_at,
-      updated_at,
-    ];
-    const res = await mysql.executeQuery(query, params);
-    return { message: 'Review added successfully', res };
-  } catch (error) {
-    // Re-throw with the custom error code preserved
-    throw error;
+  // Add WHERE conditions
+  params.push(updateData.reviewId);
+  params.push(updateData.userId);
+
+  const query = `
+    UPDATE reviews 
+    SET ${updateFields.join(', ')}
+    WHERE id = ? AND userId = ?
+  `;
+
+  const result = await mysql.executeQuery(query, params) as ResultSetHeader;
+
+  // Check if any row was actually updated
+  if (result.affectedRows === 0) {
+    throw new ForbiddenError('Unable to update review. You can only update your own reviews.');
+  }
+
+  // Fetch and return updated review
+  const updatedReview = await mysql.executeQuery(
+    'SELECT id, rating, comment FROM reviews WHERE id = ?',
+    [updateData.reviewId]
+  ) as Array<{ id: string; rating: number; comment: string }>;
+
+  return updatedReview[0];
+};
+
+// Helper functions for validations
+const validateBookExists = async (bookId: string): Promise<void> => {
+  const existingBook = await mysql.executeQuery(
+    'SELECT id FROM books WHERE id = ?',
+    [bookId]
+  ) as Array<{ id: string }>;
+
+  if (!existingBook || existingBook.length === 0) {
+    throw new NotFoundError('Book not found');
   }
 };
 
-const updateReview = async (
-  reviewId: string,
-  updateData: IUpdateReviewData
-) => {
+const validateUserCanReview = async (userId: string, bookId: string): Promise<void> => {
+  const existingCheckout = await mysql.executeQuery(
+    `SELECT c.id 
+     FROM checkouts c 
+     JOIN books_copies bc 
+      ON c.copyId = bc.id 
+     WHERE userId = ? AND bookId = ? AND  isReturned = 1; 
+    `,
+    [userId, bookId]
+  ) as Array<{ id: string }>;
+
+  if (!existingCheckout || existingCheckout.length === 0) {
+    throw new ForbiddenError('You can only review books you have borrowed and returned');
+  }
+};
+
+const validateReviewExists = async (reviewId: string): Promise<void> => {
+  const existingReview = await mysql.executeQuery(
+    'SELECT id  FROM reviews WHERE id = ?',
+    [reviewId]
+  ) as Array<{ id: string }>;
+
+  if (!existingReview || existingReview.length === 0) {
+    throw new NotFoundError('Review not found');
+  }
+};
+
+const validateReviewOwnership = (review: IUpdateReviewData, userId: string): void => {
+  if (review.userId !== userId) {
+    throw new ForbiddenError('You can only update your own reviews');
+  }
+};
+
+// Add a new review
+const addReview = async (reviewData: IReviewData): Promise<{
+  id: string;
+  message: string;
+}> => {
+  // Validate input data
+  if (!reviewData?.userId || !reviewData?.bookId || !reviewData?.rating || !reviewData?.comment) {
+    throw new ValidationError('User ID, Book ID, rating, and comment are required');
+  }
+
+  // Validate rating range
+  if (reviewData.rating < 1 || reviewData.rating > 5 || !Number.isInteger(reviewData.rating)) {
+    throw new ValidationError('Rating must be an integer between 1 and 5');
+  }
+
+  // Validate comment length
+  if (reviewData.comment.trim().length < 10) {
+    throw new ValidationError('Comment must be at least 10 characters long');
+  }
+
   try {
-    const existingReview = (await mysql.executeQuery(
-      'SELECT * FROM reviews WHERE id = ?',
-      [reviewId]
-    )) as Array<{ id: string }>;
-    if (!existingReview || existingReview.length === 0) {
-      throw new Error('User not found');
-    }
-    const updatedAt = new Date();
-    const query = `
-        UPDATE reviews
-        SET rating = ?, comment = ?, updatedAt = ?
-        WHERE id = ? AND userId = ?
-        `;
-    const params = [
-      updateData.rating,
-      updateData.comment,
-      updatedAt,
-      reviewId,
-      updateData.userId,
-    ];
-    await mysql.executeQuery(query, params);
+    // check if book exists
+    await validateBookExists(reviewData.bookId);
 
-    const res = (await mysql.executeQuery(
-      'SELECT * FROM reviews WHERE id = ?',
-      [reviewId]
-    )) as (IUpdateReviewData & RowDataPacket)[];
+    // check if user can add review
+    await validateUserCanReview(reviewData.userId, reviewData.bookId);
 
-    return { message: 'Review added successfully', res: res[0] };
+
+    // Create the review
+    const reviewId = await createReview(reviewData);
+
+    return {
+      id: reviewId,
+      message: 'Review added successfully'
+    };
   } catch (error) {
-    throw new Error(
-      `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    // Re-throw custom errors as-is
+    if (error instanceof AppError) {
+      throw error;
+    }
+    
+    // Handle database errors
+    console.error('Database error in addReview:', error);
+    throw new Error('Failed to add review due to database error');
+  }
+};
+
+// Update an existing review
+const updateReview = async ( updateData: IUpdateReviewData ) => {
+  // Validate input parameters
+  if (!updateData || typeof updateData !== 'object') {
+    throw new ValidationError('Update data is required');
+  }
+
+  if (!updateData.reviewId || typeof updateData.reviewId !== 'string') {
+    throw new ValidationError('Review ID is required and must be a valid string');
+  }
+
+  if (!updateData.userId) {
+    throw new ValidationError('User ID is required for authorization');
+  }
+  try {
+    // Check if the review exists
+    await validateReviewExists(updateData.reviewId);
+
+    // check if the user is the owner of the review
+    validateReviewOwnership(updateData, updateData.userId);
+
+    const updatedReview = await performReviewUpdate(updateData);
+
+    return {
+      message: 'Review updated successfully',
+      data: updatedReview
+    };
+  } catch (error) {
+    // Re-throw custom errors as-is
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    // Handle database errors
+    console.error('Database error in updateReview:', error);
+    throw new Error('Failed to update review due to database error');
   }
 };
 
