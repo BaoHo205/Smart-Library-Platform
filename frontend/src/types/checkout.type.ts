@@ -13,13 +13,16 @@ export interface CheckoutItem {
 export type CheckoutResponse = CheckoutItem[];
 
 // Alternative with boolean conversion helpers
-export interface CheckoutItemWithBooleans extends Omit<CheckoutItem, 'isReturned' | 'isLate'> {
+export interface CheckoutItemWithBooleans
+  extends Omit<CheckoutItem, 'isReturned' | 'isLate'> {
   isReturned: boolean;
   isLate: boolean;
 }
 
 // Utility function to convert number booleans to actual booleans
-export const convertCheckoutItem = (item: CheckoutItem): CheckoutItemWithBooleans => ({
+export const convertCheckoutItem = (
+  item: CheckoutItem
+): CheckoutItemWithBooleans => ({
   ...item,
   isReturned: Boolean(item.isReturned),
   isLate: Boolean(item.isLate),
@@ -29,7 +32,7 @@ export const convertCheckoutItem = (item: CheckoutItem): CheckoutItemWithBoolean
 export enum CheckoutStatus {
   ACTIVE = 'active',
   RETURNED = 'returned',
-  OVERDUE = 'overdue'
+  OVERDUE = 'overdue',
 }
 
 // Helper type for filtering checkouts

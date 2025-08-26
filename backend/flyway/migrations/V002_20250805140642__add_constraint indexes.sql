@@ -28,7 +28,7 @@ FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE checkouts 
 ADD CONSTRAINT fk_checkouts_book 
-FOREIGN KEY (bookId) REFERENCES books(id) ON DELETE CASCADE ON UPDATE CASCADE;
+FOREIGN KEY (copyId) REFERENCES books_copies(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Add foreign key constraints to Reviews table
 ALTER TABLE reviews 
@@ -54,6 +54,9 @@ ADD CONSTRAINT unique_book_author UNIQUE (bookId, authorId);
 
 ALTER TABLE book_genres 
 ADD CONSTRAINT unique_book_genre UNIQUE (bookId, genreId);
+
+ALTER TABLE books_copies
+ADD CONSTRAINT unique_book_copy UNIQUE (id, bookId);
 
 -- Add other unique constraints
 ALTER TABLE users 

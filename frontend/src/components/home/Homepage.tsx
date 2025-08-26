@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { Book } from '@/types/book.type';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { getAllBooks } from '@/api/books.api';
 
 const HomePage = () => {
-  const [currentGenre, setCurrentGenre] = useState<string>("");
+  const [currentGenre, setCurrentGenre] = useState<string>('');
   const [searchParam, setSearchParam] = useState<string>('title');
   const [searchInput, setSearchInput] = useState<string>('');
   const [books, setBooks] = useState<Book[]>([]);
@@ -44,7 +44,12 @@ const HomePage = () => {
 
   const fetchBooks = async (): Promise<void> => {
     try {
-      const bookResponse = await getAllBooks(currentGenre, currentPage, searchParam, searchInput);
+      const bookResponse = await getAllBooks(
+        currentGenre,
+        currentPage,
+        searchParam,
+        searchInput
+      );
       setBooks(bookResponse.data);
       setPages(Math.ceil(bookResponse.total / 9));
       console.log('Books fetched:', bookResponse);
@@ -89,6 +94,6 @@ const HomePage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default HomePage;

@@ -12,9 +12,7 @@ const page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get<BookShow[]>(
-          '/api/v1/books'
-        );
+        const response = await axiosInstance.get<BookShow[]>('/api/v1/books');
         setBooks(response.data);
       } catch (error) {
         console.error('Error fetching books:', error);

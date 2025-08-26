@@ -3,21 +3,21 @@ import { useDebounce } from './useDebounce';
 import { getAllUsers, searchUsers } from '@/api/users.api';
 
 export interface UserSearchResult {
-    id: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    displayName: string;
-    avatarUrl?: string;
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  displayName: string;
+  avatarUrl?: string;
 }
 
 export function useUserSearch(searchTerm: string) {
-    const [users, setUsers] = useState<UserSearchResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
+  const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
 
     useEffect(() => {
         const searchUsers = async () => {
@@ -52,8 +52,8 @@ export function useUserSearch(searchTerm: string) {
             }
         };
 
-        searchUsers();
-    }, [debouncedSearchTerm]);
+    searchUsers();
+  }, [debouncedSearchTerm]);
 
-    return { users, loading, error };
+  return { users, loading, error };
 }

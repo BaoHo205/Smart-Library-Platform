@@ -83,17 +83,19 @@ export const getAverageSessionTime = async () => {
           $cond: {
             if: { $type: '$startTime' },
             then: { $dateFromString: { dateString: '$startTime' } },
-            else: '$startTime'
-          }
-        }
-      }
+            else: '$startTime',
+          },
+        },
+      },
     },
     {
       $addFields: {
-        month: { $dateToString: { format: "%Y-%m", date: "$startTimeAsDate" } },
-        fullMonthLabel: { $dateToString: { format: "%b %Y", date: "$startTimeAsDate" } },
-        dayOfYear: { $dayOfYear: "$startTimeAsDate" }
-      }
+        month: { $dateToString: { format: '%Y-%m', date: '$startTimeAsDate' } },
+        fullMonthLabel: {
+          $dateToString: { format: '%b %Y', date: '$startTimeAsDate' },
+        },
+        dayOfYear: { $dayOfYear: '$startTimeAsDate' },
+      },
     },
     {
       $group: {
@@ -155,10 +157,10 @@ export const getMostHighlightedBooks = async (limit: number = 5) => {
           $cond: {
             if: { $type: '$startTime' },
             then: { $dateFromString: { dateString: '$startTime' } },
-            else: '$startTime'
-          }
-        }
-      }
+            else: '$startTime',
+          },
+        },
+      },
     },
     {
       $group: {
@@ -172,12 +174,12 @@ export const getMostHighlightedBooks = async (limit: number = 5) => {
       $addFields: {
         uniqueReadersCount: { $size: '$uniqueReaders' },
         avgHighlightsPerSession: {
-          $divide: ['$totalHighlights', '$totalSessions']
+          $divide: ['$totalHighlights', '$totalSessions'],
         },
         highlightDensity: {
-          $divide: ['$totalHighlights', '$totalSessions']
-        }
-      }
+          $divide: ['$totalHighlights', '$totalSessions'],
+        },
+      },
     },
     {
       $project: {
@@ -209,10 +211,10 @@ export const getTopBooksByReadTime = async (limit: number = 10) => {
           $cond: {
             if: { $type: '$startTime' },
             then: { $dateFromString: { dateString: '$startTime' } },
-            else: '$startTime'
-          }
-        }
-      }
+            else: '$startTime',
+          },
+        },
+      },
     },
     {
       $group: {
@@ -283,21 +285,33 @@ export const getSessionsByBook = async (
 };
 
 // get reading trends over time (for chart data)
-export const getReadingTrends = async (userId?: string, months: number | 'all' = 6, startDate?: Date, endDate?: Date) => {
+export const getReadingTrends = async (
+  userId?: string,
+  months: number | 'all' = 6,
+  startDate?: Date,
+  endDate?: Date
+) => {
   const matchStage: any = {
-    sessionDuration: { $exists: true, $ne: null }
+    sessionDuration: { $exists: true, $ne: null },
   };
 
   if (startDate && endDate) {
     matchStage.$or = [
       { startTime: { $gte: startDate, $lte: endDate } },
-      { startTime: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } }
+      {
+        startTime: {
+          $gte: startDate.toISOString(),
+          $lte: endDate.toISOString(),
+        },
+      },
     ];
   } else if (months !== 'all' && typeof months === 'number') {
-    const dateThreshold = new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000);
+    const dateThreshold = new Date(
+      Date.now() - months * 30 * 24 * 60 * 60 * 1000
+    );
     matchStage.$or = [
       { startTime: { $gte: dateThreshold } }, // Date objects
-      { startTime: { $gte: dateThreshold.toISOString() } } // String dates
+      { startTime: { $gte: dateThreshold.toISOString() } }, // String dates
     ];
   }
   // If months === 'all', don't add any date filter (get all data)
@@ -314,16 +328,16 @@ export const getReadingTrends = async (userId?: string, months: number | 'all' =
           $cond: {
             if: { $type: '$startTime' },
             then: { $dateFromString: { dateString: '$startTime' } },
-            else: '$startTime'
-          }
-        }
-      }
+            else: '$startTime',
+          },
+        },
+      },
     },
     {
       $group: {
         _id: {
           year: { $year: '$startTimeAsDate' },
-          month: { $month: '$startTimeAsDate' }
+          month: { $month: '$startTimeAsDate' },
         },
         totalSessions: { $sum: 1 },
         totalDuration: { $sum: '$sessionDuration' },
@@ -336,25 +350,25 @@ export const getReadingTrends = async (userId?: string, months: number | 'all' =
       $addFields: {
         monthLabel: {
           $dateToString: {
-            format: "%b",
+            format: '%b',
             date: {
               $dateFromParts: {
                 year: '$_id.year',
-                month: '$_id.month'
-              }
-            }
-          }
+                month: '$_id.month',
+              },
+            },
+          },
         },
         fullMonthLabel: {
           $dateToString: {
-            format: "%b %Y",
+            format: '%b %Y',
             date: {
               $dateFromParts: {
                 year: '$_id.year',
-                month: '$_id.month'
-              }
-            }
-          }
+                month: '$_id.month',
+              },
+            },
+          },
         },
         uniqueBooksCount: { $size: '$uniqueBooks' },
         uniqueUsersCount: { $size: '$uniqueUsers' },
@@ -430,7 +444,7 @@ export const getMostHighlightedBooksWithDetails = async (limit: number = 5) => {
         uniqueReadersCount: item.uniqueReadersCount,
         totalSessions: item.totalSessions,
         avgHighlightsPerSession: item.avgHighlightsPerSession,
-        highlightDensity: item.highlightDensity
+        highlightDensity: item.highlightDensity,
       };
     })
   );
@@ -454,7 +468,7 @@ export const getTopBooksByReadTimeWithDetails = async (limit: number = 10) => {
         avgSessionDuration: item.avgSessionDuration,
         totalPages: item.totalPages,
         totalHighlights: item.totalHighlights,
-        engagementScore: item.engagementScore
+        engagementScore: item.engagementScore,
       };
     })
   );
