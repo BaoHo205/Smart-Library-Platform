@@ -52,7 +52,7 @@ export function TopBooksByReadingTime({ books, loading, limit = 10 }: TopBooksBy
         <Card className="h-full">
             <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900">
-                    Top {limit} books by reading time
+                    {limit === 9999 ? 'Top All Books by Reading Time' : `Top ${limit} Books by Reading Time`}
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-0 h-[400px]">
@@ -63,62 +63,81 @@ export function TopBooksByReadingTime({ books, loading, limit = 10 }: TopBooksBy
                         </p>
                     </div>
                 ) : (
-                    <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-0">
                         <style jsx>{`
-                            div::-webkit-scrollbar {
+                            .truncate {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                max-width: 100%;
+                            }
+                            .min-w-0 {
+                                min-width: 0;
+                            }
+                            table {
+                                table-layout: fixed;
+                            }
+                            td, th {
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                            }
+                            .scrollable-body::-webkit-scrollbar {
                                 display: none;
                             }
                         `}</style>
-                        <Table>
-                            <TableHeader className="sticky top-0 bg-white z-10">
+
+                        {/* Fixed Header Table */}
+                        <Table className="table-fixed w-full border-separate border-spacing-0" style={{ tableLayout: 'fixed' }}>
+                            <TableHeader>
                                 <TableRow className="border-b border-gray-200">
-                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-16">
+                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-[15%] overflow-hidden bg-white">
                                         Rank
                                     </TableHead>
-                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3">
+                                    <TableHead className="text-left font-medium text-gray-700 px-4 py-3 w-[65%] overflow-hidden bg-white">
                                         Book Name
                                     </TableHead>
-                                    <TableHead className="text-right font-medium text-gray-700 px-4 py-3 w-24">
+                                    <TableHead className="text-right font-medium text-gray-700 px-4 py-3 w-[20%] overflow-hidden bg-white">
                                         Time
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody>
-                                {books.slice(0, limit).map((book, index) => (
-                                    <TableRow
-                                        key={book.bookId}
-                                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                                        onClick={() => {
-                                            window.open(`/books/${book.bookId}`, '_blank');
-                                        }}
-                                    >
-                                        <TableCell className="px-4 py-4 text-sm font-medium text-gray-900">
-                                            #{index + 1}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4">
-                                            <div className="space-y-1">
-                                                <p className="line-clamp-1 text-sm font-medium text-gray-900">
-                                                    {book.title}
-                                                </p>
-                                                <p className="text-xs text-gray-500 line-clamp-1">
-                                                    by {book.author}
-                                                </p>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-right">
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    {formatReadingTime(book.totalReadingTime)}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {book.totalSessions} sessions
-                                                </p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
                         </Table>
+
+                        {/* Scrollable Body Table */}
+                        <div className="scrollable-body h-[370px] overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                            <Table className="table-fixed w-full border-separate border-spacing-0" style={{ tableLayout: 'fixed' }}>
+                                <TableBody>
+                                    {books.slice(0, limit === 9999 ? undefined : limit).map((book, index) => (
+                                        <TableRow
+                                            key={book.bookId}
+                                            className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                                            onClick={() => {
+                                                window.open(`/books/${book.bookId}`, '_blank');
+                                            }}
+                                        >
+                                            <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 w-[15%] overflow-hidden">
+                                                #{index + 1}
+                                            </TableCell>
+                                            <TableCell className="px-4 py-4 w-[65%] overflow-hidden">
+                                                <div className="space-y-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate" title={book.title}>
+                                                        {book.title}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 truncate" title={`by ${book.author}`}>
+                                                        by {book.author}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="px-4 py-4 text-right w-[20%] overflow-hidden">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {formatReadingTime(book.totalReadingTime)}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 )}
             </CardContent>

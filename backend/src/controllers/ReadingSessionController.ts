@@ -258,7 +258,8 @@ export const getReadingTrends = async (req: Request, res: Response) => {
   // #swagger.parameters['endDate'] = { description: 'End date for custom range (optional)', type: 'string', in: 'query' }
   try {
     const userId = req.query.userId as string;
-    const months = req.query.months ? parseInt(req.query.months as string) : 6;
+    const monthsParam = req.query.months as string;
+    const months = monthsParam === 'all' ? 'all' : (monthsParam ? parseInt(monthsParam) : 6);
     const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
     const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
 

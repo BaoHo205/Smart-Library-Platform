@@ -41,7 +41,7 @@ const userData = {
         },
         {
           title: 'Reading Analytics',
-          url: '/analytics',
+          url: '/reading-analytics',
         },
       ],
     },
@@ -67,7 +67,7 @@ const staffData = {
         },
         {
           title: 'Reading Analytics',
-          url: '/analytics',
+          url: '/reading-analytics',
         },
       ],
     },
@@ -79,7 +79,7 @@ const staffData = {
     {
       title: 'My Report',
       icon: FileText,
-      url: '/reports',
+      url: '/my-reports',
     },
   ],
 };

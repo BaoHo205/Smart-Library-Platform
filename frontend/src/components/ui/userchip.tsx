@@ -36,7 +36,7 @@ export function UserChip({ user, loading }: UserChipProps) {
             ?
           </div>
         </Avatar>
-        <span className="text-sm font-medium text-gray-500">Guest</span>
+        <span className="text-sm font-medium text-gray-500">Hacker</span>
       </div>
     );
   }

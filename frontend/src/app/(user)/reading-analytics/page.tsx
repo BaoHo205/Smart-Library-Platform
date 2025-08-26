@@ -29,6 +29,15 @@ export default function ReadingAnalyticsPage() {
         isStaff ? 'platform' : 'personal'
     );
 
+    // Clear userId filter when switching to personal mode
+    const handleViewModeChange = (newViewMode: 'personal' | 'platform') => {
+        setViewMode(newViewMode);
+        if (newViewMode === 'personal') {
+            // Clear userId filter when switching to personal mode
+            setFilters(prev => ({ ...prev, userId: undefined }));
+        }
+    };
+
     const [filters, setFilters] = useState<AnalyticsFiltersState>({
         months: 6,
         deviceType: 'all',
@@ -59,7 +68,7 @@ export default function ReadingAnalyticsPage() {
 
     const fillMissingMonths = (
         data: ReadingTrend[],
-        months: number,
+        months: number | 'all',
         dateRange?: { from: Date | undefined; to: Date | undefined }
     ): ReadingTrend[] => {
         if (data.length === 0) {
@@ -70,14 +79,14 @@ export default function ReadingAnalyticsPage() {
             if (dateRange?.from && dateRange?.to) {
                 startDate = new Date(dateRange.from);
                 endDate = new Date(dateRange.to);
-            } else if (months === 999) {
+            } else if (months === 'all') {
                 // Max option - use a reasonable default range (last 12 months)
                 const currentDate = new Date();
                 startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11, 1);
                 endDate = currentDate;
             } else {
                 const currentDate = new Date();
-                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - months + 1, 1);
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - (months as number) + 1, 1);
                 endDate = currentDate;
             }
 
@@ -107,7 +116,7 @@ export default function ReadingAnalyticsPage() {
         if (dateRange?.from && dateRange?.to) {
             startDate = new Date(dateRange.from);
             endDate = new Date(dateRange.to);
-        } else if (months === 999) {
+        } else if (months === 'all') {
             if (data.length === 0) return data;
 
             const sortedData = [...data].sort((a, b) => {
@@ -123,7 +132,7 @@ export default function ReadingAnalyticsPage() {
         } else {
             // Use months back from current date, not from the data
             const currentDate = new Date();
-            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - months + 1, 1);
+            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - (months as number) + 1, 1);
             endDate = currentDate;
         }
 
@@ -173,7 +182,7 @@ export default function ReadingAnalyticsPage() {
                     api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
                     api.getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
-                        filters.months,
+                        filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange
                     )
                 ]);
@@ -229,7 +238,7 @@ export default function ReadingAnalyticsPage() {
                     api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
                     api.getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
-                        filters.months,
+                        filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange
                     )
                 ]);
@@ -342,7 +351,7 @@ export default function ReadingAnalyticsPage() {
                     {isStaff && (
                         <div className="mt-4 flex items-center gap-1 bg-gray-100 rounded-lg p-1 w-fit">
                             <button
-                                onClick={() => setViewMode('personal')}
+                                onClick={() => handleViewModeChange('personal')}
                                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${viewMode === 'personal'
                                     ? 'bg-white text-gray-900 shadow-sm'
                                     : 'text-gray-600 hover:text-gray-900'
@@ -351,7 +360,7 @@ export default function ReadingAnalyticsPage() {
                                 My Analytics
                             </button>
                             <button
-                                onClick={() => setViewMode('platform')}
+                                onClick={() => handleViewModeChange('platform')}
                                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${viewMode === 'platform'
                                     ? 'bg-white text-gray-900 shadow-sm'
                                     : 'text-gray-600 hover:text-gray-900'
@@ -367,6 +376,7 @@ export default function ReadingAnalyticsPage() {
                     filters={filters}
                     onFiltersChange={handleFiltersChange}
                     loading={false}
+                    viewMode={viewMode}
                 />
 
                 <div className="space-y-8">

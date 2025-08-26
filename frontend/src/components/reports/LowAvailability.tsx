@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AverageSessionChart } from './AverageSessionChart';
+// import { AverageSessionChart } from './AverageSessionChart';
 import { BookAvailability, ReadingTrend } from '@/lib/types';
+import { AlertTriangleIcon } from 'lucide-react';
 
 interface LowAvailabilityProps {
     books: BookAvailability[];
@@ -52,6 +53,14 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
         );
     }
 
+    const getAvailabilityIconColor = (percentage: number) => {
+        if (percentage <= 20) return 'text-red-500';
+        if (percentage <= 40) return 'text-orange-500';
+        if (percentage <= 60) return 'text-yellow-500';
+        if (percentage <= 80) return 'text-blue-500';
+        return 'text-green-500';
+    };
+
     return (
         <Card className="h-fit">
             <CardHeader>
@@ -69,27 +78,29 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                             </p>
                         </div>
                     ) : (
-                        books.slice(0, 5).map((book) => (
+                        books.slice(0, 5).map((book, index) => (
                             <div
                                 key={book.bookId}
                                 className="flex items-center justify-between py-2"
                             >
-                                <div className="flex-1 space-y-1">
-                                    <h4 className="line-clamp-1 text-sm font-medium text-gray-900">
-                                        {book.title}
-                                    </h4>
-                                    <p className="text-xs text-gray-500">
-                                        by {book.author}
-                                    </p>
-                                    <p className="text-xs text-gray-400">
-                                        {book.availableCopies} of {book.totalCopies} available
-                                    </p>
+                                <div className="flex items-center space-x-2">
+                                    <AlertTriangleIcon
+                                        className={`h-4 w-4 ${getAvailabilityIconColor(book.availability_percentage)}`}
+                                    />
+                                    <div className="flex-1 space-y-1">
+                                        <h4 className="line-clamp-1 text-sm font-medium text-gray-900">
+                                            {book.title}
+                                        </h4>
+                                        <p className="text-xs text-gray-400">
+                                            {book.availableCopies} of {book.quantity} available
+                                        </p>
+                                    </div>
                                 </div>
                                 <Badge
-                                    variant={book.availabilityPercentage === 0 ? 'destructive' : 'secondary'}
+                                    variant={book.availability_percentage === 0 ? 'destructive' : 'secondary'}
                                     className="ml-2"
                                 >
-                                    {book.availabilityPercentage}%
+                                    {book.availability_percentage}%
                                 </Badge>
                             </div>
                         ))
@@ -108,7 +119,7 @@ export function LowAvailability({ books, chartData, loading, dailyAverage }: Low
                             {dailyAverage} minutes/day
                         </p>
                     </div>
-                    <AverageSessionChart data={chartData} />
+                    {/* <AverageSessionChart data={chartData} /> */}
                 </div>
             </CardContent>
         </Card>
