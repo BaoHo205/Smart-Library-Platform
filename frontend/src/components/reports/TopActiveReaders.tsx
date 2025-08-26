@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TopActiveReader } from '@/lib/types';
+import { TopActiveReader } from '@/types/reports.type';
 import { UsersIcon, CalendarIcon } from 'lucide-react';
 
 interface TopActiveReadersProps {

@@ -4,7 +4,7 @@ import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { getAllBooks } from '@/api/book.api';
+import { getAllBooks } from '@/api/books.api';
 
 const HomePage = () => {
   const [currentGenre, setCurrentGenre] = useState<string>("");

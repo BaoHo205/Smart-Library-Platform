@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
-import { AnalyticsFiltersState, DeviceType } from '@/lib/types';
+import { AnalyticsFiltersState, DeviceType } from '@/types/reading-session.type';
 import { useUserSearch, UserSearchResult } from '@/hooks/useUserSearch';
 
 import { DateRange } from 'react-day-picker';

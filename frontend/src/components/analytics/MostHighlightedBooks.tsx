@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MostHighlightedBook } from '@/lib/types';
+import { MostHighlightedBook } from '@/types/reading-session.type';
 
 interface MostHighlightedBooksProps {
     books: MostHighlightedBook[];

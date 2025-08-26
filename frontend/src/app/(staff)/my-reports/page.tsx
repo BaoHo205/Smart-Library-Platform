@@ -12,13 +12,13 @@ import {
 } from '@/components/reports';
 import { useAuth } from '@/components/auth/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
-import api from '@/api/api';
+import { getMostBorrowedBooks, getBooksWithLowAvailability, getTopActiveReaders } from '@/api/staffReports.api';
 import {
     MostBorrowedBook,
     TopActiveReader,
     BookAvailability,
     StaffReportsFiltersState,
-} from '@/lib/types';
+} from '@/types/reports.type';
 
 export default function StaffReportsPage() {
     const { user, loading: authLoading } = useAuth();
@@ -66,9 +66,13 @@ export default function StaffReportsPage() {
                 console.log('Fetching data with filters:', filters);
 
                 const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    api.getMostBorrowedBooks(filters.startDate, filters.endDate, filters.mostBorrowedLimit),
-                    api.getBooksWithLowAvailability(filters.interval),
-                    api.getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
+                    getMostBorrowedBooks(
+                        filters.startDate,
+                        filters.endDate,
+                        filters.mostBorrowedLimit
+                    ),
+                    getBooksWithLowAvailability(filters.interval),
+                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
                 ]);
 
                 console.log('Data fetched:', { mostBorrowedData, lowAvailabilityData, topReadersData });
@@ -103,9 +107,13 @@ export default function StaffReportsPage() {
                 setTopReadersLoading(true);
 
                 const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    api.getMostBorrowedBooks(filters.startDate, filters.endDate, filters.mostBorrowedLimit),
-                    api.getBooksWithLowAvailability(filters.interval),
-                    api.getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
+                    getMostBorrowedBooks(
+                        filters.startDate,
+                        filters.endDate,
+                        filters.mostBorrowedLimit
+                    ),
+                    getBooksWithLowAvailability(filters.interval),
+                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
                 ]);
 
                 setMostBorrowedBooks(mostBorrowedData);

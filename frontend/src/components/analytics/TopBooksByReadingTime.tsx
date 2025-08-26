@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TopBookByReadingTime } from '@/lib/types';
+import { TopBookByReadingTime } from '@/types/reading-session.type';
 
 interface TopBooksByReadingTimeProps {
     books: TopBookByReadingTime[];

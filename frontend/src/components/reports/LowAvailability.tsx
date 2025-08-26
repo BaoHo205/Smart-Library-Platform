@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 // import { AverageSessionChart } from './AverageSessionChart';
-import { BookAvailability, ReadingTrend } from '@/lib/types';
+import { BookAvailability } from '@/types/reports.type';
 import { AlertTriangleIcon } from 'lucide-react';
 
 interface LowAvailabilityProps {

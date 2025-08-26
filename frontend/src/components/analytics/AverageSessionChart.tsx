@@ -17,7 +17,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import { ReadingTrend } from '@/lib/types';
+import { ReadingTrend } from '@/types/reading-session.type';
 
 interface AverageSessionChartProps {
     data: ReadingTrend[];

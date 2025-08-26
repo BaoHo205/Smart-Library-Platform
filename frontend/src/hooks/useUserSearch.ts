@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from './useDebounce';
-import api from '@/api/api';
+import { getAllUsers, searchUsers } from '@/api/users.api';
 
 export interface UserSearchResult {
     id: string;
@@ -25,7 +25,7 @@ export function useUserSearch(searchTerm: string) {
                 // Load all users alphabetically when no search term
                 setLoading(true);
                 try {
-                    const response = await api.getAllUsers();
+                    const response = await getAllUsers();
                     setUsers(response);
                     setError(null);
                 } catch (err) {
@@ -40,7 +40,7 @@ export function useUserSearch(searchTerm: string) {
             if (debouncedSearchTerm.length >= 1) {
                 setLoading(true);
                 try {
-                    const response = await api.searchUsers(debouncedSearchTerm);
+                    const response = await searchUsers(debouncedSearchTerm);
                     setUsers(response);
                     setError(null);
                 } catch (err) {

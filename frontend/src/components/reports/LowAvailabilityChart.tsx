@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookAvailability } from '@/lib/types';
+import { BookAvailability } from '@/types/reports.type';
 import { AlertTriangleIcon } from 'lucide-react';
 
 interface LowAvailabilityChartProps {

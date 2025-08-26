@@ -177,6 +177,11 @@
             "name": "endDate",
             "in": "query",
             "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {

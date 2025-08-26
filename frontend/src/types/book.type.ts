@@ -34,3 +34,34 @@ export interface BooksApiResponse<T> {
   message?: string;
   error?: string;
 }
+
+export interface BookDetails {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  isbn: string;
+  quantity: number;
+  availableCopies: number;
+  pageCount: number;
+  description: string | null;
+  status: 'available' | 'unavailable';
+  createdAt: Date;
+  updatedAt: Date;
+  avgRating: number;
+  numberOfRatings: number;
+  authors: string[];
+  genres: string[];
+  publisherName: string;
+}
+
+export interface IReview {
+  id: string;
+  userId: string;
+  bookId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userName: string;
+  name: string;
+}

@@ -3,14 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MostBorrowedBook } from '@/lib/types';
+import { MostBorrowedBook } from '@/types/reports.type';
 import { CalendarIcon, BookOpenIcon } from 'lucide-react';
 
 interface MostBorrowedBooksProps {
     books: MostBorrowedBook[];
     loading: boolean;
     onBookClick: (bookId: string) => void;
-    limit?: number;
+    limit?: number | 'max';
     onShowAll?: () => void;
     startDate: string;
     endDate: string;
@@ -39,7 +39,7 @@ export function MostBorrowedBooks({
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {Array.from({ length: limit }).map((_, i) => (
+                        {Array.from({ length: typeof limit === 'number' ? limit : 5 }).map((_, i) => (
                             <div key={i} className="space-y-3">
                                 <Skeleton className="h-32 w-full rounded-lg" />
                                 <div className="space-y-2">
@@ -87,7 +87,7 @@ export function MostBorrowedBooks({
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    {books.slice(0, limit).map((book, index) => (
+                    {(limit === 'max' ? books : books.slice(0, limit)).map((book, index) => (
                         <div
                             key={book.bookId}
                             className="group cursor-pointer space-y-3"

@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { MostHighlightedBook } from '@/lib/types';
+import { MostHighlightedBook } from '@/types/reading-session.type';
 
 interface BooksModalProps {
     books: MostHighlightedBook[];

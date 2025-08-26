@@ -10,14 +10,14 @@ import { BooksModal } from '@/components/analytics/BooksModal';
 import { AnalyticsFilters as AnalyticsFiltersComponent } from '@/components/analytics/AnalyticsFilters';
 import { useAuth } from '@/components/auth/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
-import api from '@/api/api';
+import { getMostHighlightedBooksWithDetails, getTopBooksByReadTimeWithDetails, getReadingTrends } from '@/api/readingSessions.api';
 import {
     UserProfile,
     MostHighlightedBook,
     TopBookByReadingTime,
     ReadingTrend,
     AnalyticsFiltersState,
-} from '@/lib/types';
+} from '@/types/reading-session.type';
 
 export default function ReadingAnalyticsPage() {
     const { user, loading: authLoading } = useAuth();
@@ -178,9 +178,9 @@ export default function ReadingAnalyticsPage() {
                 setChartLoading(true);
 
                 const [highlightedBooksData, topBooksData, chartTrendsData] = await Promise.all([
-                    api.getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
-                    api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
-                    api.getReadingTrends(
+                    getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
+                    getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
+                    getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
                         filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange
@@ -234,9 +234,9 @@ export default function ReadingAnalyticsPage() {
                 setChartLoading(true);
 
                 const [highlightedBooksData, topBooksData, chartTrendsData] = await Promise.all([
-                    api.getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
-                    api.getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
-                    api.getReadingTrends(
+                    getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
+                    getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
+                    getReadingTrends(
                         viewMode === 'personal' ? user.id : undefined,
                         filters.months === 'all' ? 'all' : filters.months,
                         filters.dateRange

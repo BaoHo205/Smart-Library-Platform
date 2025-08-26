@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { RefreshCwIcon, FilterIcon } from 'lucide-react';
-import { StaffReportsFiltersState } from '@/lib/types';
+import { StaffReportsFiltersState } from '@/types/reports.type';
 
 interface StaffReportsFiltersProps {
     filters: StaffReportsFiltersState;
@@ -33,7 +33,11 @@ export function StaffReportsFilters({ filters, onFiltersChange, loading = false 
     };
 
     const handleMostBorrowedLimitChange = (value: string) => {
-        onFiltersChange({ mostBorrowedLimit: parseInt(value) });
+        if (value === 'max') {
+            onFiltersChange({ mostBorrowedLimit: 'max' });
+        } else {
+            onFiltersChange({ mostBorrowedLimit: parseInt(value) });
+        }
     };
 
     const handleTopReadersLimitChange = (value: string) => {
@@ -144,7 +148,7 @@ export function StaffReportsFilters({ filters, onFiltersChange, loading = false 
                         <Label className="text-sm font-medium text-gray-700">
                             Most Borrowed Limit
                         </Label>
-                        <Select value={filters.mostBorrowedLimit.toString()} onValueChange={handleMostBorrowedLimitChange}>
+                        <Select value={filters.mostBorrowedLimit === 'max' ? 'max' : filters.mostBorrowedLimit.toString()} onValueChange={handleMostBorrowedLimitChange}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select limit" />
                             </SelectTrigger>
@@ -153,6 +157,7 @@ export function StaffReportsFilters({ filters, onFiltersChange, loading = false 
                                 <SelectItem value="10">Top 10</SelectItem>
                                 <SelectItem value="15">Top 15</SelectItem>
                                 <SelectItem value="20">Top 20</SelectItem>
+                                <SelectItem value="max">Max (All)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
