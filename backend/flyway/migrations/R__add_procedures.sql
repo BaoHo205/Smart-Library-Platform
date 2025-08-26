@@ -121,6 +121,7 @@ proc: BEGIN
 END//
 
 DELIMITER $$
+
 CREATE PROCEDURE AddNewBook(
     IN p_title VARCHAR(500),
     IN p_thumbnailUrl TEXT,
@@ -130,7 +131,7 @@ CREATE PROCEDURE AddNewBook(
     IN p_pageCount INT,
     IN p_publisherId VARCHAR(36),
     IN p_description TEXT,
-    IN p_status ENUM('available', 'unavailable'),
+    IN p_avgRating DECIMAL(2,1),
     IN p_authorIds TEXT,
     IN p_genreIds TEXT,
     IN p_staffId VARCHAR(36),
@@ -142,6 +143,8 @@ BEGIN
     DECLARE v_pos INT DEFAULT 1;
     DECLARE v_len INT DEFAULT 0;
     DECLARE v_bookId VARCHAR(36); 
+    DECLARE i INT;
+    DECLARE v_copiesId VARCHAR(36);
 
     -- Error handler to rollback transaction on SQL errors
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -155,7 +158,7 @@ BEGIN
     START TRANSACTION;
     
     -- Validate required inputs
-    IF p_title IS NULL OR p_authorIds IS NULL OR p_authorIds = ''  OR p_genreIds IS NULL OR p_genreIds = '' OR p_publisherId IS NULL OR p_publisherId = '' THEN
+    IF p_title IS NULL OR p_authorIds IS NULL OR p_authorIds = '' OR p_genreIds IS NULL OR p_genreIds = '' OR p_publisherId IS NULL OR p_publisherId = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Required fields (title, author_ids, p_genreIds, p_publisherId) cannot be null or empty';
     END IF;
@@ -173,7 +176,7 @@ BEGIN
         pageCount,
         publisherId,
         description,
-        status,
+        avgRating,
         createdAt,
         updatedAt
     ) VALUES (
@@ -186,10 +189,30 @@ BEGIN
         p_pageCount,
         p_publisherId,
         p_description,
-        p_status,
+        p_avgRating,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
     );
+    
+    -- Loop to create book copies based on p_quantity
+    SET i = 1;
+    WHILE i <= p_quantity DO
+        SET v_copiesId = UUID();
+        INSERT INTO books_copies (
+            id,
+            bookId,
+            isBorrowed,
+            createdAt,
+            updatedAt
+        ) VALUES (
+            v_copiesId,
+            v_bookId,
+            1,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+        );
+        SET i = i + 1;
+    END WHILE;
 
     -- Append trailing comma to ensure last author ID is processed
     SET p_authorIds = CONCAT(p_authorIds, ',');
@@ -643,7 +666,7 @@ CREATE PROCEDURE UpdateBook(
     IN p_pageCount INT,
     IN p_publisherId VARCHAR(36),
     IN p_description TEXT,
-    IN p_status ENUM('available', 'unavailable', 'retired'),
+    IN p_avgRating DECIMAL(2,1),
     IN p_authorIds TEXT,
     IN p_genreIds TEXT,
     IN p_staffId VARCHAR(36)
@@ -677,11 +700,10 @@ BEGIN
         title = IFNULL(p_title, title),
         thumbnailUrl = IFNULL(p_thumbnailUrl, thumbnailUrl),
         isbn = IFNULL(p_isbn, isbn),
-        quantity = IFNULL(p_quantity, quantity),
         pageCount = IFNULL(p_pageCount, pageCount),
         publisherId = IFNULL(p_publisherId, publisherId),
         description = IFNULL(p_description, description),
-        status = IFNULL(p_status, status),
+        avgRating = IFNULL(p_avgRating, avgRating),
         updatedAt = CURRENT_TIMESTAMP
     WHERE id = p_bookId;
 

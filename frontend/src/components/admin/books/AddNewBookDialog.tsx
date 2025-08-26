@@ -1,4 +1,3 @@
-// components/AddNewBookDialog.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +38,8 @@ const formSchema = z.object({
   thumbnailLink: z.string().url({ message: "Invalid URL." }).optional(),
   bookQuantity: z.number({ message: "Quantity is required." }).min(1, { message: "Quantity cannot be negative." }),
   description: z.string({ message: "Book description is required." }).min(200, { message: "Book description must above 200 chars" }),
-  pageCount: z.number({ message: "Page count is required." }).min(10, { message: "The number of book pages is larger than 10" })
+  pageCount: z.number({ message: "Page count is required." }).min(10, { message: "The number of book pages is larger than 10" }),
+  avgRating: z.number({ message: "Average rating is required." }).min(0, { message: "Rating cannot be negative." }).max(5, { message: "Rating cannot exceed 5." })
 });
 
 export const AddNewBookDialog = () => {
@@ -56,12 +56,13 @@ export const AddNewBookDialog = () => {
       bookTitle: "",
       isbn: "",
       publisher: "",
-      author: [], // Change this to an empty array
+      author: [],
       genre: [],
       thumbnailLink: "",
       bookQuantity: 0,
       description: "",
       pageCount: 0,
+      avgRating: 0, // Added default value for avgRating
     },
   });
 
@@ -88,7 +89,6 @@ export const AddNewBookDialog = () => {
 
       addAuthor(created.data.data[0]);
 
-      // This is a crucial change: add the new author ID to the existing array
       const currentAuthors = form.getValues("author");
       form.setValue("author", [...currentAuthors, authorId]);
 
@@ -100,10 +100,6 @@ export const AddNewBookDialog = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("Submitting values:", values);
-    // Convert the arrays of IDs to comma-separated strings
-    const authorIdsString = values.author.join(',');
-    const genreIdsString = values.genre.join(',');
-
     try {
       const newBookData = {
         title: values.bookTitle,
@@ -114,8 +110,9 @@ export const AddNewBookDialog = () => {
         publisherId: values.publisher,
         description: values.description || null,
         status: "available",
-        authorIds: authorIdsString,
-        genreIds: genreIdsString,
+        authorIds: values.author.join(','),
+        genreIds: values.genre.join(','),
+        avgRating: values.avgRating, // Added avgRating to the payload
         staffId: "",
       };
       const response = await axiosInstance.post('/api/v1/books/add', newBookData);
@@ -137,7 +134,13 @@ export const AddNewBookDialog = () => {
   const handlePageChange = (delta: number) => {
     const currentPage = form.getValues("pageCount");
     form.setValue("pageCount", Math.max(0, currentPage + delta));
-  }
+  };
+
+  const handleRatingChange = (delta: number) => {
+    const currentRating = form.getValues("avgRating");
+    const newRating = Math.max(0, Math.min(5, currentRating + delta)); // Clamp between 0 and 5
+    form.setValue("avgRating", Number(newRating.toFixed(1))); // Format to one decimal place
+  };
 
   const publisherOptions = publisherList.map(p => ({
     id: p.id!,
@@ -157,7 +160,7 @@ export const AddNewBookDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button onClick={() => setOpen(true)}>Add New Book</Button>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add new Book</DialogTitle>
         </DialogHeader>
@@ -325,6 +328,34 @@ export const AddNewBookDialog = () => {
                         />
                       </FormControl>
                       <Button type="button" variant="outline" size="icon" onClick={() => handlePageChange(1)}>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="avgRating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="avgRating">Average Rating</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <Button type="button" variant="outline" size="icon" onClick={() => handleRatingChange(-0.1)}>
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <FormControl>
+                        <Input
+                          id="avgRating"
+                          type="number"
+                          step="0.1"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          className="w-16 text-center"
+                        />
+                      </FormControl>
+                      <Button type="button" variant="outline" size="icon" onClick={() => handleRatingChange(0.1)}>
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>

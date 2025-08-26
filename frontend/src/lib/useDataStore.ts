@@ -1,4 +1,5 @@
-import { BookShow } from "@/app/admin/columns";
+import { BookShow } from "@/components/admin/books/columns";
+import { Copies } from "@/components/admin/copies/columns";
 import { create } from "zustand";
 
 export interface Publisher {
@@ -22,6 +23,7 @@ type DataState = {
     authorList: Author[];
     genreList: Genre[];
     books: BookShow[];
+    bookCopies: Copies[];
     addPublisher: (pub: Publisher) => void;
     addAuthor: (auth: Author) => void;
     addBook: (book: BookShow) => void;
@@ -29,6 +31,7 @@ type DataState = {
     setAuthors: (list: Author[]) => void;
     setGenres: (list: Genre[]) => void;
     setBooks: (list: BookShow[]) => void;
+    setBookCopies: (copies: Copies[]) => void;
     retireBook: (bookId: string) => void;
     updateQuantity: (bookId: string, newQuantity: number) => void;
 };
@@ -38,6 +41,7 @@ export const useDataStore = create<DataState>((set) => ({
     authorList: [],
     genreList: [],
     books: [],
+    bookCopies: [],
 
     addPublisher: (pub) =>
         set((state) => ({ publisherList: [...state.publisherList, pub] })),
@@ -52,6 +56,7 @@ export const useDataStore = create<DataState>((set) => ({
     setAuthors: (list) => set(() => ({ authorList: list })),
     setGenres: (list) => set(() => ({ genreList: list })),
     setBooks: (list) => set(() => ({ books: list })),
+    setBookCopies: (list) => set(() => ({ bookCopies: list })),
 
     retireBook: (bookId) =>
         set((state) => ({

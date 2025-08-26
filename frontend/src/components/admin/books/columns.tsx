@@ -6,20 +6,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { EditBookDialog } from "./EditBookDialog"
 import { Badge } from "@/components/ui/badge"
-
-export type BookShow = {
-  thumbnailUrl: string
-  isbn: string
-  id: string
-  title: string
-  author: string
-  publisherName: string
-  authors: string
-  genres: string
-  quantity: number
-  description: string
-  status: string
-}
+import { BookShow } from "./EditBookDialog"
 
 export const columns: ColumnDef<BookShow>[] = [
   {
@@ -82,17 +69,18 @@ export const columns: ColumnDef<BookShow>[] = [
     }
   },
   {
-    accessorKey: "status",
+    accessorKey: "isRetired",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      const isAvailable = status === "available";
+      const status = row.getValue("isRetired") as number;
+      const isAvailable = status === 0;
+      const stringStatus = isAvailable ? "available" : "unavailable"
       return (
         <Badge
           variant="outline"
           className={`${isAvailable ? "bg-green-100 text-green-800 border-green-300" : "bg-red-100 text-red-800 border-red-300"}`}
         >
-          {status}
+          {stringStatus}
         </Badge>
       );
     },

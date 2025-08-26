@@ -19,23 +19,32 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import React from 'react';
+import React, { useState } from 'react';
 import { AddNewBookDialog } from './AddNewBookDialog';
+import BookCopies from '../copies/BookCopies';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const table = useReactTable({
     data,
     columns,
@@ -47,6 +56,17 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
   });
+
+  const handleRowClick = (event: React.MouseEvent, bookId: string) => {
+    const target = event.target as HTMLElement;
+    // Prevent dialog from opening if clicking within the edit column or a dialog
+    const isActionColumn = target.closest('[data-column-id="edit"]');
+    const isDialogContent = target.closest('.dialog-content'); // Check for dialog content
+    if (!isActionColumn && !isDialogContent) {
+      setSelectedBookId(bookId);
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
     <div>
@@ -65,18 +85,16 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id} className="text-center">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id} className="text-center">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -86,10 +104,14 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="text-center"
+                  className="text-center cursor-pointer hover:bg-gray-100"
+                  onClick={event => handleRowClick(event, row.original.id)}
                 >
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      data-column-id={cell.column.id}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -108,7 +130,6 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
-            {/* This is the new "Add new book" row */}
             <TableRow className="border-t text-center">
               <TableCell colSpan={columns.length}>
                 <AddNewBookDialog />
@@ -135,6 +156,14 @@ export function DataTable<TData, TValue>({
           Next
         </Button>
       </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="dialog-content">
+          <DialogHeader>
+            <DialogTitle>Book Copies</DialogTitle>
+          </DialogHeader>
+          {selectedBookId && <BookCopies id={selectedBookId} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

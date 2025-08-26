@@ -331,9 +331,9 @@ export interface NewBook {
   pageCount: number;
   publisherId: string;
   description: string;
-  status: BookStatus;
-  authorIds: string,
-  genreIds: string
+  authorIds: string;
+  genreIds: string;
+  avgRating: number;
 }
 
 const addNewBook = async (req: Request, res: Response): Promise<void> => {
@@ -438,7 +438,66 @@ const retireBook = async (req: Request, res: Response): Promise<void> => {
 }
 
 const updateBook = async (req: Request, res: Response) => {
+  try {
+    const { bookId } = req.params;
+    console.log(bookId)
+    const {
+      title,
+      thumbnailUrl,
+      isbn,
+      quantity,
+      pageCount,
+      publisherId,
+      description,
+      authorIds,
+      genreIds,
+      status,
+      avgRating
+    } = req.body;
 
+    // Call the service function to execute the stored procedure.
+    // We pass the fields that are provided, and let the service handle partial updates.
+    await BookService.updateBook(
+      {
+        title,
+        thumbnailUrl,
+        isbn,
+        quantity,
+        pageCount,
+        publisherId,
+        description,
+        authorIds,
+        genreIds,
+        avgRating
+      },
+      bookId,
+      PLACEHOLDER_STAFF_ID
+    );
+
+    res.status(200).json({ message: 'Book updated successfully.' });
+  } catch (error) {
+    console.error('Error updating book:', error);
+    res.status(500).json({ message: 'Failed to update book.', error: error });
+  }
+}
+
+const getBookCopies = async (req: Request, res: Response) => {
+  try {
+    const { bookId } = req.params;
+    if (!bookId) {
+      throw new Error('Missing bookId parameter');
+    }
+
+    const result = await BookService.getBookCopies(bookId);
+
+    res.status(200).json({
+      message: 'Get book copies successfully.',
+      result: result
+    });
+  } catch (error) {
+    console.error('Error getting book copies:', error);
+    res.status(500).json({ message: 'Failed get book copies.', error: error });
+  }
 }
 
 export default {
@@ -451,4 +510,6 @@ export default {
   getBookInfoById,
   getAllReviewsByBookId,
   isBookBorrowed,
+  getBookCopies,
+  updateBook
 };

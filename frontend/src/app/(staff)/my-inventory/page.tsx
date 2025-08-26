@@ -6,10 +6,11 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-import { columns, BookShow } from "./columns"
-import { DataTable } from "./data-table"
+import { columns } from "@/components/admin/books/columns"
+import { DataTable } from "@/components/admin/books/data-table"
 import axiosInstance from '@/config/axiosConfig';
 import { useDataStore } from '@/lib/useDataStore';
+import { BookShow } from '@/components/admin/books/EditBookDialog';
 
 const page = () => {
   const setBooks = useDataStore((s) => s.setBooks);

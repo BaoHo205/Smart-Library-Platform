@@ -211,8 +211,8 @@ async function searchBooks(
       b.quantity,
       b.availableCopies,
       b.avgRating,
-      b.status,
       b.description,
+      b.isRetired,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres
@@ -442,7 +442,7 @@ const addNewBook = async (
       bookData.pageCount || 500,
       bookData.publisherId || null,
       bookData.description || null,
-      bookData.status || 'available',
+      bookData.avgRating,
       bookData.authorIds,
       bookData.genreIds,
       staffId,
@@ -592,6 +592,67 @@ const isBookBorrowed = async (
   }
 };
 
+const updateBook = async (
+  bookData: NewBook,
+  bookId: string,
+  staffId: string
+): Promise<void> => {
+  try {
+    const query = `
+            CALL UpdateBook(
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            );
+        `;
+
+    // The array of parameters must be in the exact order the stored procedure expects.
+    const params = [
+      bookId,
+      bookData.title || null,
+      bookData.thumbnailUrl || null,
+      bookData.isbn || null,
+      bookData.quantity || null,
+      bookData.pageCount || null,
+      bookData.publisherId || null,
+      bookData.description || null,
+      bookData.avgRating,
+      bookData.authorIds,
+      bookData.genreIds,
+      staffId
+    ];
+
+    // The `executeQuery` function handles connection pooling and prepared statements for us.
+    await mysqlConnection.executeQuery(query, params);
+
+    console.log(`Book with ID ${bookData} updated successfully.`);
+  } catch (error) {
+    console.error('Error in BookService.updateBook:', error);
+    throw new Error('Failed to update book in the database.');
+  }
+};
+
+interface BookCopiesRow {
+  id: string;
+  isBorrowed: number;
+}
+
+const getBookCopies = async (bookId: string) => {
+  const query = `
+    SELECT id, isBorrowed
+    FROM books_copies
+    WHERE bookId = ?
+  `
+
+  const param = [bookId]
+
+  try {
+    const result = await mysqlConnection.executeQuery(query, param) as unknown as BookCopiesRow;
+    return result;
+  } catch (error) {
+    console.error('Error in BookService.getBookCopies:', error);
+    throw new Error('Failed to get book copies in the database.');
+  }
+}
+
 export default {
   searchBooks,
   borrowBook,
@@ -603,4 +664,6 @@ export default {
   retireBook,
   getAllReviewsByBookId,
   isBookBorrowed,
+  updateBook,
+  getBookCopies
 };
