@@ -377,7 +377,7 @@ const addNewBook = async (req: Request, res: Response): Promise<void> => {
  * @param {Response} res The Express response object.
  */
 const updateBookInventory = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params; // Book ID from URL
+  const { bookId } = req.params; // Book ID from URL
   const { quantity } = req.body; // New quantity from request body
 
   // Basic validation
@@ -387,14 +387,14 @@ const updateBookInventory = async (req: Request, res: Response): Promise<void> =
   }
 
   try {
-    const updated = await BookService.updateBookInventory(id, quantity, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.updateBookInventory(bookId, quantity, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res.status(200).json({ message: `Book ${id} inventory updated successfully to ${quantity}.` });
+      res.status(200).json({ message: `Book ${bookId} inventory updated successfully to ${quantity}.` });
     } else {
-      res.status(404).json({ message: `Book with ID ${id} not found.` });
+      res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.updateBookInventoryController for ID ${id}:`, error);
+    console.error(`Error in bookController.updateBookInventoryController for ID ${bookId}:`, error);
     if (error instanceof Error) {
       res.status(500).json({ message: 'Internal server error', error: error.message });
     } else {
@@ -410,25 +410,74 @@ const updateBookInventory = async (req: Request, res: Response): Promise<void> =
  * @param {Response} res The Express response object.
  */
 const retireBook = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params; // Book ID from URL
-  //const { status } = req.body; // New status from request body
-
-  // Basic validation for allowed status values (must match ENUM in DB)
-  // const allowedStatuses: Book['status'][] = [BookStatus.AVAILABLE, BookStatus.UNAVAILABLE];
-  // if (!status || !allowedStatuses.includes(status)) {
-  //   res.status(400).json({ message: `Invalid status provided. Allowed statuses: ${allowedStatuses.join(', ')}` });
-  //   return;
-  // }
+  const { bookId } = req.params;
 
   try {
-    const updated = await BookService.retireBook(id, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.retireBook(bookId, PLACEHOLDER_STAFF_ID);
     if (updated) {
-      res.status(200).json({ message: `Book ${id} status updated successfully to 'unavailable'.` });
+      res.status(200).json({ message: `Book ${bookId} status updated successfully to 'unavailable'.` });
     } else {
-      res.status(404).json({ message: `Book with ID ${id} not found.` });
+      res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.retireBookController for ID ${id}:`, error);
+    console.error(`Error in bookController.retireBookController for ID ${bookId}:`, error);
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
+    }
+  }
+}
+
+const addCopy = async (req: Request, res: Response): Promise<void> => {
+  const { bookId } = req.params;
+
+  try {
+    const result = await BookService.addNewCopy(bookId, PLACEHOLDER_STAFF_ID);
+    res.status(201).json({ message: `Book Copy has been created.`, data: result });
+
+  } catch (error: unknown) {
+    console.error(`Error in bookController.addCopy for ID ${bookId}:`, error);
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
+    }
+  }
+}
+
+const deleteCopy = async (req: Request, res: Response): Promise<void> => {
+  const { copyId } = req.params;
+
+  try {
+    const updated = await BookService.deleteBookCopyById(copyId, PLACEHOLDER_STAFF_ID);
+    if (updated) {
+      res.status(200).json({ message: `Book Copy ${copyId} has been deleted.` });
+    } else {
+      res.status(404).json({ message: `Book Copy with ID ${copyId} not found.` });
+    }
+  } catch (error: unknown) {
+    console.error(`Error in bookController.deleteCopy for ID ${copyId}:`, error);
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error', error: String(error) });
+    }
+  }
+}
+
+const retireCopy = async (req: Request, res: Response): Promise<void> => {
+  const { copyId } = req.params;
+
+  try {
+    const updated = await BookService.retireCopy(copyId, PLACEHOLDER_STAFF_ID);
+    if (updated) {
+      res.status(200).json({ message: `Book ${copyId} status updated successfully to 'unavailable'.` });
+    } else {
+      res.status(404).json({ message: `Book with ID ${copyId} not found.` });
+    }
+  } catch (error: unknown) {
+    console.error(`Error in bookController.retireCopyController for ID ${copyId}:`, error);
     if (error instanceof Error) {
       res.status(500).json({ message: 'Internal server error', error: error.message });
     } else {
@@ -511,5 +560,8 @@ export default {
   getAllReviewsByBookId,
   isBookBorrowed,
   getBookCopies,
-  updateBook
+  updateBook,
+  retireCopy,
+  addCopy,
+  deleteCopy
 };

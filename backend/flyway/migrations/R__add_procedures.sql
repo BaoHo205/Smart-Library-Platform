@@ -5,6 +5,10 @@ DROP PROCEDURE IF EXISTS ReturnBook;
 DROP PROCEDURE IF EXISTS AddNewBook;
 DROP PROCEDURE IF EXISTS UpdateBookInventory;
 DROP PROCEDURE IF EXISTS RetireBook;
+DROP PROCEDURE IF EXISTS RetireBookCopy;
+DROP PROCEDURE IF EXISTS AddBookCopy;
+DROP PROCEDURE IF EXISTS DeleteBookCopy;
+DROP PROCEDURE IF EXISTS UpdateBook;
 DROP PROCEDURE IF EXISTS ReviewBook;
 
 -- Create stored procedure for borrowing a book
@@ -328,6 +332,9 @@ CREATE PROCEDURE RetireBook(
     IN p_staffId VARCHAR(36)
 )
 BEGIN
+    -- Declare a variable to hold the current retired status
+    DECLARE currentIsRetired TINYINT;
+
     -- Error handler to rollback transaction on SQL errors
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -345,22 +352,198 @@ BEGIN
         SET MESSAGE_TEXT = 'Book ID cannot be null';
     END IF;
 
-    -- Update the book's status to 'unavailable'
-    UPDATE books
-    SET
-        status = 'unavailable',
-        updatedAt = CURRENT_TIMESTAMP
+    -- Check the current status of the book
+    SELECT isRetired INTO currentIsRetired
+    FROM books
     WHERE id = p_bookId;
 
-    -- Check if a row was affected
-    IF ROW_COUNT() = 0 THEN
+    -- Check if the book was found
+    IF currentIsRetired IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Book not found';
     END IF;
 
-    -- Log the staff action
-    CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Book ID ', p_bookId, ' retired'));
+    -- If the book is already retired, log the attempt and exit gracefully
+    IF currentIsRetired = 1 THEN
+        CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Attempted to retire an already retired book: ', p_bookId));
+    ELSE
+        -- The book is not retired, so we can proceed with retiring it
+        UPDATE books
+        SET
+            isRetired = 1,
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE id = p_bookId;
+
+        -- Also retire all book copies associated with this book
+        UPDATE books_copies
+        SET
+            isBorrowed = 0, -- Set to 0 to indicate the copies are no longer borrowed
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE bookId = p_bookId;
+
+        -- Log the successful action
+        CALL AddStaffLog(p_staffId, p_bookId, 'UPDATE', CONCAT('Book and all its copies with ID ', p_bookId, ' retired'));
+    END IF;
     
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE AddBookCopy(
+    IN p_bookId VARCHAR(36),
+    IN p_staffId VARCHAR(36),
+    OUT o_copyId VARCHAR(36)
+)
+BEGIN
+    -- Declare a variable to hold the new UUID
+    DECLARE newCopyId VARCHAR(36);
+
+    -- Declare a handler for any SQL exceptions to roll back the transaction.
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while adding the book copy. The transaction was rolled back.';
+    END;
+
+    -- Start a transaction to ensure the operation is atomic.
+    START TRANSACTION;
+
+    -- Check if the provided book ID is valid.
+    IF NOT EXISTS (SELECT 1 FROM books WHERE id = p_bookId) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book not found. Cannot add a copy of a non-existent book.';
+    END IF;
+    
+    -- Generate a new UUID for the book copy
+    SET newCopyId = UUID();
+
+    -- Insert a new record into the books_copies table.
+    -- The newCopyId variable is used for the ID.
+    INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt)
+    VALUES (newCopyId, p_bookId, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    
+    CALL AddStaffLog(p_staffId, p_bookId, 'CREATE', CONCAT('New book copy created with ID ', newCopyId));
+
+    -- Set the OUT parameter to the newly created ID
+    SET o_copyId = newCopyId;
+
+    -- Commit the transaction if the insertion was successful.
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE DeleteBookCopy(
+    IN p_copyId VARCHAR(36),
+    IN p_staffId VARCHAR(36)
+)
+BEGIN
+    DECLARE v_bookId VARCHAR(36);
+    DECLARE v_isBorrowed BOOLEAN;
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while deleting the book copy';
+    END;
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Validate input
+    IF p_copyId IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book copy ID cannot be null';
+    END IF;
+
+    -- Step 1: Check if the book copy exists and get its details.
+    SELECT bookId, isBorrowed INTO v_bookId, v_isBorrowed
+    FROM books_copies
+    WHERE id = p_copyId;
+
+    -- Step 2: Check if the book copy is currently borrowed.
+    -- We are deliberately throwing a custom error if it is.
+    IF v_isBorrowed THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete a book copy that is currently borrowed.';
+    END IF;
+
+    -- Step 3: Log the action before deletion.
+    CALL AddStaffLog(p_staffId, v_bookId, 'DELETE', CONCAT('Attempted to delete book copy with ID ', p_copyId));
+
+    -- Step 4: Delete the book copy from the books_copies table.
+    DELETE FROM books_copies
+    WHERE id = p_copyId;
+
+    -- Step 5: If the deletion is successful, commit the transaction.
+    COMMIT;
+    
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE RetireBookCopy(
+    IN p_copyId VARCHAR(36),
+    IN p_staffId VARCHAR(36)
+)
+BEGIN
+    -- Declare a variable to hold the current status
+    DECLARE currentIsBorrowed TINYINT;
+    -- Error handler to rollback transaction on SQL errors
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'An error occurred while retiring the book';
+    END;
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Validate input
+    IF p_copyId IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID cannot be null';
+    END IF;
+
+    -- Check the current status of the book copy
+    SELECT isBorrowed INTO currentIsBorrowed
+    FROM books_copies
+    WHERE id = p_copyId;
+
+    -- Check if the book copy exists
+    IF currentIsBorrowed IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Copy not found';
+    END IF;
+
+    -- Now, check if the book is already retired (isBorrowed = 0)
+    IF currentIsBorrowed = 0 THEN
+        -- If it's already retired, we don't need to do anything.
+        -- We'll just log the attempt and exit successfully.
+        CALL AddStaffLog(p_staffId, p_copyId, 'UPDATE', CONCAT('Attempted to retire an already retired copy: ', p_copyId));
+    ELSE
+        -- The book is currently borrowed (isBorrowed = 1), so we can proceed with retiring it.
+        UPDATE books_copies
+        SET
+            isBorrowed = 0,
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE id = p_copyId;
+        
+        -- Log the successful action
+        CALL AddStaffLog(p_staffId, p_copyId, 'UPDATE', CONCAT('Copy ID ', p_copyId, ' retired'));
+    END IF;
+
     COMMIT;
 END$$
 

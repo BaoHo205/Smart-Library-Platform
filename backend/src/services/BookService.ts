@@ -476,6 +476,79 @@ const addNewBook = async (
   }
 };
 
+const addNewCopy = async (
+  bookId: string,
+  staffId: string
+): Promise<BookCopy> => {
+  try {
+    const procedure =
+      'CALL AddBookCopy(?, ?, @new_copy_id)';
+    const params = [
+      bookId,
+      staffId
+    ];
+
+    // Execute the stored procedure (returns OkPacket or similar)
+    await mysqlConnection.executeQuery(procedure, params);
+
+    // Retrieve the OUT parameter
+    const result = (await mysqlConnection.executeQuery(
+      'SELECT @new_copy_id AS id'
+    )) as unknown as IdRow[];
+
+    if (!result) {
+      throw new Error('Failed to retrieve new book ID from procedure');
+    }
+
+    console.log(result[0].id)
+
+    const book = await getBookCopyById(result[0].id);
+    console.log(book)
+
+    return book;
+  } catch (error) {
+    console.error('Error in bookService.addNewCopy:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not create book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not create book copy: ${String(error)}`);
+    }
+  }
+};
+interface BookCopy {
+  id: string;
+  isBorrowed: number
+}
+const getBookCopyById = async (id: string) => {
+  try {
+    const query = 'SELECT id, isBorrowed FROM books_copies WHERE id = ?';
+    const result = await mysqlConnection.executeQuery(query, [id]) as unknown as BookCopy[];
+    return result[0];
+  } catch (error) {
+    console.error('Error in bookService.getBookCopyById:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not get book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not get book copy: ${String(error)}`);
+    }
+  }
+}
+
+const deleteBookCopyById = async (copyId: string, staffId: string) => {
+  try {
+    const query = 'CALL DeleteBookCopy(?, ?)';
+    await mysqlConnection.executeQuery(query, [copyId, staffId]);
+    return true;
+  } catch (error) {
+    console.error('Error in bookService.getBookCopyById:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not get book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not get book copy: ${String(error)}`);
+    }
+  }
+}
+
 /**
  * Updates the quantity and availableCopies of a specific book by calling the `UpdateBookInventory`
  * stored procedure.
@@ -533,6 +606,26 @@ const retireBook = async (
       throw new Error(`Could not retire book: ${error.message}`);
     } else {
       throw new Error(`Could not retire book: ${String(error)}`);
+    }
+  }
+};
+
+const retireCopy = async (
+  bookId: string,
+  staffId: string
+): Promise<boolean> => {
+  try {
+    const procedure = 'CALL RetireBookCopy(?, ?)';
+    const params = [bookId, staffId];
+
+    const results = await mysqlConnection.executeQuery(procedure, params);
+    return true;
+  } catch (error) {
+    console.error(`Error in bookService.retireCopy for CopyID ${bookId}:`, error);
+    if (error instanceof Error) {
+      throw new Error(`Could not retire copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not retire copy: ${String(error)}`);
     }
   }
 };
@@ -665,5 +758,8 @@ export default {
   getAllReviewsByBookId,
   isBookBorrowed,
   updateBook,
-  getBookCopies
+  getBookCopies,
+  retireCopy,
+  deleteBookCopyById,
+  addNewCopy
 };

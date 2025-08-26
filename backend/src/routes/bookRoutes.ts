@@ -12,7 +12,10 @@ bookRouter.put('/return/:bookId', bookController.returnBook);
 bookRouter.put('/update/:bookId', bookController.updateBook);
 bookRouter.post('/add', bookController.addNewBook);
 bookRouter.put('/inventory/:id', bookController.updateBookInventory);
-bookRouter.put('/retired/:id', bookController.retireBook);
+bookRouter.put('/retired/:bookId', bookController.retireBook);
+bookRouter.put('/copy/retired/:copyId', bookController.retireCopy);
+bookRouter.post('/copy/create/:bookId', bookController.addCopy);
+bookRouter.delete('/copy/delete/:copyId', bookController.deleteCopy);
 bookRouter.get('/:bookId/isBorrowed', bookController.isBookBorrowed);
 bookRouter.get('/:bookId/copies', bookController.getBookCopies)
 export default bookRouter;

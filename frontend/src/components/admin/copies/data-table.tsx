@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -23,15 +22,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import React from 'react';
+import { PlusCircleIcon } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    onAddClick: () => void;
+    isAdding: boolean;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    onAddClick,
+    isAdding,
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -40,7 +50,6 @@ export function DataTable<TData, TValue>({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         state: {
@@ -98,9 +107,31 @@ export function DataTable<TData, TValue>({
                                 </TableCell>
                             </TableRow>
                         )}
+                        <TableRow className="border-t text-center align-middle">
+                            <TableCell colSpan={columns.length} className='text-center '>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={onAddClick}
+                                                disabled={isAdding}
+                                                className="cursor-pointer"
+                                            >
+                                                <PlusCircleIcon />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Add a new copy</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </TableCell>
+                        </TableRow>
                     </TableBody>
                 </Table>
             </div>
         </div>
     );
 }
+
