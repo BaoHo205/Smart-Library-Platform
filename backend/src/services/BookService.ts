@@ -239,12 +239,12 @@ async function searchBooks(
 
 const borrowBook = async (
   userId: string,
-  bookId: string,
-  dueDate: string
+  bookId: string
 ): Promise<BorrowBookResult> => {
   try {
     // Convert string to MySQL date format (YYYY-MM-DD) and add 1 day
-    const date = new Date(dueDate);
+    const date = new Date();
+    date.setDate(date.getDate() + 14);
 
     // Call the stored procedure
     await mysqlConnection.executeQuery(
@@ -275,7 +275,7 @@ const borrowBook = async (
 
 const returnBook = async (
   userId: string,
-  bookId: string
+  copyId: string
 ): Promise<ReturnBookResult> => {
   try {
     // Call the stored procedure
@@ -283,7 +283,7 @@ const returnBook = async (
       `
             CALL ReturnBook(?, ?, @p_success, @p_message, @p_isLate)
         `,
-      [userId, bookId]
+      [userId, copyId]
     );
 
     // Get the output parameters
@@ -568,8 +568,9 @@ const isBookBorrowed = async (
   try {
     const query = `
       SELECT COUNT(*) as count
-      FROM checkouts
-      WHERE bookId = ? AND userId = ? AND returnDate IS NULL
+      FROM checkouts c
+      JOIN books_copies bc ON c.copyId = bc.id
+      WHERE bc.bookId = ? AND c.userId = ? AND c.returnDate IS NULL
     `;
 
     const result = (await mysqlConnection.executeQuery(query, [

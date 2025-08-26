@@ -43,9 +43,12 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const limitParam = typeof limit === 'string' && limit.trim().toLowerCase() === 'max'
-      ? 'max'
-      : (limit ? Number(limit) : undefined);
+    const limitParam =
+      typeof limit === 'string' && limit.trim().toLowerCase() === 'max'
+        ? 'max'
+        : limit
+          ? Number(limit)
+          : undefined;
 
     const result = await StaffService.getMostBorrowedBooks(
       String(startDate || '').trim(),

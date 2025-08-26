@@ -22,9 +22,12 @@ const getMostBorrowedBooks = async (
 
     // fetch all without LIMIT if limit is 'max' or not provided
     // if limit is a number, inject safe integer literal (some MySQL setups reject bound LIMIT params)
-    const hasNumericLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
+    const hasNumericLimit =
+      typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
     const safeLimit = hasNumericLimit ? Math.trunc(limit as number) : undefined;
-    const query = hasNumericLimit ? `${baseQuery}\n      LIMIT ${safeLimit};` : `${baseQuery};`;
+    const query = hasNumericLimit
+      ? `${baseQuery}\n      LIMIT ${safeLimit};`
+      : `${baseQuery};`;
     const params = [startDate, endDate];
 
     const result = await mysql.executeQuery(query, params);

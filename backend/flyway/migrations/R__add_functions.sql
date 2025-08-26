@@ -12,12 +12,13 @@ READS SQL DATA
 DETERMINISTIC
 BEGIN
     DECLARE available_count INT;
+    DECLARE is_retired BOOLEAN;
     
-    SELECT availableCopies INTO available_count
+    SELECT availableCopies, isRetired INTO available_count, is_retired
     FROM books 
     WHERE id = bookId;
     
-    RETURN COALESCE(available_count, 0) > 0;
+    RETURN COALESCE(available_count, 0) > 0 AND COALESCE(is_retired, FALSE) = FALSE;
 END//
 
 DELIMITER ;
