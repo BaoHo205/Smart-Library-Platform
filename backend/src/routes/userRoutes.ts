@@ -8,7 +8,11 @@ userRouter.get('/profile', UserController.getProfile);
 
 // User search endpoints (staff only)
 userRouter.get('/all', authMiddleware.verifyStaff, UserController.getAllUsers);
-userRouter.get('/search', authMiddleware.verifyStaff, UserController.searchUsers);
+userRouter.get(
+  '/search',
+  authMiddleware.verifyStaff,
+  UserController.searchUsers
+);
 
 userRouter.post(
   '/reviews/add',
