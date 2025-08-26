@@ -218,10 +218,16 @@ async function searchBooks(
     ${whereSql}
   `;
 
-  const countResult = (await mysqlConnection.executeQuery(countSql, params)) as CountRow[];
+  const countResult = (await mysqlConnection.executeQuery(
+    countSql,
+    params
+  )) as CountRow[];
   const total = countResult[0]?.total ?? 0;
 
-  const rows = (await mysqlConnection.executeQuery(sql, params)) as BookListItem[];
+  const rows = (await mysqlConnection.executeQuery(
+    sql,
+    params
+  )) as BookListItem[];
 
   return {
     data: rows,
@@ -364,8 +370,8 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
       ...book,
       authors: book.authors
         ? book.authors
-          .split(', ')
-          .filter((author: string) => author.trim() !== '')
+            .split(', ')
+            .filter((author: string) => author.trim() !== '')
         : [],
       genres: book.genres
         ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '')

@@ -6,7 +6,13 @@ import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
 import { returnBook } from '@/api/checkout.api';
 
-const LoanCard = ({ checkout, setCheckouts }: { checkout: CheckoutItem; setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>> }) => {
+const LoanCard = ({
+  checkout,
+  setCheckouts,
+}: {
+  checkout: CheckoutItem;
+  setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>>;
+}) => {
   const formatDateDMY = (iso?: string | null) => {
     if (!iso) return '—';
     try {
@@ -21,10 +27,14 @@ const LoanCard = ({ checkout, setCheckouts }: { checkout: CheckoutItem; setCheck
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <h1 className="text-xl font-bold text-ellipsis text-nowrap overflow-hidden">{checkout.bookName}</h1>
-        <p className="text-muted-foreground text-sm text-ellipsis text-nowrap overflow-hidden">{checkout.bookAuthors}</p>
+        <h1 className="overflow-hidden text-xl font-bold text-nowrap text-ellipsis">
+          {checkout.bookName}
+        </h1>
+        <p className="text-muted-foreground overflow-hidden text-sm text-nowrap text-ellipsis">
+          {checkout.bookAuthors}
+        </p>
         <div className="flex gap-2">
-          {checkout.bookGenres.split(',').map((genre) => (
+          {checkout.bookGenres.split(',').map(genre => (
             <Badge variant={'default'} key={genre}>
               {genre}
             </Badge>
@@ -44,7 +54,17 @@ const LoanCard = ({ checkout, setCheckouts }: { checkout: CheckoutItem; setCheck
         <div className="flex gap-1.5">
           <span className="text-xs font-bold">{`Due by ${formatDateDMY(checkout.dueDate)}`}</span>
         </div>
-        <Button onClick={() => { returnBook(checkout.bookId); setCheckouts((prev) => prev.filter((c) => c.bookId !== checkout.bookId)); }} disabled={false}>Return</Button>
+        <Button
+          onClick={() => {
+            returnBook(checkout.bookId);
+            setCheckouts(prev =>
+              prev.filter(c => c.bookId !== checkout.bookId)
+            );
+          }}
+          disabled={false}
+        >
+          Return
+        </Button>
       </CardFooter>
     </Card>
   );

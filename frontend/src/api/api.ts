@@ -1,6 +1,10 @@
 import axiosInstance from '@/config/axiosConfig';
 import { UserSearchResult } from '@/hooks/useUserSearch';
-import { MostBorrowedBook, BookAvailability, TopActiveReader } from '@/lib/types';
+import {
+  MostBorrowedBook,
+  BookAvailability,
+  TopActiveReader,
+} from '@/lib/types';
 
 // BookDetails interface to match backend
 export interface BookDetails {
@@ -134,7 +138,11 @@ export interface AverageSessionTimeResponse {
 
 export interface ReadingSessionAnalyticsResponse {
   success: boolean;
-  data: MostHighlightedBookResponse[] | TopBookByReadingTimeResponse[] | ReadingTrendResponse[] | AverageSessionTimeResponse[];
+  data:
+    | MostHighlightedBookResponse[]
+    | TopBookByReadingTimeResponse[]
+    | ReadingTrendResponse[]
+    | AverageSessionTimeResponse[];
   message: string;
 }
 
@@ -275,29 +283,47 @@ const isBookBorrowed = async (bookId: string): Promise<boolean> => {
 };
 
 // Reading Session Analytics API Functions
-const getMostHighlightedBooksWithDetails = async (limit: number = 5): Promise<MostHighlightedBookResponse[]> => {
+const getMostHighlightedBooksWithDetails = async (
+  limit: number = 5
+): Promise<MostHighlightedBookResponse[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/reading-sessions/most-highlighted-with-details?limit=${limit}`);
+    const response = await axiosInstance.get(
+      `/api/v1/reading-sessions/most-highlighted-with-details?limit=${limit}`
+    );
     return response.data.data;
   } catch (error) {
-    console.error('Failed to fetch most highlighted books with details:', error);
+    console.error(
+      'Failed to fetch most highlighted books with details:',
+      error
+    );
     throw error;
   }
 };
 
-const getTopBooksByReadTimeWithDetails = async (limit: number = 10): Promise<TopBookByReadingTimeResponse[]> => {
+const getTopBooksByReadTimeWithDetails = async (
+  limit: number = 10
+): Promise<TopBookByReadingTimeResponse[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/reading-sessions/top-books-time-with-details?limit=${limit}`);
+    const response = await axiosInstance.get(
+      `/api/v1/reading-sessions/top-books-time-with-details?limit=${limit}`
+    );
     return response.data.data;
   } catch (error) {
-    console.error('Failed to fetch top books by reading time with details:', error);
+    console.error(
+      'Failed to fetch top books by reading time with details:',
+      error
+    );
     throw error;
   }
 };
 
-const getAverageSessionTime = async (): Promise<AverageSessionTimeResponse[]> => {
+const getAverageSessionTime = async (): Promise<
+  AverageSessionTimeResponse[]
+> => {
   try {
-    const response = await axiosInstance.get('/api/v1/reading-sessions/avg-time');
+    const response = await axiosInstance.get(
+      '/api/v1/reading-sessions/avg-time'
+    );
     return response.data.data;
   } catch (error) {
     console.error('Failed to fetch average session time:', error);
@@ -305,7 +331,11 @@ const getAverageSessionTime = async (): Promise<AverageSessionTimeResponse[]> =>
   }
 };
 
-const getReadingTrends = async (userId?: string, months: number | 'all' = 6, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<ReadingTrendResponse[]> => {
+const getReadingTrends = async (
+  userId?: string,
+  months: number | 'all' = 6,
+  dateRange?: { from: Date | undefined; to: Date | undefined }
+): Promise<ReadingTrendResponse[]> => {
   try {
     const params = new URLSearchParams();
     if (userId) params.append('userId', userId);
@@ -318,7 +348,9 @@ const getReadingTrends = async (userId?: string, months: number | 'all' = 6, dat
       params.append('months', months.toString());
     }
 
-    const response = await axiosInstance.get(`/api/v1/reading-sessions/trends?${params.toString()}`);
+    const response = await axiosInstance.get(
+      `/api/v1/reading-sessions/trends?${params.toString()}`
+    );
     return response.data.data;
   } catch (error) {
     console.error('Failed to fetch reading trends:', error);
@@ -337,7 +369,7 @@ const getAllUsers = async (): Promise<UserSearchResult[]> => {
       lastName: user.lastName,
       email: user.email,
       displayName: `${user.firstName} ${user.lastName}`,
-      avatarUrl: undefined
+      avatarUrl: undefined,
     }));
   } catch (error) {
     console.error('Failed to fetch all users:', error);
@@ -347,7 +379,9 @@ const getAllUsers = async (): Promise<UserSearchResult[]> => {
 
 const searchUsers = async (query: string): Promise<UserSearchResult[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/user/search?query=${encodeURIComponent(query)}`);
+    const response = await axiosInstance.get(
+      `/api/v1/user/search?query=${encodeURIComponent(query)}`
+    );
     return response.data.data.map((user: any) => ({
       id: user.id,
       userName: user.userName,
@@ -355,7 +389,7 @@ const searchUsers = async (query: string): Promise<UserSearchResult[]> => {
       lastName: user.lastName,
       email: user.email,
       displayName: `${user.firstName} ${user.lastName}`,
-      avatarUrl: undefined
+      avatarUrl: undefined,
     }));
   } catch (error) {
     console.error('Failed to search users:', error);
@@ -364,15 +398,23 @@ const searchUsers = async (query: string): Promise<UserSearchResult[]> => {
 };
 
 // Staff Reports API
-const getMostBorrowedBooks = async (startDate: string, endDate: string, limit: number = 5): Promise<MostBorrowedBook[]> => {
+const getMostBorrowedBooks = async (
+  startDate: string,
+  endDate: string,
+  limit: number = 5
+): Promise<MostBorrowedBook[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/staff/most-borrowed-books?startDate=${startDate}&endDate=${endDate}&limit=${limit}`);
+    const response = await axiosInstance.get(
+      `/api/v1/staff/most-borrowed-books?startDate=${startDate}&endDate=${endDate}&limit=${limit}`
+    );
     const books = response.data.data || [];
 
     const booksWithDetails = await Promise.all(
       books.map(async (book: any) => {
         try {
-          const bookDetailResponse = await axiosInstance.get(`/api/v1/books/${book.id}`);
+          const bookDetailResponse = await axiosInstance.get(
+            `/api/v1/books/${book.id}`
+          );
           const bookDetail = bookDetailResponse.data.data;
           return {
             bookId: book.id || `book_${Date.now()}_${Math.random()}`,
@@ -381,10 +423,13 @@ const getMostBorrowedBooks = async (startDate: string, endDate: string, limit: n
             total_checkouts: book.total_checkouts || 0,
             availableCopies: book.availableCopies || 0,
             quantity: book.quantity || 0,
-            coverUrl: bookDetail?.thumbnailUrl || null
+            coverUrl: bookDetail?.thumbnailUrl || null,
           };
         } catch (error) {
-          console.error(`Failed to fetch book details for ${book.title}:`, error);
+          console.error(
+            `Failed to fetch book details for ${book.title}:`,
+            error
+          );
           return {
             bookId: book.id || `book_${Date.now()}_${Math.random()}`,
             title: book.title || '',
@@ -392,7 +437,7 @@ const getMostBorrowedBooks = async (startDate: string, endDate: string, limit: n
             total_checkouts: book.total_checkouts || 0,
             availableCopies: book.availableCopies || 0,
             quantity: book.quantity || 0,
-            coverUrl: null
+            coverUrl: null,
           };
         }
       })
@@ -405,9 +450,13 @@ const getMostBorrowedBooks = async (startDate: string, endDate: string, limit: n
   }
 };
 
-const getBooksWithLowAvailability = async (interval: number = 60): Promise<BookAvailability[]> => {
+const getBooksWithLowAvailability = async (
+  interval: number = 60
+): Promise<BookAvailability[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/staff/low-availability?interval=${interval}`);
+    const response = await axiosInstance.get(
+      `/api/v1/staff/low-availability?interval=${interval}`
+    );
     const books = response.data.data || [];
 
     // No need to fetch book details for low availability - just return the data
@@ -418,7 +467,7 @@ const getBooksWithLowAvailability = async (interval: number = 60): Promise<BookA
       quantity: book.quantity || 0,
       availability_percentage: book.availability_percentage || 0,
       recent_checkouts: book.recent_checkouts || 0,
-      coverUrl: null // Low availability doesn't need cover images
+      coverUrl: null, // Low availability doesn't need cover images
     }));
   } catch (error) {
     console.error('Error fetching books with low availability:', error);
@@ -426,9 +475,14 @@ const getBooksWithLowAvailability = async (interval: number = 60): Promise<BookA
   }
 };
 
-const getTopActiveReaders = async (monthsBack: number = 6, limit: number = 10): Promise<TopActiveReader[]> => {
+const getTopActiveReaders = async (
+  monthsBack: number = 6,
+  limit: number = 10
+): Promise<TopActiveReader[]> => {
   try {
-    const response = await axiosInstance.get(`/api/v1/staff/top-active-readers?monthsBack=${monthsBack}&limit=${limit}`);
+    const response = await axiosInstance.get(
+      `/api/v1/staff/top-active-readers?monthsBack=${monthsBack}&limit=${limit}`
+    );
     return response.data.data || [];
   } catch (error) {
     console.error('Error fetching top active readers:', error);
