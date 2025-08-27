@@ -71,13 +71,13 @@ const adaptReview = (review: IReview): Review => {
   };
 };
 
-// Helper function to generate due date (2 weeks from now)
-const generateDueDate = (): string => {
-  const today = new Date();
-  const dueDate = new Date(today);
-  dueDate.setDate(today.getDate() + 14); // 2 weeks from now
-  return dueDate.toISOString().split('T')[0];
-};
+// // Helper function to generate due date (2 weeks from now)
+// const generateDueDate = (): string => {
+//   const today = new Date();
+//   const dueDate = new Date(today);
+//   dueDate.setDate(today.getDate() + 14); // 2 weeks from now
+//   return dueDate.toISOString().split('T')[0];
+// };
 
 interface BookDetailPageProps {
   bookId: string;
@@ -99,14 +99,6 @@ export default function BookInfoPage({
     setError(null);
 
     try {
-      // const [bookResponse, reviewsResponse] = await Promise.all([
-      //   api.getBookInfoById(bookId),
-      //   api.getReviewsByBookId(bookId),
-      // ])
-
-      // setBook(adaptBookDetails(bookResponse))
-      // setReviews(reviewsResponse.map(adaptReview))
-
       // Fetch book details
       const bookResponse = await getBookInfoById(bookId);
       setBook(adaptBookDetails(bookResponse));
@@ -144,19 +136,7 @@ export default function BookInfoPage({
 
     setBorrowing(true);
     try {
-      // setBorrowing(true)
-      const dueDate = generateDueDate();
-
-      // await api.borrowBook(bookId, dueDate)
-
-      // // Set borrowed state to true after successful borrow
-      // setIsBorrowed(true)
-
-      // // Refresh book data to update availability status
-      // await fetchBookData()
-
-      // console.log("Book borrowed successfully")
-      const result = await borrowBook(bookId, dueDate);
+      const result = await borrowBook(bookId);
       if (result.success) {
         setIsBorrowed(true);
         toast.success('Book borrowed successfully!');
@@ -262,6 +242,7 @@ export default function BookInfoPage({
         onAddReview={handleAddReview}
         onUpdateReview={handleUpdateReview}
         currentUserId={user?.id}
+        isBorrowed={isBorrowed}
       />
     </div>
   );

@@ -12,7 +12,19 @@ export interface CheckoutItem {
 
 export type CheckoutResponse = CheckoutItem[];
 
-// Alternative with boolean conversion helpers
+interface CheckoutSummary {
+  checkoutId: string;
+  userId: string;
+  bookId: string;
+  checkoutDate: string; // ISO date string
+}
+
+export interface CheckoutApiResponse {
+  success: boolean;
+  message: string;
+  data: CheckoutSummary;
+}
+  // Alternative with boolean conversion helpers
 export interface CheckoutItemWithBooleans
   extends Omit<CheckoutItem, 'isReturned' | 'isLate'> {
   isReturned: boolean;

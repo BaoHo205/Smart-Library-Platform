@@ -15,7 +15,7 @@ interface UserProfile {
   role: UserRole;
 }
 
-// Helper functions for review operations
+// HELPER FUNCTIONS FOR REVIEWS
 const createReview = async (reviewData: IReviewData): Promise<string> => {
   const reviewId = uuidv4();
   const now = new Date();
@@ -39,7 +39,9 @@ const createReview = async (reviewData: IReviewData): Promise<string> => {
   return reviewId;
 };
 
-const performReviewUpdate = async (updateData: IUpdateReviewData): Promise<IUpdateReviewResponse> => {
+const performReviewUpdate = async (
+  updateData: IUpdateReviewData
+): Promise<IUpdateReviewResponse> => {
   const updatedAt = new Date();
   
   // Build dynamic query based on provided fields
@@ -85,7 +87,7 @@ const performReviewUpdate = async (updateData: IUpdateReviewData): Promise<IUpda
   return updatedReview[0];
 };
 
-// Helper functions for validations
+// HELPER VALIDATION FUNCTIONS
 const validateBookExists = async (bookId: string): Promise<void> => {
   const existingBook = await mysql.executeQuery(
     'SELECT id FROM books WHERE id = ?',
@@ -103,13 +105,13 @@ const validateUserCanReview = async (userId: string, bookId: string): Promise<vo
      FROM checkouts c 
      JOIN books_copies bc 
       ON c.copyId = bc.id 
-     WHERE userId = ? AND bookId = ? AND  isReturned = 1; 
+     WHERE userId = ? AND bookId = ? AND c.checkoutDate IS NOT NULL; 
     `,
     [userId, bookId]
   ) as Array<{ id: string }>;
 
   if (!existingCheckout || existingCheckout.length === 0) {
-    throw new ForbiddenError('You can only review books you have borrowed and returned');
+    throw new ForbiddenError('You can only review books you have borrowed');
   }
 };
 
@@ -135,28 +137,12 @@ const addReview = async (reviewData: IReviewData): Promise<{
   id: string;
   message: string;
 }> => {
-  // Validate input data
-  if (!reviewData?.userId || !reviewData?.bookId || !reviewData?.rating || !reviewData?.comment) {
-    throw new ValidationError('User ID, Book ID, rating, and comment are required');
-  }
-
-  // Validate rating range
-  if (reviewData.rating < 1 || reviewData.rating > 5 || !Number.isInteger(reviewData.rating)) {
-    throw new ValidationError('Rating must be an integer between 1 and 5');
-  }
-
-  // Validate comment length
-  if (reviewData.comment.trim().length < 10) {
-    throw new ValidationError('Comment must be at least 10 characters long');
-  }
-
   try {
     // check if book exists
     await validateBookExists(reviewData.bookId);
 
     // check if user can add review
     await validateUserCanReview(reviewData.userId, reviewData.bookId);
-
 
     // Create the review
     const reviewId = await createReview(reviewData);
@@ -166,7 +152,7 @@ const addReview = async (reviewData: IReviewData): Promise<{
       message: 'Review added successfully'
     };
   } catch (error) {
-    // Re-throw custom errors as-is
+    // AppError
     if (error instanceof AppError) {
       throw error;
     }

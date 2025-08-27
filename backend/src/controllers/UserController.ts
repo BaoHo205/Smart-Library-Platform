@@ -62,32 +62,38 @@ const addReview = async (req: AuthRequest, res: Response): Promise<Response> => 
   // #swagger.summary = 'Add book review'
   // #swagger.description = 'Add a review for a book. User must have borrowed and returned the book first.'
 
+  const { bookId, rating, comment } = req.body;
+  const userId = req.userId;
+
+  // Basic input validation
+  if (!userId || !bookId || rating === undefined || !comment) {
+    return res.status(400).json({
+      success: false,
+      message: 'User ID, Book ID, rating, and comment are required',
+    });
+  }
+
+  if (typeof rating !== 'number' || rating < 1 || rating > 5 || !Number.isInteger(rating)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Rating must be an integer between 1 and 5',
+    });
+  }
+
+  if (typeof comment !== 'string' || comment.trim().length < 4) {
+    return res.status(400).json({
+      success: false,
+      message: 'Comment must be at least 4 characters long',
+    });
+  }
   try {
-    // const reviewData = {
-    //   ...req.body,
-    //   userId: req.userId,
-    // };
-
     const reviewData: INewReviewData = {
-      bookId: req.body.bookId.toString().trim(),
-      rating: parseInt(req.body.rating, 10),
-      comment: req.body.comment.toString().trim(),
-      userId: req.userId, // From auth middleware
+      bookId: bookId.toString().trim(),
+      rating: rating,
+      comment: comment.toString().trim(),
+      userId: userId, 
     };
-
-    // Validate required fields
-    if (!reviewData.bookId || !reviewData.comment || isNaN(reviewData.rating)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Book ID, rating, and comment are required and must be valid'
-        }
-      });
-    }
-
     const result = await UserService.addReview(reviewData as IReviewData);
-
 
     return res.status(201).json({
       success: true,
@@ -128,24 +134,44 @@ const updateReview = async (req: AuthRequest, res: Response) => {
   // #swagger.summary = 'Update book review'
   // #swagger.description = 'Update an existing book review by review ID. Requires user or staff authentication.'
   // #swagger.parameters['reviewId'] = { description: 'Review ID to update', type: 'string' }
+  const reviewId = req.params.reviewId.trim();
+  const { rating, comment } = req.body;
+  const userId = req.userId;
+
+  if (!reviewId || typeof reviewId !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Review ID is required and must be a valid string',
+    });
+  }
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'User ID is required for authorization',
+    });
+  }
+
+  if (rating !== undefined && (typeof rating !== 'number' || rating < 1 || rating > 5 || !Number.isInteger(rating))) {
+    return res.status(400).json({
+      success: false,
+      message: 'Rating must be an integer between 1 and 5',
+    });
+  }
+
+  if (comment !== undefined && (typeof comment !== 'string' || comment.trim().length < 4)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Comment must be at least 4 characters long',
+    });
+  }
+
   try {
-    const reviewId = req.params.reviewId?.trim();
-
-    if (!reviewId) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Review ID is required'
-        }
-      });
-    }
-
     const updateData: IUpdateReviewData = {
-      reviewId,
-      userId: req.userId!, // From auth middleware
-      rating: req.body.rating ? parseInt(req.body.rating, 10) : undefined,
-      comment: req.body.comment ? req.body.comment.toString() : undefined,
+      reviewId: reviewId,
+      userId: userId, 
+      rating: rating,
+      comment: comment.toString(),
     };
 
     // Check if at least one field is provided

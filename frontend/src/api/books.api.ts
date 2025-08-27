@@ -1,6 +1,6 @@
 import axiosInstance from '@/config/axiosConfig';
 import type { BookDetails, IReview } from '@/types/book.type';
-import type { BooksApiResponse } from '@/types/book.type';
+
 import type { GetAllBooksResponse } from '@/types/book.type';
 
 // List

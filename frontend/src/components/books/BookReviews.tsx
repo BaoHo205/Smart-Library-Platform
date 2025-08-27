@@ -24,7 +24,8 @@ interface BookReviewsProps {
   reviews: Review[] | null;
   onAddReview: (rating: number, comment: string) => void;
   onUpdateReview: (reviewId: string, rating: number, comment: string) => void;
-  currentUserId?: string; // Add this to identify the current authenticated user
+  currentUserId?: string; 
+  isBorrowed: boolean;
 }
 
 export default function BookReviews({
@@ -32,6 +33,7 @@ export default function BookReviews({
   onAddReview,
   onUpdateReview,
   currentUserId,
+  isBorrowed
 }: BookReviewsProps) {
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
@@ -87,11 +89,10 @@ export default function BookReviews({
         {[1, 2, 3, 4, 5].map(star => (
           <Star
             key={star}
-            className={`h-5 w-5 ${
-              star <= (interactive ? hoverState || rating : rating)
+            className={`h-5 w-5 ${star <= (interactive ? hoverState || rating : rating)
                 ? 'fill-yellow-400 text-yellow-400'
                 : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+              } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
             onClick={() => interactive && onStarClick?.(star)}
             onMouseEnter={() => interactive && setHoverState(star)}
             onMouseLeave={() => interactive && setHoverState(0)}
@@ -122,39 +123,41 @@ export default function BookReviews({
       </div>
 
       {/* Add Review Form */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
-            <Avatar>
-              <AvatarImage src="/placeholder.svg?height=40&width=40" />
-              <AvatarFallback>CU</AvatarFallback>
-            </Avatar>
+      {isBorrowed && (
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <Avatar>
+                <AvatarImage src="/placeholder.svg?height=40&width=40" />
+                <AvatarFallback>CU</AvatarFallback>
+              </Avatar>
 
-            <div className="flex-1 space-y-4">
-              <div className="flex items-center gap-2">
-                {renderStars(newRating, true, setNewRating)}
-              </div>
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-2">
+                  {renderStars(newRating, true, setNewRating)}
+                </div>
 
-              <Textarea
-                placeholder="Type your message here"
-                value={newReview}
-                onChange={e => setNewReview(e.target.value)}
-                className="min-h-[100px]"
-              />
+                <Textarea
+                  placeholder="Type your message here"
+                  value={newReview}
+                  onChange={e => setNewReview(e.target.value)}
+                  className="min-h-[100px]"
+                />
 
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleAddReview}
-                  disabled={!newReview.trim() || newRating === 0}
-                  className="bg-slate-800 hover:bg-slate-700"
-                >
-                  Add Review
-                </Button>
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleAddReview}
+                    disabled={!newReview.trim() || newRating === 0}
+                    className="bg-slate-800 hover:bg-slate-700"
+                  >
+                    Add Review
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Reviews List */}
       <div className="space-y-4">
