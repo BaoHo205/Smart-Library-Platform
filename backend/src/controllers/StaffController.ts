@@ -7,7 +7,7 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
   // #swagger.summary = 'Get most borrowed books in a specific period'
   // #swagger.description = 'Retrieve statistics of the most frequently borrowed books. Staff access required.'
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, limit } = req.query;
 
     const startDateStr = String(startDate || '').trim();
     const endDateStr = String(endDate || '').trim();
@@ -43,9 +43,17 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    const limitParam =
+      typeof limit === 'string' && limit.trim().toLowerCase() === 'max'
+        ? 'max'
+        : limit
+          ? Number(limit)
+          : undefined;
+
     const result = await StaffService.getMostBorrowedBooks(
       String(startDate || '').trim(),
-      String(endDate || '').trim()
+      String(endDate || '').trim(),
+      limitParam
     );
     res.status(200).json({
       success: true,

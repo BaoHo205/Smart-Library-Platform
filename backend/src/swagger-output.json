@@ -177,6 +177,11 @@
             "name": "endDate",
             "in": "query",
             "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {
@@ -387,18 +392,6 @@
             "required": true,
             "type": "string",
             "description": "Book ID to borrow"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dueDate": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {

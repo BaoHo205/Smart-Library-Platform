@@ -5,8 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
-import api from '@/api/api';
-import type { BookDetails, IReview } from '@/api/api';
+import { getBookInfoById, getReviewsByBookId, addReview, updateReview, isBookBorrowed } from '@/api/books.api';
+import { borrowBook } from '@/api/checkout.api';
+import type { BookDetails, IReview } from '@/types/book.type';
 import toast from 'react-hot-toast';
 import { useAuth } from '../auth/useAuth';
 
@@ -107,15 +108,15 @@ export default function BookInfoPage({
       // setReviews(reviewsResponse.map(adaptReview))
 
       // Fetch book details
-      const bookResponse = await api.getBookInfoById(bookId);
+      const bookResponse = await getBookInfoById(bookId);
       setBook(adaptBookDetails(bookResponse));
 
       // Check if the book is already borrowed by this user
-      const borrowStatus = await api.isBookBorrowed(bookId);
+      const borrowStatus = await isBookBorrowed(bookId);
       setIsBorrowed(borrowStatus);
 
       // Fetch reviews
-      const reviewsResponse = await api.getReviewsByBookId(bookId);
+      const reviewsResponse = await getReviewsByBookId(bookId);
       setReviews(reviewsResponse.map(adaptReview));
 
       // Check if current user has already borrowed this book
@@ -155,7 +156,7 @@ export default function BookInfoPage({
       // await fetchBookData()
 
       // console.log("Book borrowed successfully")
-      const result = await api.borrowBook(bookId, dueDate);
+      const result = await borrowBook(bookId, dueDate);
       if (result.success) {
         setIsBorrowed(true);
         toast.success('Book borrowed successfully!');
@@ -172,12 +173,12 @@ export default function BookInfoPage({
 
   const handleAddReview = async (rating: number, comment: string) => {
     try {
-      await api.addReview(bookId, rating, comment);
+      await addReview(bookId, rating, comment);
 
       // Refresh data to show new review and updated rating
       const [updatedBookInfo, updatedReviews] = await Promise.all([
-        api.getBookInfoById(bookId),
-        api.getReviewsByBookId(bookId),
+        getBookInfoById(bookId),
+        getReviewsByBookId(bookId),
       ]);
 
       setBook(adaptBookDetails(updatedBookInfo));
@@ -194,12 +195,12 @@ export default function BookInfoPage({
     comment: string
   ) => {
     try {
-      await api.updateReview(reviewId, rating, comment);
+      await updateReview(reviewId, rating, comment);
 
       // Refresh data to show updated review and rating
       const [updatedBookInfo, updatedReviews] = await Promise.all([
-        api.getBookInfoById(bookId),
-        api.getReviewsByBookId(bookId),
+        getBookInfoById(bookId),
+        getReviewsByBookId(bookId),
       ]);
 
       setBook(adaptBookDetails(updatedBookInfo));

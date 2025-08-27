@@ -98,7 +98,6 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
   // #swagger.parameters['bookId'] = { description: 'Book ID to borrow', type: 'string' }
   try {
     const { bookId } = req.params;
-    const { dueDate } = req.body;
     const userId = req.userId;
 
     if (!userId) {
@@ -117,35 +116,7 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
       return;
     }
 
-    if (!dueDate) {
-      res.status(400).json({
-        success: false,
-        message: 'Due date is required',
-      });
-      return;
-    }
-
-    // Validate due date format and ensure it's in the future
-    const dueDateObj = new Date(dueDate);
-    const today = new Date();
-
-    if (isNaN(dueDateObj.getTime())) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid due date format',
-      });
-      return;
-    }
-
-    if (dueDateObj <= today) {
-      res.status(400).json({
-        success: false,
-        message: 'Due date must be in the future',
-      });
-      return;
-    }
-
-    const result = await BookService.borrowBook(userId, bookId, dueDate);
+    const result = await BookService.borrowBook(userId, bookId);
 
     if (result.success) {
       res.status(200).json({
@@ -155,7 +126,6 @@ const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
           checkoutId: result.checkoutId,
           userId,
           bookId,
-          dueDate,
           checkoutDate: new Date().toISOString().split('T')[0],
         },
       });

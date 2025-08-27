@@ -1,8 +1,12 @@
 import mysql from '../database/mysql/connection';
 
-const getMostBorrowedBooks = async (startDate: string, endDate: string) => {
+const getMostBorrowedBooks = async (
+  startDate: string,
+  endDate: string,
+  limit?: number | 'max'
+) => {
   try {
-    const query = `
+    const baseQuery = `
       SELECT b.id, b.title, 
              GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') as authors,
              COUNT(DISTINCT c.id) AS total_checkouts,
@@ -14,10 +18,18 @@ const getMostBorrowedBooks = async (startDate: string, endDate: string) => {
       LEFT JOIN authors a ON ba.authorId = a.id
       WHERE c.checkoutDate BETWEEN ? AND ?
       GROUP BY b.id, b.title, b.availableCopies, b.quantity
-      ORDER BY total_checkouts DESC
-      LIMIT 10;
-    `;
+      ORDER BY total_checkouts DESC`;
+
+    // fetch all without LIMIT if limit is 'max' or not provided
+    // if limit is a number, inject safe integer literal (some MySQL setups reject bound LIMIT params)
+    const hasNumericLimit =
+      typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
+    const safeLimit = hasNumericLimit ? Math.trunc(limit as number) : undefined;
+    const query = hasNumericLimit
+      ? `${baseQuery}\n      LIMIT ${safeLimit};`
+      : `${baseQuery};`;
     const params = [startDate, endDate];
+
     const result = await mysql.executeQuery(query, params);
     return result;
   } catch (error) {

@@ -224,7 +224,7 @@ const getUserById = async (userId: string): Promise<UserProfile | null> => {
       WHERE id = ?
     `;
 
-    const result = await mysql.executeQuery(sql, [userId]) as UserProfile[];
+    const result = (await mysql.executeQuery(sql, [userId])) as UserProfile[];
     return result[0] || null;
   } catch (error) {
     console.error('Error getting user by ID:', error);
@@ -240,7 +240,7 @@ const getAllUsers = async (): Promise<UserProfile[]> => {
       ORDER BY userName ASC
     `;
 
-    const result = await mysql.executeQuery(sql) as UserProfile[];
+    const result = (await mysql.executeQuery(sql)) as UserProfile[];
     return result;
   } catch (error) {
     console.error('Error getting all users:', error);
@@ -258,7 +258,12 @@ const searchUsers = async (query: string): Promise<UserProfile[]> => {
       ORDER BY userName ASC
     `;
 
-    const result = await mysql.executeQuery(sql, [searchTerm, searchTerm, searchTerm, searchTerm]) as UserProfile[];
+    const result = (await mysql.executeQuery(sql, [
+      searchTerm,
+      searchTerm,
+      searchTerm,
+      searchTerm,
+    ])) as UserProfile[];
     return result;
   } catch (error) {
     console.error('Error searching users:', error);

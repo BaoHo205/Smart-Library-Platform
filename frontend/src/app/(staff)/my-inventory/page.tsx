@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import { columns, BookShow } from './columns';
 import { DataTable } from './data-table';
-import axios from 'axios';
+import axiosInstance from '@/config/axiosConfig';
 
 const page = () => {
   const [books, setBooks] = useState<BookShow[]>([]);
@@ -12,12 +12,10 @@ const page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<BookShow[]>(
-          'http://localhost:5000/api/books'
-        );
+        const response = await axiosInstance.get<BookShow[]>('/api/v1/books');
         setBooks(response.data);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching books:', error);
       }
     };
 

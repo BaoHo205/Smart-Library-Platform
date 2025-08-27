@@ -94,10 +94,14 @@ const BookCard: React.FC<Book> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={checkouts.some(checkout => checkout.bookId === id && !checkout.isReturned)}
+          disabled={checkouts.some(
+            checkout => checkout.bookId === id && !checkout.isReturned
+          )}
           className="w-full"
         >
-          {checkouts.some(checkout => checkout.bookId === id && !checkout.isReturned)
+          {checkouts.some(
+            checkout => checkout.bookId === id && !checkout.isReturned
+          )
             ? 'Borrowed'
             : 'Borrow'}
         </Button>
