@@ -13,7 +13,8 @@ const getMostBorrowedBooks = async (
              b.availableCopies,
              b.quantity
       FROM checkouts c
-      JOIN books b ON c.bookId = b.id
+      JOIN books_copies bc ON c.copyId = bc.id
+      JOIN books b ON bc.bookId = b.id
       LEFT JOIN book_authors ba ON b.id = ba.bookId
       LEFT JOIN authors a ON ba.authorId = a.id
       WHERE c.checkoutDate BETWEEN ? AND ?
@@ -66,21 +67,30 @@ const getTopActiveReaders = async (
   }
 };
 
-const getBooksWithLowAvailability = async (interval: number) => {
+const getBooksWithLowAvailability = async (limit: number = 5) => {
   try {
-    const query = `
-            SELECT b.id, b.title, b.availableCopies, b.quantity,
-                   ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
-                   COUNT(c.id) as recent_checkouts
-            FROM books b
-            LEFT JOIN checkouts c ON b.id = c.bookId 
-              AND c.checkoutDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-            WHERE (b.availableCopies / b.quantity) < 0.2   -- Less than 20% available
-              OR b.availableCopies = 0
-            GROUP BY b.id, b.title, b.availableCopies, b.quantity
-            ORDER BY availability_percentage ASC, recent_checkouts DESC;
-        `;
-    const result = await mysql.executeQuery(query, interval);
+    const baseQuery = `
+      SELECT b.id, b.title, b.availableCopies, b.quantity,
+             ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
+             0 as recent_checkouts,
+             CASE 
+               WHEN b.availableCopies = 0 THEN 'Out of Stock'
+               WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
+               WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
+               WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
+               ELSE 'Good'
+             END as availability_status
+      FROM books b
+      WHERE (b.availableCopies / b.quantity) < 0.5   -- Less than 50% available (more inclusive)
+        OR b.availableCopies = 0
+      ORDER BY availability_percentage ASC`;
+
+    // limit (build query)
+    const hasNumericLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
+    const safeLimit = hasNumericLimit ? Math.trunc(limit as number) : 5;
+    const query = `${baseQuery}\n      LIMIT ${safeLimit};`;
+
+    const result = await mysql.executeQuery(query, []);
     return result;
   } catch (error) {
     throw new Error(
@@ -88,6 +98,7 @@ const getBooksWithLowAvailability = async (interval: number) => {
     );
   }
 };
+
 export default {
   getMostBorrowedBooks,
   getTopActiveReaders,

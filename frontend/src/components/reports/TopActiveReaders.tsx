@@ -73,7 +73,7 @@ export function TopActiveReaders({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="h-[800px] overflow-y-auto space-y-4 pr-2">
           {readers.length === 0 ? (
             <div className="py-8 text-center">
               <UsersIcon className="mx-auto mb-2 h-12 w-12 text-gray-400" />

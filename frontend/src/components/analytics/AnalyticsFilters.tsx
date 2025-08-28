@@ -840,7 +840,27 @@ export function AnalyticsFilters({
                     variant="outline"
                     className="border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
                   >
-                    Custom date range
+                    {(() => {
+                      const startDate = new Date(filters.dateRange.from!);
+                      const endDate = new Date(filters.dateRange.to!);
+                      const isSameDay = startDate.toDateString() === endDate.toDateString();
+                      
+                      return isSameDay 
+                        ? startDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })
+                        : `${startDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })} - ${endDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}`;
+                    })()}
                   </Badge>
                 )}
                 {filters.deviceType !== 'all' && (

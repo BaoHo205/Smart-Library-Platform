@@ -25,12 +25,10 @@ export default function StaffReportsPage() {
   const router = useRouter();
 
   const [filters, setFilters] = useState<StaffReportsFiltersState>({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0], // 30 days ago
-    endDate: new Date().toISOString().split('T')[0], // today
+    startDate: new Date().toISOString().split('T')[0], 
+    endDate: new Date().toISOString().split('T')[0], 
     monthsBack: 6,
-    interval: 60,
+    lowAvailabilityLimit: 5,
     mostBorrowedLimit: 5,
     topReadersLimit: 10,
   });
@@ -79,7 +77,7 @@ export default function StaffReportsPage() {
                         filters.endDate,
                         filters.mostBorrowedLimit
                     ),
-                    getBooksWithLowAvailability(filters.interval),
+                    getBooksWithLowAvailability(filters.lowAvailabilityLimit),
                     getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
                 ]);
 
@@ -124,7 +122,7 @@ export default function StaffReportsPage() {
                         filters.endDate,
                         filters.mostBorrowedLimit
                     ),
-                    getBooksWithLowAvailability(filters.interval),
+                    getBooksWithLowAvailability(filters.lowAvailabilityLimit),
                     getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
                 ]);
 
@@ -233,7 +231,7 @@ export default function StaffReportsPage() {
               <LowAvailabilityChart
                 books={lowAvailabilityBooks}
                 loading={lowAvailabilityLoading}
-                interval={filters.interval}
+                limit={filters.lowAvailabilityLimit}
               />
             </div>
 

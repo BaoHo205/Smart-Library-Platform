@@ -40,8 +40,8 @@ export const getMostBorrowedBooks = async (
     return booksWithDetails;
 };
 
-export const getBooksWithLowAvailability = async (interval: number = 60): Promise<BookAvailability[]> => {
-    const response = await axiosInstance.get(`/api/v1/staff/low-availability?interval=${interval}`);
+export const getBooksWithLowAvailability = async (limit: number = 5): Promise<BookAvailability[]> => {
+    const response = await axiosInstance.get(`/api/v1/staff/low-availability?lowAvailabilityLimit=${limit}`);
     const books = response.data.data || [];
     return books.map((book: any) => ({
         bookId: book.id || `book_${Date.now()}_${Math.random()}`,

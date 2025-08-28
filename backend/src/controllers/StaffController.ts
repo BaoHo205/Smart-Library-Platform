@@ -98,7 +98,7 @@ const getBooksWithLowAvailability = async (req: AuthRequest, res: Response) => {
   // #swagger.description = 'Retrieve books that have low availability/stock levels. Staff access required.'
   try {
     const response = await StaffService.getBooksWithLowAvailability(
-      req.query.interval ? Number(req.query.interval) : 60
+      req.query.lowAvailabilityLimit ? Number(req.query.lowAvailabilityLimit) : 5
     );
     res.status(200).json({
       success: true,

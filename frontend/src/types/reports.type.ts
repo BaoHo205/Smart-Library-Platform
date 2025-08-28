@@ -2,7 +2,7 @@ export interface StaffReportsFiltersState {
     startDate: string;
     endDate: string;
     monthsBack: number;
-    interval: number;
+    lowAvailabilityLimit: number;
     mostBorrowedLimit: number | 'max';
     topReadersLimit: number;
 }

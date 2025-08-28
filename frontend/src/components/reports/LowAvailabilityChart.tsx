@@ -8,13 +8,13 @@ import { AlertTriangleIcon } from 'lucide-react';
 interface LowAvailabilityChartProps {
   books: BookAvailability[];
   loading: boolean;
-  interval: number;
+  limit?: number;
 }
 
 export function LowAvailabilityChart({
   books,
   loading,
-  interval,
+  limit = 5,
 }: LowAvailabilityChartProps) {
   if (loading) {
     return (
@@ -50,19 +50,27 @@ export function LowAvailabilityChart({
   }
 
   const getAvailabilityColor = (percentage: number) => {
-    if (percentage <= 20) return 'bg-red-500';
-    if (percentage <= 40) return 'bg-orange-500';
-    if (percentage <= 60) return 'bg-yellow-500';
-    if (percentage <= 80) return 'bg-blue-500';
+    if (percentage <= 10) return 'bg-red-500';
+    if (percentage <= 25) return 'bg-orange-500';
+    if (percentage <= 50) return 'bg-yellow-500';
+    if (percentage <= 75) return 'bg-blue-500';
     return 'bg-green-500';
   };
 
   const getAvailabilityIconColor = (percentage: number) => {
-    if (percentage <= 20) return 'text-red-500';
-    if (percentage <= 40) return 'text-orange-500';
-    if (percentage <= 60) return 'text-yellow-500';
-    if (percentage <= 80) return 'text-blue-500';
+    if (percentage <= 10) return 'text-red-500';
+    if (percentage <= 25) return 'text-orange-500';
+    if (percentage <= 50) return 'text-yellow-500';
+    if (percentage <= 75) return 'text-blue-500';
     return 'text-green-500';
+  };
+
+  const getAvailabilityStatus = (percentage: number, availableCopies: number) => {
+    if (availableCopies === 0) return 'Out of Stock';
+    if (percentage <= 10) return 'Critical';
+    if (percentage <= 25) return 'Low';
+    if (percentage <= 50) return 'Moderate';
+    return 'Good';
   };
 
   const getRankingLabel = (index: number) => {
@@ -75,11 +83,11 @@ export function LowAvailabilityChart({
 
   const getRankingColor = (index: number) => {
     const rank = index + 1;
-    if (rank === 1) return 'bg-orange-500';
-    if (rank === 2) return 'bg-teal-500';
-    if (rank === 3) return 'bg-blue-600';
-    if (rank === 4) return 'bg-yellow-500';
-    return 'bg-orange-400';
+    if (rank === 1) return 'bg-red-500';
+    if (rank === 2) return 'bg-orange-500';
+    if (rank === 3) return 'bg-yellow-500';
+    if (rank === 4) return 'bg-blue-500';
+    return 'bg-green-500';
   };
 
   const top5Books = books.slice(0, 5);
@@ -97,7 +105,7 @@ export function LowAvailabilityChart({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Low availability books list */}
-        <div className="space-y-4">
+        <div className="h-[480px] overflow-y-auto space-y-4 pr-2">
           {books.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-sm text-gray-500">
@@ -105,7 +113,7 @@ export function LowAvailabilityChart({
               </p>
             </div>
           ) : (
-            top5Books.map((book, index) => (
+            books.slice(0, 10).map((book, index) => ( // Show up to 10 books in the list
               <div
                 key={book.bookId}
                 className="flex items-center justify-between py-2"
@@ -121,13 +129,18 @@ export function LowAvailabilityChart({
                     <p className="text-xs text-gray-400">
                       {book.availableCopies} of {book.quantity} available
                     </p>
+                    <p className="text-xs text-gray-500">
+                      Status: {getAvailabilityStatus(book.availability_percentage, book.availableCopies)}
+                    </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-900">
+                <div className="ml-2 text-right">
+                  <div className="text-sm font-medium text-gray-900">
                     {book.availability_percentage}%
                   </div>
-                  <div className="text-xs text-gray-500">Unavailability</div>
+                  <div className="text-xs text-gray-500">
+                    {getRankingLabel(index)}
+                  </div>
                 </div>
               </div>
             ))
@@ -136,37 +149,108 @@ export function LowAvailabilityChart({
 
         <hr className="border-gray-200" />
 
-        {/* Bar Chart */}
+        {/* Top 5 Low Availability Books Chart */}
         <div className="space-y-4">
           <div>
             <h3 className="text-sm font-medium text-gray-900">
               Top 5 Low Availability Books
             </h3>
-            <p className="mt-1 text-xs text-gray-500">Last {interval} days</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Last 60 days - Lower percentage = More urgent attention needed
+            </p>
           </div>
-
-          <div className="space-y-3">
-            {top5Books.map((book, index) => (
-              <div key={`${book.title}-${index}`} className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-gray-700">
-                    {getRankingLabel(index)}
-                  </span>
-                  <span className="text-gray-500">
-                    {book.availability_percentage}%
-                  </span>
-                </div>
-                <div className="h-3 w-full rounded-full bg-gray-200">
-                  <div
-                    className={`h-3 rounded-full transition-all duration-300 ${getRankingColor(index)}`}
-                    style={{
-                      width: `${(book.availability_percentage / maxPercentage) * 100}%`,
-                    }}
-                  />
-                </div>
+          
+          {/* Chart Legend */}
+          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+              <span className="font-medium">📊 Chart Legend:</span>
+              <span className="text-gray-500">Availability Status Guide</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span>0% = Out of Stock (Critical)</span>
               </div>
-            ))}
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span>1-25% = Low Availability</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span>26-50% = Moderate</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>51%+ = Good Availability</span>
+              </div>
+            </div>
           </div>
+          
+          {top5Books.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-gray-500">
+                No low availability books found
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {top5Books.map((book, index) => (
+                <div key={book.bookId} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-700">
+                        {getRankingLabel(index)}
+                      </span>
+                      <span className="text-xs text-gray-500">•</span>
+                      <span className="text-xs text-gray-600 line-clamp-1 max-w-[200px]">
+                        {book.title}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-medium text-gray-900">
+                        {book.availability_percentage}%
+                      </span>
+                      <div className="text-xs text-gray-500">
+                        {book.availableCopies} of {book.quantity} copies
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative h-3 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${getRankingColor(index)} transition-all duration-300 ease-out`}
+                      style={{
+                        width: `${Math.min((book.availability_percentage / maxPercentage) * 100, 100)}%`,
+                      }}
+                    />
+                  </div>
+                  {/* Status indicator */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`px-2 py-1 rounded-full ${
+                      book.availability_percentage === 0 
+                        ? 'bg-red-100 text-red-700' 
+                        : book.availability_percentage <= 25 
+                        ? 'bg-orange-100 text-orange-700'
+                        : book.availability_percentage <= 50 
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-green-100 text-green-700'
+                    }`}>
+                      {getAvailabilityStatus(book.availability_percentage, book.availableCopies)}
+                    </span>
+                    <span className="text-gray-500">
+                      {book.availability_percentage === 0 
+                        ? '🚨 Immediate action required' 
+                        : book.availability_percentage <= 25 
+                        ? '⚠️ Low stock warning'
+                        : book.availability_percentage <= 50 
+                        ? '📊 Monitor closely'
+                        : '✅ Good availability'
+                      }
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

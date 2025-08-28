@@ -9,16 +9,16 @@ import { AlertTriangleIcon } from 'lucide-react';
 
 interface LowAvailabilityProps {
   books: BookAvailability[];
-  chartData: ReadingTrend[];
   loading: boolean;
   dailyAverage: number;
+  limit?: number;
 }
 
 export function LowAvailability({
   books,
-  chartData,
   loading,
   dailyAverage,
+  limit = 5,
 }: LowAvailabilityProps) {
   if (loading) {
     return (
@@ -63,6 +63,14 @@ export function LowAvailability({
     return 'text-green-500';
   };
 
+  const getAvailabilityStatus = (percentage: number, availableCopies: number) => {
+    if (availableCopies === 0) return 'Out of Stock';
+    if (percentage <= 10) return 'Critical';
+    if (percentage <= 25) return 'Low';
+    if (percentage <= 50) return 'Moderate';
+    return 'Good';
+  };
+
   return (
     <Card className="h-fit">
       <CardHeader>
@@ -72,7 +80,7 @@ export function LowAvailability({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Low availability books list */}
-        <div className="space-y-4">
+        <div className="h-[280px] overflow-y-auto space-y-4 pr-2">
           {books.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-sm text-gray-500">
@@ -80,7 +88,7 @@ export function LowAvailability({
               </p>
             </div>
           ) : (
-            books.slice(0, 5).map((book, index) => (
+            books.slice(0, limit).map((book, index) => (
               <div
                 key={book.bookId}
                 className="flex items-center justify-between py-2"
@@ -96,13 +104,18 @@ export function LowAvailability({
                     <p className="text-xs text-gray-400">
                       {book.availableCopies} of {book.quantity} available
                     </p>
+                    <p className="text-xs text-gray-500">
+                      Status: {getAvailabilityStatus(book.availability_percentage, book.availableCopies)}
+                    </p>
                   </div>
                 </div>
                 <Badge
                   variant={
                     book.availability_percentage === 0
                       ? 'destructive'
-                      : 'secondary'
+                      : book.availability_percentage <= 25
+                      ? 'secondary'
+                      : 'outline'
                   }
                   className="ml-2"
                 >

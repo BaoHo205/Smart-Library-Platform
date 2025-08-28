@@ -235,7 +235,7 @@
         "description": "Retrieve books that have low availability/stock levels. Staff access required.",
         "parameters": [
           {
-            "name": "interval",
+            "name": "lowAvailabilityLimit",
             "in": "query",
             "type": "string"
           }
