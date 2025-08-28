@@ -316,7 +316,6 @@ UPDATE books_copies SET isBorrowed = TRUE WHERE id IN (
 );
 
 -- Update book available copies to reflect current status
--- This will create realistic low availability scenarios
 UPDATE books SET availableCopies = availableCopies - 6 WHERE id IN (
     '825c0ff5-0599-4127-af19-9a63bfe3c1d5',
     'edd3c35b-527e-4e67-bfcb-b546ce48ca85',
@@ -326,35 +325,20 @@ UPDATE books SET availableCopies = availableCopies - 6 WHERE id IN (
     '1394174b-5a6e-458a-88c8-4d6656484ff7'
 );
 
--- Create realistic availability scenarios for testing
--- Book 1: Very low availability (Critical)
+-- testing
 UPDATE books SET availableCopies = 1, quantity = 10 WHERE id = '825c0ff5-0599-4127-af19-9a63bfe3c1d5';
-
--- Book 2: Low availability (Low)
 UPDATE books SET availableCopies = 2, quantity = 8 WHERE id = 'edd3c35b-527e-4e67-bfcb-b546ce48ca85';
-
--- Book 3: Moderate availability (Moderate)
 UPDATE books SET availableCopies = 3, quantity = 10 WHERE id = 'c5304b68-66c0-42c8-a594-431bd2ff252f';
-
--- Book 4: Low availability (Low)
-UPDATE books SET availableCopies = 1, quantity = 6 WHERE id = '5bb6d3ba-537c-494a-9085-bcfe47f2c245';
-
--- Book 5: Very low availability (Critical)
+UPDATE books SET availableCopies = 0, quantity = 6 WHERE id = '5bb6d3ba-537c-494a-9085-bcfe47f2c245';
 UPDATE books SET availableCopies = 0, quantity = 5 WHERE id = '4c6887cd-e5c5-4470-8313-9fb48a3ce662';
-
--- Book 6: Low availability (Low)
 UPDATE books SET availableCopies = 2, quantity = 7 WHERE id = '1394174b-5a6e-458a-88c8-4d6656484ff7';
-
--- Add more books with moderate availability for variety
 UPDATE books SET availableCopies = 4, quantity = 12 WHERE id = '7a51bac2-45d1-4e7b-8c2e-09e2494d73a5';
 UPDATE books SET availableCopies = 3, quantity = 9 WHERE id = '97d9a4f2-5c49-4e95-8908-93ba9c938775';
 UPDATE books SET availableCopies = 5, quantity = 15 WHERE id = '65417324-3787-4b56-a9e9-7007e8879a05';
 UPDATE books SET availableCopies = 2, quantity = 8 WHERE id = 'b43b7020-824e-4808-a291-ac53c17e252b';
 UPDATE books SET availableCopies = 1, quantity = 4 WHERE id = '1394174b-5a6e-458a-88c8-4d6656484ff7';
-
--- Add more books with moderate availability for variety
 UPDATE books SET availableCopies = 4, quantity = 12 WHERE id = '7a51bac2-45d1-4e7b-8c2e-09e2494d73a5';
-UPDATE books SET availableCopies = 3, quantity = 9 WHERE id = '97d9a4f2-5c49-4e95-8908-93ba9c938775';
+UPDATE books SET availableCopies = 0, quantity = 9 WHERE id = '97d9a4f2-5c49-4e95-8908-93ba9c938775';
 UPDATE books SET availableCopies = 5, quantity = 15 WHERE id = '65417324-3787-4b56-a9e9-7007e8879a05';
 UPDATE books SET availableCopies = 2, quantity = 8 WHERE id = 'b43b7020-824e-4808-a291-ac53c17e252b';
 UPDATE books SET availableCopies = 1, quantity = 4 WHERE id = '1394174b-5a6e-458a-88c8-4d6656484ff7';

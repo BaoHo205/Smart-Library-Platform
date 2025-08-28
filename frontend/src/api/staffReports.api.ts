@@ -2,12 +2,24 @@ import axiosInstance from '@/config/axiosConfig';
 import type { MostBorrowedBook, BookAvailability, TopActiveReader } from '@/types/reports.type';
 
 export const getMostBorrowedBooks = async (
-    startDate: string,
-    endDate: string,
-    limit: number | 'max' = 5
+    startDate?: string,
+    endDate?: string,
+    limit: number | 'max' = 5,
+    allTime: boolean = false
 ): Promise<MostBorrowedBook[]> => {
     const limitParam = limit === 'max' ? 'max' : String(limit);
-    const response = await axiosInstance.get(`/api/v1/staff/most-borrowed-books?startDate=${startDate}&endDate=${endDate}&limit=${limitParam}`);
+    
+    // query parameters
+    const params = new URLSearchParams();
+    if (allTime) {
+        params.append('allTime', 'true');
+    } else {
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+    }
+    params.append('limit', limitParam);
+    
+    const response = await axiosInstance.get(`/api/v1/staff/most-borrowed-books?${params.toString()}`);
     const books = response.data.data || [];
     const booksWithDetails = await Promise.all(
         books.map(async (book: any) => {
@@ -56,9 +68,10 @@ export const getBooksWithLowAvailability = async (limit: number = 5): Promise<Bo
 
 export const getTopActiveReaders = async (
     monthsBack: number = 6,
-    limit: number = 10
+    limit: number | 'max' = 10
 ): Promise<TopActiveReader[]> => {
-    const response = await axiosInstance.get(`/api/v1/staff/top-active-readers?monthsBack=${monthsBack}&limit=${limit}`);
+    const limitParam = limit === 'max' ? 'max' : String(limit);
+    const response = await axiosInstance.get(`/api/v1/staff/top-active-readers?monthsBack=${monthsBack}&limit=${limitParam}`);
     return response.data.data || [];
 };
 

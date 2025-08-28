@@ -73,7 +73,11 @@ export function MostBorrowedBooks({
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-1 text-sm text-gray-500">
             <CalendarIcon className="h-4 w-4" />
-            <span>{formatDate(startDate)} - {formatDate(endDate)}</span>
+            {startDate && endDate ? (
+              <span>{formatDate(startDate)} - {formatDate(endDate)}</span>
+            ) : (
+              <span>All time</span>
+            )}
           </div>
           {onShowAll && (
             <button

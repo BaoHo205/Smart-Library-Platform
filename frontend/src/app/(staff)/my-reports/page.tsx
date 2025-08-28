@@ -20,13 +20,36 @@ import {
     StaffReportsFiltersState,
 } from '@/types/reports.type';
 
+// Helper function to calculate date range based on months back
+const calculateDateRange = (monthsBack: number | 'all') => {
+  if (monthsBack === 'all') {
+    // For all-time, return empty strings (will be handled by API)
+    return {
+      startDate: '',
+      endDate: ''
+    };
+  }
+  
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - monthsBack);
+  
+  return {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0]
+  };
+};
+
 export default function StaffReportsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Calculate initial date range for last 6 months
+  const initialDateRange = calculateDateRange(6);
+
   const [filters, setFilters] = useState<StaffReportsFiltersState>({
-    startDate: new Date().toISOString().split('T')[0], 
-    endDate: new Date().toISOString().split('T')[0], 
+    startDate: initialDateRange.startDate,
+    endDate: initialDateRange.endDate,
     monthsBack: 6,
     lowAvailabilityLimit: 5,
     mostBorrowedLimit: 5,
@@ -71,15 +94,16 @@ export default function StaffReportsPage() {
 
         console.log('Fetching data with filters:', filters);
 
-                const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    getMostBorrowedBooks(
-                        filters.startDate,
-                        filters.endDate,
-                        filters.mostBorrowedLimit
-                    ),
-                    getBooksWithLowAvailability(filters.lowAvailabilityLimit),
-                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
-                ]);
+        const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
+            getMostBorrowedBooks(
+                filters.startDate,
+                filters.endDate,
+                filters.mostBorrowedLimit,
+                filters.monthsBack === 'all'
+            ),
+            getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
+        ]);
 
         console.log('Data fetched:', {
           mostBorrowedData,
@@ -116,15 +140,16 @@ export default function StaffReportsPage() {
         setLowAvailabilityLoading(true);
         setTopReadersLoading(true);
 
-                const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    getMostBorrowedBooks(
-                        filters.startDate,
-                        filters.endDate,
-                        filters.mostBorrowedLimit
-                    ),
-                    getBooksWithLowAvailability(filters.lowAvailabilityLimit),
-                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
-                ]);
+        const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
+            getMostBorrowedBooks(
+                filters.startDate,
+                filters.endDate,
+                filters.mostBorrowedLimit,
+                filters.monthsBack === 'all'
+            ),
+            getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
+        ]);
 
         setMostBorrowedBooks(mostBorrowedData);
         setLowAvailabilityBooks(lowAvailabilityData);
@@ -144,7 +169,18 @@ export default function StaffReportsPage() {
 
   const handleFiltersChange = useCallback(
     (newFilters: Partial<StaffReportsFiltersState>) => {
-      setFilters(prev => ({ ...prev, ...newFilters }));
+      setFilters(prev => {
+        const updatedFilters = { ...prev, ...newFilters };
+        
+        // If monthsBack changed, recalculate the date range
+        if (newFilters.monthsBack !== undefined && newFilters.monthsBack !== prev.monthsBack) {
+          const newDateRange = calculateDateRange(newFilters.monthsBack);
+          updatedFilters.startDate = newDateRange.startDate;
+          updatedFilters.endDate = newDateRange.endDate;
+        }
+        
+        return updatedFilters;
+      });
     },
     []
   );
@@ -231,7 +267,6 @@ export default function StaffReportsPage() {
               <LowAvailabilityChart
                 books={lowAvailabilityBooks}
                 loading={lowAvailabilityLoading}
-                limit={filters.lowAvailabilityLimit}
               />
             </div>
 

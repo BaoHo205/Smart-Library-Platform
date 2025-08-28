@@ -56,10 +56,10 @@ export function LowAvailability({
   }
 
   const getAvailabilityIconColor = (percentage: number) => {
-    if (percentage <= 20) return 'text-red-500';
-    if (percentage <= 40) return 'text-orange-500';
-    if (percentage <= 60) return 'text-yellow-500';
-    if (percentage <= 80) return 'text-blue-500';
+    if (percentage <= 10) return 'text-red-500';
+    if (percentage <= 25) return 'text-orange-500';
+    if (percentage <= 50) return 'text-yellow-500';
+    if (percentage <= 75) return 'text-blue-500';
     return 'text-green-500';
   };
 
@@ -78,11 +78,11 @@ export function LowAvailability({
           Books with Low Availability
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Low availability books list */}
-        <div className="h-[280px] overflow-y-auto space-y-4 pr-2">
+        <div className="h-[200px] overflow-y-auto space-y-2 pr-2">
           {books.length === 0 ? (
-            <div className="py-8 text-center">
+            <div className="py-4 text-center">
               <p className="text-sm text-gray-500">
                 All books have good availability
               </p>
@@ -91,13 +91,13 @@ export function LowAvailability({
             books.slice(0, limit).map((book, index) => (
               <div
                 key={book.bookId}
-                className="flex items-center justify-between py-2"
+                className="flex items-center justify-between py-1.5"
               >
                 <div className="flex items-center space-x-2">
                   <AlertTriangleIcon
                     className={`h-4 w-4 ${getAvailabilityIconColor(book.availability_percentage)}`}
                   />
-                  <div className="flex-1 space-y-1">
+                  <div className="flex-1 space-y-0.5">
                     <h4 className="line-clamp-1 text-sm font-medium text-gray-900">
                       {book.title}
                     </h4>
@@ -129,7 +129,7 @@ export function LowAvailability({
         <hr className="border-gray-200" />
 
         {/* Average Session Time Chart */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <h3 className="text-sm font-medium text-gray-900">
               Average Session Time

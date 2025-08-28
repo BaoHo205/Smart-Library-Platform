@@ -46,9 +46,15 @@ export function StaffReportsFilters({
   loading = false,
 }: StaffReportsFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: new Date(),
+  // Initialize date range to default 6-month range
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 6);
+    return {
+      from: startDate,
+      to: endDate,
+    };
   });
 
   const [localMostBorrowedLimit, setLocalMostBorrowedLimit] = useState(
@@ -67,19 +73,11 @@ export function StaffReportsFilters({
     }
     setLocalTopReadersLimit(filters.topReadersLimit.toString());
     
-    // Only set date range if filters are explicitly set and different from today
-    const today = new Date().toISOString().split('T')[0];
-    if (filters.startDate && filters.endDate && 
-        (filters.startDate !== today || filters.endDate !== today)) {
+    // Set date range based on filters
+    if (filters.startDate && filters.endDate) {
       setDateRange({
         from: new Date(filters.startDate),
         to: new Date(filters.endDate),
-      });
-    } else {
-      // Reset to today's date
-      setDateRange({
-        from: new Date(),
-        to: new Date(),
       });
     }
   }, [filters.mostBorrowedLimit, filters.topReadersLimit, filters.startDate, filters.endDate]);
@@ -102,19 +100,21 @@ export function StaffReportsFilters({
         },
       });
     } else {
-      // Reset to default single day (today)
-      const today = new Date().toISOString().split('T')[0];
+      // Reset to default 6-month range
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 6);
       onFiltersChange({ 
-        startDate: today,
-        endDate: today
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0]
       });
     }
   };
 
   const handleMonthsBackChange = (value: string) => {
-    if (value === 'max') {
-      onFiltersChange({ monthsBack: 24 }); // Set to max available
-      toast.success('Time period set to maximum', {
+    if (value === 'all') {
+      onFiltersChange({ monthsBack: 'all' }); // Set to all time
+      toast.success('Time period set to all time', {
         duration: 2000,
         icon: '⏰',
         style: {
@@ -137,16 +137,9 @@ export function StaffReportsFilters({
         },
       });
     }
-    // Reset date range when changing months back
-    const today = new Date().toISOString().split('T')[0];
-    setDateRange({
-      from: new Date(),
-      to: new Date(),
-    });
-    onFiltersChange({
-      startDate: today,
-      endDate: today,
-    });
+    
+    // Note: The parent component will handle recalculating the date range
+    // based on the new monthsBack value
   };
 
   const handleLowAvailabilityLimitChange = (value: string) => {
@@ -232,7 +225,7 @@ export function StaffReportsFilters({
           },
         });
       } else {
-        onFiltersChange({ topReadersLimit: 9999 });
+        onFiltersChange({ topReadersLimit: 'max' });
         setLocalTopReadersLimit('max');
         toast.success('Showing all active readers', {
           duration: 2000,
@@ -278,10 +271,14 @@ export function StaffReportsFilters({
   };
 
   const clearAllFilters = () => {
-    const today = new Date().toISOString().split('T')[0];
+    // Calculate default date range for 6 months
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 6);
+    
     const defaultFilters: StaffReportsFiltersState = {
-      startDate: today,
-      endDate: today,
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
       monthsBack: 6,
       lowAvailabilityLimit: 5,
       mostBorrowedLimit: 5,
@@ -289,8 +286,8 @@ export function StaffReportsFilters({
     };
     onFiltersChange(defaultFilters);
     setDateRange({
-      from: new Date(),
-      to: new Date(),
+      from: startDate,
+      to: endDate,
     });
     setLocalMostBorrowedLimit('5');
     setLocalTopReadersLimit('10');
@@ -313,9 +310,20 @@ export function StaffReportsFilters({
     if (filters.lowAvailabilityLimit !== 5) count++;
     if (filters.mostBorrowedLimit !== 5) count++;
     if (filters.topReadersLimit !== 10) count++;
-    // Add count for custom date range if it's different from today
-    const today = new Date().toISOString().split('T')[0];
-    if (filters.startDate !== today || filters.endDate !== today) count++;
+    
+    // Check if custom date range is applied (not the calculated range from monthsBack)
+    if (filters.monthsBack !== 'all') {
+      const today = new Date();
+      const calculatedStartDate = new Date();
+      calculatedStartDate.setMonth(today.getMonth() - filters.monthsBack);
+      const expectedStartDate = calculatedStartDate.toISOString().split('T')[0];
+      const expectedEndDate = today.toISOString().split('T')[0];
+      
+      if (filters.startDate !== expectedStartDate || filters.endDate !== expectedEndDate) {
+        count++;
+      }
+    }
+    
     return count;
   };
 
@@ -427,11 +435,11 @@ export function StaffReportsFilters({
                     <SelectItem value="6">Last 6 months</SelectItem>
                     <SelectItem value="12">Last 12 months</SelectItem>
                     <SelectItem value="24">Last 24 months</SelectItem>
-                    <SelectItem value="max">Max (All time)</SelectItem>
+                    <SelectItem value="all">All time</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500">
-                  {filters.monthsBack === 24
+                  {filters.monthsBack === 'all'
                     ? 'Reports data from first to last available'
                     : `Reports data from the last ${filters.monthsBack} months`}
                 </p>
@@ -665,8 +673,8 @@ export function StaffReportsFilters({
                     variant="outline"
                     className="border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
                   >
-                    {filters.monthsBack === 24
-                      ? 'Max'
+                    {filters.monthsBack === 'all'
+                      ? 'All time'
                       : `${filters.monthsBack} months`}
                   </Badge>
                 )}
@@ -696,43 +704,54 @@ export function StaffReportsFilters({
                     className="border-purple-200 bg-purple-50 text-purple-700 transition-colors hover:bg-purple-100"
                   >
                     Top{' '}
-                    {filters.topReadersLimit === 9999
+                    {filters.topReadersLimit === 'max'
                       ? 'Max'
                       : filters.topReadersLimit}{' '}
                     readers
                   </Badge>
                 )}
-                {/* Add date range badge */}
+                
                 {(() => {
-                  const today = new Date().toISOString().split('T')[0];
-                  if (filters.startDate !== today || filters.endDate !== today) {
-                    const startDate = new Date(filters.startDate);
-                    const endDate = new Date(filters.endDate);
-                    const isSameDay = startDate.toDateString() === endDate.toDateString();
+                  
+                  if (filters.monthsBack !== 'all') {
                     
-                    return (
-                      <Badge
-                        variant="outline"
-                        className="border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
-                      >
-                        {isSameDay 
-                          ? startDate.toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })
-                          : `${startDate.toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })} - ${endDate.toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })}`
-                        }
-                      </Badge>
-                    );
+                    const today = new Date();
+                    const calculatedStartDate = new Date();
+                    calculatedStartDate.setMonth(today.getMonth() - filters.monthsBack);
+                    const expectedStartDate = calculatedStartDate.toISOString().split('T')[0];
+                    const expectedEndDate = today.toISOString().split('T')[0];
+                    
+                    
+                    if (filters.startDate && filters.endDate && 
+                        (filters.startDate !== expectedStartDate || filters.endDate !== expectedEndDate)) {
+                      const startDate = new Date(filters.startDate);
+                      const endDate = new Date(filters.endDate);
+                      const isSameDay = startDate.toDateString() === endDate.toDateString();
+                      
+                      return (
+                        <Badge
+                          variant="outline"
+                          className="border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
+                        >
+                          {isSameDay 
+                            ? startDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })
+                            : `${startDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })} - ${endDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}`
+                          }
+                        </Badge>
+                      );
+                    }
                   }
                   return null;
                 })()}

@@ -1,10 +1,10 @@
 export interface StaffReportsFiltersState {
     startDate: string;
     endDate: string;
-    monthsBack: number;
+    monthsBack: number | 'all';
     lowAvailabilityLimit: number;
     mostBorrowedLimit: number | 'max';
-    topReadersLimit: number;
+    topReadersLimit: number | 'max';
 }
 
 export interface MostBorrowedBook {

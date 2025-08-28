@@ -3,23 +3,47 @@ import mysql from '../database/mysql/connection';
 const getMostBorrowedBooks = async (
   startDate: string,
   endDate: string,
-  limit?: number | 'max'
+  limit?: number | 'max',
+  allTime: boolean = false
 ) => {
   try {
-    const baseQuery = `
-      SELECT b.id, b.title, 
-             GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') as authors,
-             COUNT(DISTINCT c.id) AS total_checkouts,
-             b.availableCopies,
-             b.quantity
-      FROM checkouts c
-      JOIN books_copies bc ON c.copyId = bc.id
-      JOIN books b ON bc.bookId = b.id
-      LEFT JOIN book_authors ba ON b.id = ba.bookId
-      LEFT JOIN authors a ON ba.authorId = a.id
-      WHERE c.checkoutDate BETWEEN ? AND ?
-      GROUP BY b.id, b.title, b.availableCopies, b.quantity
-      ORDER BY total_checkouts DESC`;
+    let baseQuery: string;
+    let params: any[];
+
+    if (allTime) {
+      // For all-time data, don't filter by date
+      baseQuery = `
+        SELECT b.id, b.title, 
+               GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') as authors,
+               COUNT(DISTINCT c.id) AS total_checkouts,
+               b.availableCopies,
+               b.quantity
+        FROM checkouts c
+        JOIN books_copies bc ON c.copyId = bc.id
+        JOIN books b ON bc.bookId = b.id
+        LEFT JOIN book_authors ba ON b.id = ba.bookId
+        LEFT JOIN authors a ON ba.authorId = a.id
+        GROUP BY b.id, b.title, b.availableCopies, b.quantity
+        ORDER BY total_checkouts DESC`;
+      params = [];
+    } else {
+      // For time-based data, filter by date range
+      baseQuery = `
+        SELECT b.id, b.title, 
+               GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') as authors,
+               COUNT(DISTINCT c.id) AS total_checkouts,
+               b.availableCopies,
+               b.quantity
+        FROM checkouts c
+        JOIN books_copies bc ON c.copyId = bc.id
+        JOIN books b ON bc.bookId = b.id
+        LEFT JOIN book_authors ba ON b.id = ba.bookId
+        LEFT JOIN authors a ON ba.authorId = a.id
+        WHERE c.checkoutDate BETWEEN ? AND ?
+        GROUP BY b.id, b.title, b.availableCopies, b.quantity
+        ORDER BY total_checkouts DESC`;
+      params = [startDate, endDate];
+    }
 
     // fetch all without LIMIT if limit is 'max' or not provided
     // if limit is a number, inject safe integer literal (some MySQL setups reject bound LIMIT params)
@@ -29,7 +53,6 @@ const getMostBorrowedBooks = async (
     const query = hasNumericLimit
       ? `${baseQuery}\n      LIMIT ${safeLimit};`
       : `${baseQuery};`;
-    const params = [startDate, endDate];
 
     const result = await mysql.executeQuery(query, params);
     return result;
@@ -42,10 +65,10 @@ const getMostBorrowedBooks = async (
 
 const getTopActiveReaders = async (
   monthsBack: number = 6,
-  limit: string = '10'
+  limit: string | 'max' = '10'
 ) => {
   try {
-    const query = `
+    const baseQuery = `
       SELECT CONCAT(u.firstName, ' ', u.lastName) AS reader_name,
              COUNT(DISTINCT c.id) AS total_checkouts,
              MAX(c.checkoutDate) as last_checkout_date
@@ -53,11 +76,15 @@ const getTopActiveReaders = async (
       JOIN users u ON c.userId = u.id
       WHERE c.checkoutDate >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
       GROUP BY u.id, reader_name
-      ORDER BY total_checkouts DESC
-      LIMIT ?;
-      
-    `;
-    const params = [monthsBack, limit];
+      ORDER BY total_checkouts DESC`;
+
+    // Add LIMIT only if it's a numeric value, not 'max'
+    const hasNumericLimit = limit !== 'max' && !isNaN(parseInt(limit)) && parseInt(limit) > 0;
+    const query = hasNumericLimit
+      ? `${baseQuery}\n      LIMIT ${parseInt(limit)};`
+      : `${baseQuery};`;
+    
+    const params = [monthsBack];
     const result = await mysql.executeQuery(query, params);
     return result;
   } catch (error) {
@@ -85,10 +112,8 @@ const getBooksWithLowAvailability = async (limit: number = 5) => {
         OR b.availableCopies = 0
       ORDER BY availability_percentage ASC`;
 
-    // limit (build query)
-    const hasNumericLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
-    const safeLimit = hasNumericLimit ? Math.trunc(limit as number) : 5;
-    const query = `${baseQuery}\n      LIMIT ${safeLimit};`;
+    // Remove limit to show ALL books with low availability
+    const query = `${baseQuery};`;
 
     const result = await mysql.executeQuery(query, []);
     return result;
