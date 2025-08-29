@@ -14,6 +14,7 @@ const reviewSchema = z.object({
 });
 
 export default function BookReviews({
+  bookId,
   reviews,
   onAddReview,
   onUpdateReview,
@@ -40,7 +41,7 @@ export default function BookReviews({
       return;
     }
     setAddReviewError(null); // Clear any previous error
-    onAddReview(newRating, newReview);
+    onAddReview(bookId, newRating, newReview);
     setNewReview('');
     setNewRating(0);
   };
@@ -60,7 +61,7 @@ export default function BookReviews({
       return;
     }
     setEditReviewError(null);
-    onUpdateReview(editingReviewId, editReviewRating, editReviewText);
+    onUpdateReview(bookId, editReviewRating, editReviewText);
     setEditingReviewId('');
     setEditReviewText('');
     setEditReviewRating(0);

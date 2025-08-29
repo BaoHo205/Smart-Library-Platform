@@ -81,9 +81,10 @@ export interface Review {
 }
 
 export interface BookReviewsProps {
-  reviews: Review[] | null;
-  onAddReview: (rating: number, comment: string) => void;
-  onUpdateReview: (reviewId: string, rating: number, comment: string) => void;
+  bookId: string;
+  reviews: Review[] | [];
+  onAddReview: (bookId: string, rating: number, comment: string) => void;
+  onUpdateReview: (bookId: string, rating: number, comment: string) => void;
   currentUserId?: string; 
   isBorrowed: boolean;
 }
