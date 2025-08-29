@@ -5,9 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
-import { getBookInfoById, getReviewsByBookId, addReview, updateReview, isBookBorrowed } from '@/api/books.api';
+import { getBookInfoById, getReviewsByBookId, reviewBook, isBookBorrowed } from '@/api/books.api';
 import { borrowBook } from '@/api/checkout.api';
-import type { BookDetails, IReview } from '@/types/book.type';
+import type { BookDetails, IReview, Review } from '@/types/book.type';
 import toast from 'react-hot-toast';
 import { useAuth } from '../auth/useAuth';
 
@@ -26,19 +26,6 @@ interface BookDetailType {
   availableCopies: number;
 }
 
-// Interface to match Review component props
-export interface Review {
-  id: string;
-  userId: string;
-  bookId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
-  userName: string;
-  // userAvatar?: string
-  name: string;
-}
 
 // Adapter function to convert BookDetails to BookDetailType
 const adaptBookDetails = (book: BookDetails): BookDetailType => {
@@ -71,24 +58,24 @@ const adaptReview = (review: IReview): Review => {
   };
 };
 
-// Helper function to generate due date (2 weeks from now)
-const generateDueDate = (): string => {
-  const today = new Date();
-  const dueDate = new Date(today);
-  dueDate.setDate(today.getDate() + 14); // 2 weeks from now
-  return dueDate.toISOString().split('T')[0];
-};
+// // Helper function to generate due date (2 weeks from now)
+// const generateDueDate = (): string => {
+//   const today = new Date();
+//   const dueDate = new Date(today);
+//   dueDate.setDate(today.getDate() + 14); // 2 weeks from now
+//   return dueDate.toISOString().split('T')[0];
+// };
 
 interface BookDetailPageProps {
   bookId: string;
 }
 
 export default function BookInfoPage({
-  bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
+  bookId,
 }: BookDetailPageProps) {
   const { user } = useAuth(); // User is guaranteed to be authenticated
   const [book, setBook] = useState<BookDetailType | null>(null);
-  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [reviews, setReviews] = useState<Review[] | []>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [borrowing, setBorrowing] = useState(false);
@@ -99,14 +86,6 @@ export default function BookInfoPage({
     setError(null);
 
     try {
-      // const [bookResponse, reviewsResponse] = await Promise.all([
-      //   api.getBookInfoById(bookId),
-      //   api.getReviewsByBookId(bookId),
-      // ])
-
-      // setBook(adaptBookDetails(bookResponse))
-      // setReviews(reviewsResponse.map(adaptReview))
-
       // Fetch book details
       const bookResponse = await getBookInfoById(bookId);
       setBook(adaptBookDetails(bookResponse));
@@ -144,19 +123,7 @@ export default function BookInfoPage({
 
     setBorrowing(true);
     try {
-      // setBorrowing(true)
-      const dueDate = generateDueDate();
-
-      // await api.borrowBook(bookId, dueDate)
-
-      // // Set borrowed state to true after successful borrow
-      // setIsBorrowed(true)
-
-      // // Refresh book data to update availability status
-      // await fetchBookData()
-
-      // console.log("Book borrowed successfully")
-      const result = await borrowBook(bookId, dueDate);
+      const result = await borrowBook(bookId);
       if (result.success) {
         setIsBorrowed(true);
         toast.success('Book borrowed successfully!');
@@ -171,9 +138,9 @@ export default function BookInfoPage({
     }
   };
 
-  const handleAddReview = async (rating: number, comment: string) => {
+  const handleReviewBook = async (bookId: string, rating: number, comment: string) => {
     try {
-      await addReview(bookId, rating, comment);
+      await reviewBook(bookId, rating, comment);
 
       // Refresh data to show new review and updated rating
       const [updatedBookInfo, updatedReviews] = await Promise.all([
@@ -189,27 +156,27 @@ export default function BookInfoPage({
     }
   };
 
-  const handleUpdateReview = async (
-    reviewId: string,
-    rating: number,
-    comment: string
-  ) => {
-    try {
-      await updateReview(reviewId, rating, comment);
+  // const handleUpdateReview = async (
+  //   bookId: string,
+  //   rating: number,
+  //   comment: string
+  // ) => {
+  //   try {
+  //     await reviewBook(bookId, rating, comment);
 
-      // Refresh data to show updated review and rating
-      const [updatedBookInfo, updatedReviews] = await Promise.all([
-        getBookInfoById(bookId),
-        getReviewsByBookId(bookId),
-      ]);
+  //     // Refresh data to show updated review and rating
+  //     const [updatedBookInfo, updatedReviews] = await Promise.all([
+  //       getBookInfoById(bookId),
+  //       getReviewsByBookId(bookId),
+  //     ]);
 
-      setBook(adaptBookDetails(updatedBookInfo));
-      setReviews(updatedReviews.map(adaptReview));
-    } catch (err) {
-      console.error('Error updating review:', err);
-      setError('Failed to update review. Please try again.');
-    }
-  };
+  //     setBook(adaptBookDetails(updatedBookInfo));
+  //     setReviews(updatedReviews.map(adaptReview));
+  //   } catch (err) {
+  //     console.error('Error updating review:', err);
+  //     setError('Failed to update review. Please try again.');
+  //   }
+  // };
 
   // Loading state
   if (loading) {
@@ -258,10 +225,12 @@ export default function BookInfoPage({
 
       {/* Reviews Section */}
       <BookReviews
+        bookId={book.id}
         reviews={reviews}
-        onAddReview={handleAddReview}
-        onUpdateReview={handleUpdateReview}
+        onAddReview={handleReviewBook}
+        onUpdateReview={handleReviewBook}
         currentUserId={user?.id}
+        isBorrowed={isBorrowed}
       />
     </div>
   );

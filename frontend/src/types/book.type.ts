@@ -65,3 +65,26 @@ export interface IReview {
   userName: string;
   name: string;
 }
+
+
+export interface Review {
+  id: string;
+  userId: string;
+  bookId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  userName: string;
+  name: string;
+  userAvatar?: string;
+}
+
+export interface BookReviewsProps {
+  bookId: string;
+  reviews: Review[] | [];
+  onAddReview: (bookId: string, rating: number, comment: string) => void;
+  onUpdateReview: (bookId: string, rating: number, comment: string) => void;
+  currentUserId?: string; 
+  isBorrowed: boolean;
+}

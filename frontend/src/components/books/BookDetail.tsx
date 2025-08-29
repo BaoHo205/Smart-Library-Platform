@@ -4,7 +4,7 @@ import { MapPin, Book, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import type { Review } from './BookInfo';
+import type { Review } from '@/types/book.type';
 import { renderStars } from '../Star';
 
 interface BookDetail {
@@ -57,7 +57,7 @@ export default function BookDetail({
             <div className="relative h-full min-h-[400px] w-full overflow-hidden rounded-lg bg-gray-200 shadow-lg">
               {book.coverImage ? (
                 <Image
-                  src={book.coverImage || '/placeholder.svg'}
+                  src={book.coverImage}
                   alt={`Cover of ${book.title}`}
                   fill
                   className="object-cover"
@@ -119,23 +119,25 @@ export default function BookDetail({
                   </span>
                   <span className="text-gray-600">{book.publisher}</span>
                 </div>
-                <span className="text-muted-foreground text-sm">
-                  {book.availableCopies > 0
-                    ? `${book.availableCopies} ${book.availableCopies === 1 ? 'copy' : 'copies'} available`
-                    : 'Out of stock'}
-                </span>
-
-                {book.offlineLocation && (
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-700">
-                      Offline Available
-                    </span>
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-600">
-                      {book.offlineLocation}
-                    </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-700">
+                    Offline Available
+                  </span>
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-600">
+                    Beanland Library
+                  </span>
+                </div>
+                {book.availableCopies > 0 ? (
+                  <div className="inline-block rounded-lg border-2 border-black bg-white px-3 py-1 text-sm font-semibold text-black">
+                    {`${book.availableCopies} ${book.availableCopies === 1 ? 'copy' : 'copies'} available`}
+                  </div>
+                ) : (
+                  <div className="inline-block rounded-lg border-2 border-red-500 bg-white px-3 py-1 text-sm font-semibold text-red-600">
+                    Out of stock
                   </div>
                 )}
+
               </div>
             </div>
           </div>
