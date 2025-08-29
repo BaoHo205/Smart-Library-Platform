@@ -342,3 +342,23 @@ UPDATE books SET availableCopies = 0, quantity = 9 WHERE id = '97d9a4f2-5c49-4e9
 UPDATE books SET availableCopies = 5, quantity = 15 WHERE id = '65417324-3787-4b56-a9e9-7007e8879a05';
 UPDATE books SET availableCopies = 2, quantity = 8 WHERE id = 'b43b7020-824e-4808-a291-ac53c17e252b';
 UPDATE books SET availableCopies = 1, quantity = 4 WHERE id = '1394174b-5a6e-458a-88c8-4d6656484ff7';
+UPDATE books SET availableCopies = 1, quantity = 10 WHERE id = '5b857ba9-3b52-46d4-a4bb-b2640a39db2b'; -- 10%
+UPDATE books SET availableCopies = 2, quantity = 10 WHERE id = '09d86af8-796d-4fb8-b93f-28f3b0a5745a'; -- 20%
+UPDATE books SET availableCopies = 3, quantity = 12 WHERE id = 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5'; -- 25%
+UPDATE books SET availableCopies = 4, quantity = 15 WHERE id = '4fce7bc0-36b5-4474-a37a-79e2e9e10acf'; -- 27%
+UPDATE books SET availableCopies = 0, quantity = 8 WHERE id = '679d7f9b-86c8-4675-9cef-e745d6ce3bd7'; -- 0%
+UPDATE books SET availableCopies = 1, quantity = 5 WHERE id = '5bb6d3ba-537c-494a-9085-bcfe47f2c245'; -- 20%
+UPDATE books SET availableCopies = 2, quantity = 8 WHERE id = '4c6887cd-e5c5-4470-8313-9fb48a3ce662'; -- 25%
+UPDATE books SET availableCopies = 3, quantity = 10 WHERE id = '1394174b-5a6e-458a-88c8-4d6656484ff7'; -- 30%
+UPDATE books SET availableCopies = 0, quantity = 7 WHERE id = '825c0ff5-0599-4127-af19-9a63bfe3c1d5'; -- 0%
+UPDATE books SET availableCopies = 1, quantity = 6 WHERE id = 'c5304b68-66c0-42c8-a594-431bd2ff252f'; -- 17%
+UPDATE books SET availableCopies = 2, quantity = 9 WHERE id = 'edd3c35b-527e-4e67-bfcb-b546ce48ca85'; -- 22%
+UPDATE books SET availableCopies = 3, quantity = 11 WHERE id = '7a51bac2-45d1-4e7b-8c2e-09e2494d73a5'; -- 27%
+UPDATE books SET availableCopies = 0, quantity = 4 WHERE id = '97d9a4f2-5c49-4e95-8908-93ba9c938775'; -- 0%
+UPDATE books SET availableCopies = 1, quantity = 7 WHERE id = '65417324-3787-4b56-a9e9-7007e8879a05'; -- 14%
+UPDATE books SET availableCopies = 2, quantity = 10 WHERE id = 'b43b7020-824e-4808-a291-ac53c17e252b'; -- 20%
+UPDATE books SET availableCopies = 3, quantity = 12 WHERE id = '5b857ba9-3b52-46d4-a4bb-b2640a39db2b'; -- 25%
+UPDATE books SET availableCopies = 4, quantity = 14 WHERE id = '09d86af8-796d-4fb8-b93f-28f3b0a5745a'; -- 29%
+UPDATE books SET availableCopies = 0, quantity = 6 WHERE id = 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5'; -- 0%
+UPDATE books SET availableCopies = 1, quantity = 8 WHERE id = '4fce7bc0-36b5-4474-a37a-79e2e9e10acf'; -- 13%
+UPDATE books SET availableCopies = 2, quantity = 11 WHERE id = '679d7f9b-86c8-4675-9cef-e745d6ce3bd7'; -- 18%

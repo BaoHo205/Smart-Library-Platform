@@ -66,6 +66,20 @@ export const getBooksWithLowAvailability = async (limit: number = 5): Promise<Bo
     }));
 };
 
+export const getAllBooksForCategories = async (): Promise<BookAvailability[]> => {
+    const response = await axiosInstance.get(`/api/v1/staff/low-availability?lowAvailabilityLimit=max`);
+    const books = response.data.data || [];
+    return books.map((book: any) => ({
+        bookId: book.id || `book_${Date.now()}_${Math.random()}`,
+        title: book.title || '',
+        availableCopies: book.availableCopies || 0,
+        quantity: book.quantity || 0,
+        availability_percentage: book.availability_percentage || 0,
+        recent_checkouts: book.recent_checkouts || 0,
+        coverUrl: null,
+    }));
+};
+
 export const getTopActiveReaders = async (
     monthsBack: number = 6,
     limit: number | 'max' = 10

@@ -11,11 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LowAvailabilityChartProps {
   books: BookAvailability[];
+  allBooksForCategories: BookAvailability[];
   loading: boolean;
 }
 
 export function LowAvailabilityChart({
   books,
+  allBooksForCategories,
   loading,
 }: LowAvailabilityChartProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -61,10 +63,10 @@ export function LowAvailabilityChart({
 
   // Categorize books by availability
   const categorizedBooks = {
-    'Out of Stock': books.filter(book => book.availableCopies === 0),
-    'Low Availability': books.filter(book => book.availableCopies > 0 && book.availability_percentage <= 25),
-    'Moderate': books.filter(book => book.availability_percentage > 25 && book.availability_percentage <= 50),
-    'Good': books.filter(book => book.availability_percentage > 50)
+    'Out of Stock': allBooksForCategories.filter(book => book.availableCopies === 0),
+    'Low Availability': allBooksForCategories.filter(book => book.availableCopies > 0 && book.availability_percentage <= 25),
+    'Moderate': allBooksForCategories.filter(book => book.availability_percentage > 25 && book.availability_percentage <= 50),
+    'Good': allBooksForCategories.filter(book => book.availability_percentage > 50)
   };
 
   const categoryConfig = {

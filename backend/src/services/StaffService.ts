@@ -94,26 +94,49 @@ const getTopActiveReaders = async (
   }
 };
 
-const getBooksWithLowAvailability = async (limit: number = 5) => {
+const getBooksWithLowAvailability = async (limit: number | 'max' = 5) => {
   try {
-    const baseQuery = `
-      SELECT b.id, b.title, b.availableCopies, b.quantity,
-             ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
-             0 as recent_checkouts,
-             CASE 
-               WHEN b.availableCopies = 0 THEN 'Out of Stock'
-               WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
-               WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
-               WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
-               ELSE 'Good'
-             END as availability_status
-      FROM books b
-      WHERE (b.availableCopies / b.quantity) < 0.5   -- Less than 50% available (more inclusive)
-        OR b.availableCopies = 0
-      ORDER BY availability_percentage ASC`;
+    let baseQuery: string;
+    
+    if (limit === 'max') {
+      // for categories
+      baseQuery = `
+        SELECT b.id, b.title, b.availableCopies, b.quantity,
+               ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
+               0 as recent_checkouts,
+               CASE 
+                 WHEN b.availableCopies = 0 THEN 'Out of Stock'
+                 WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
+                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
+                 WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
+                 ELSE 'Good'
+               END as availability_status
+        FROM books b
+        ORDER BY availability_percentage ASC`;
+    } else {
+      // for books list
+      baseQuery = `
+        SELECT b.id, b.title, b.availableCopies, b.quantity,
+               ROUND((b.availableCopies / b.quantity) * 100, 2) AS availability_percentage,
+               0 as recent_checkouts,
+               CASE 
+                 WHEN b.availableCopies = 0 THEN 'Out of Stock'
+                 WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
+                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
+                 WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
+                 ELSE 'Good'
+               END as availability_status
+        FROM books b
+        WHERE (b.availableCopies / b.quantity) < 0.5   -- Less than 50% available (more inclusive)
+          OR b.availableCopies = 0
+        ORDER BY availability_percentage ASC`;
+    }
 
-    // Remove limit to show ALL books with low availability
-    const query = `${baseQuery};`;
+    // Apply limit if provided and valid, but not 'max'
+    const hasNumericLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
+    const query = hasNumericLimit
+      ? `${baseQuery}\n      LIMIT ${Math.trunc(limit)};`
+      : `${baseQuery};`;
 
     const result = await mysql.executeQuery(query, []);
     return result;

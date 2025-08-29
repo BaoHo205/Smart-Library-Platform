@@ -80,7 +80,7 @@ export function StaffBooksModal({
                           <img
                             src={book.coverUrl}
                             alt={book.title}
-                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
                           <div className="p-4 text-center">

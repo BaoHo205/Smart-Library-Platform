@@ -12,7 +12,7 @@ import {
 } from '@/components/reports';
 import { useAuth } from '@/components/auth/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getMostBorrowedBooks, getBooksWithLowAvailability, getTopActiveReaders } from '@/api/staffReports.api';
+import { getMostBorrowedBooks, getBooksWithLowAvailability, getTopActiveReaders, getAllBooksForCategories } from '@/api/staffReports.api';
 import {
     MostBorrowedBook,
     TopActiveReader,
@@ -66,6 +66,9 @@ export default function StaffReportsPage() {
   const [lowAvailabilityBooks, setLowAvailabilityBooks] = useState<
     BookAvailability[]
   >([]);
+  const [allBooksForCategories, setAllBooksForCategories] = useState<
+    BookAvailability[]
+  >([]);
   const [topActiveReaders, setTopActiveReaders] = useState<TopActiveReader[]>(
     []
   );
@@ -94,7 +97,7 @@ export default function StaffReportsPage() {
 
         console.log('Fetching data with filters:', filters);
 
-        const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
+        const [mostBorrowedData, lowAvailabilityData, allBooksData, topReadersData] = await Promise.all([
             getMostBorrowedBooks(
                 filters.startDate,
                 filters.endDate,
@@ -102,17 +105,20 @@ export default function StaffReportsPage() {
                 filters.monthsBack === 'all'
             ),
             getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getAllBooksForCategories(),
             getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
         ]);
 
         console.log('Data fetched:', {
           mostBorrowedData,
           lowAvailabilityData,
+          allBooksData,
           topReadersData,
         });
 
         setMostBorrowedBooks(mostBorrowedData);
         setLowAvailabilityBooks(lowAvailabilityData);
+        setAllBooksForCategories(allBooksData);
         setTopActiveReaders(topReadersData);
 
         initialLoadComplete.current = true;
@@ -140,7 +146,7 @@ export default function StaffReportsPage() {
         setLowAvailabilityLoading(true);
         setTopReadersLoading(true);
 
-        const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
+        const [mostBorrowedData, lowAvailabilityData, allBooksData, topReadersData] = await Promise.all([
             getMostBorrowedBooks(
                 filters.startDate,
                 filters.endDate,
@@ -148,11 +154,13 @@ export default function StaffReportsPage() {
                 filters.monthsBack === 'all'
             ),
             getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getAllBooksForCategories(),
             getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
         ]);
 
         setMostBorrowedBooks(mostBorrowedData);
         setLowAvailabilityBooks(lowAvailabilityData);
+        setAllBooksForCategories(allBooksData);
         setTopActiveReaders(topReadersData);
       } catch (error) {
         console.error('Failed to load filtered staff reports data:', error);
@@ -266,6 +274,7 @@ export default function StaffReportsPage() {
             <div className="xl:col-span-7">
               <LowAvailabilityChart
                 books={lowAvailabilityBooks}
+                allBooksForCategories={allBooksForCategories}
                 loading={lowAvailabilityLoading}
               />
             </div>
