@@ -405,9 +405,8 @@ END $$
 DELIMITER ;
 
 -- Create stored procedure for reviewing a book
-DELIMITER //
-
-CREATE PROCEDURE ReviewBook(
+DELIMITER $$
+CREATE DEFINER=`root`@`%` PROCEDURE `ReviewBook`(
     IN p_userId VARCHAR(36),
     IN p_bookId VARCHAR(36),
     IN p_rating INT,
@@ -460,8 +459,10 @@ proc: BEGIN
     
     -- Check user has borrowed this book before
     SELECT COUNT(*) INTO v_has_borrowed
-    FROM checkouts 
-    WHERE userId = p_userId AND bookId = p_bookId;
+    FROM checkouts c
+    JOIN books_copies bc
+		ON c.copyId = bc.id
+    WHERE c.userId = p_userId AND bc.bookId = p_bookId AND c.checkoutDate IS NOT NULL;
     
     IF v_has_borrowed = 0 THEN
         SET p_success = FALSE;
@@ -475,6 +476,15 @@ proc: BEGIN
     IF p_rating < 1 OR p_rating > 5 THEN
         SET p_success = FALSE;
         SET p_message = 'Rating must be between 1 and 5';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check comment is valid
+    IF LENGTH(p_comment) < 4 THEN
+        SET p_success = FALSE;
+        SET p_message = 'Comment must be more than 4 characters long';
         SET p_reviewId = NULL;
         ROLLBACK;
         LEAVE proc;
@@ -495,10 +505,19 @@ proc: BEGIN
         SET rating = p_rating,
             comment = p_comment,
             updatedAt = CURRENT_TIMESTAMP
-        WHERE userId = p_userId AND bookId = p_bookId;
+        WHERE id = p_reviewId;
         
-        SET p_success = TRUE;
-        SET p_message = 'Review updated successfully';
+        IF ROW_COUNT() > 0 THEN
+            SET p_success = TRUE;
+            SET p_message = 'Review updated successfully';
+        ELSE
+            -- This case should be rare since we already checked for the review's existence
+            SET p_success = FALSE;
+            SET p_message = 'Failed to update review. Review not found.';
+            SET p_reviewId = NULL;
+            ROLLBACK;
+            LEAVE proc;
+        END IF;
     ELSE
         SET p_reviewId = UUID();
         INSERT INTO reviews (
@@ -506,14 +525,20 @@ proc: BEGIN
         ) VALUES (
             p_reviewId, p_userId, p_bookId, p_rating, p_comment
         );
-        
-        SET p_success = TRUE;
-        SET p_message = 'Review submitted successfully';
+        IF ROW_COUNT() > 0 THEN
+            SET p_success = TRUE;
+            SET p_message = 'Review submitted successfully';
+        ELSE
+            SET p_success = FALSE;
+            SET p_message = 'Failed to submit review.';
+            SET p_reviewId = NULL;
+            ROLLBACK;
+            LEAVE proc;
+        END IF;
     END IF;
     
     COMMIT;
-END//
-
+END$$
 DELIMITER ;
 
 -- Create stored procedure for returning a book with concurrency control
