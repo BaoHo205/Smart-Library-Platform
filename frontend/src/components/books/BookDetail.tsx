@@ -4,7 +4,7 @@ import { MapPin, Book, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import type { Review } from './BookInfo';
+import type { Review } from '@/types/book.type';
 import { renderStars } from '../Star';
 
 interface BookDetail {

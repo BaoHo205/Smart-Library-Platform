@@ -7,7 +7,7 @@ import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
 import { getBookInfoById, getReviewsByBookId, addReview, updateReview, isBookBorrowed } from '@/api/books.api';
 import { borrowBook } from '@/api/checkout.api';
-import type { BookDetails, IReview } from '@/types/book.type';
+import type { BookDetails, IReview, Review } from '@/types/book.type';
 import toast from 'react-hot-toast';
 import { useAuth } from '../auth/useAuth';
 
@@ -26,19 +26,6 @@ interface BookDetailType {
   availableCopies: number;
 }
 
-// Interface to match Review component props
-export interface Review {
-  id: string;
-  userId: string;
-  bookId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
-  userName: string;
-  // userAvatar?: string
-  name: string;
-}
 
 // Adapter function to convert BookDetails to BookDetailType
 const adaptBookDetails = (book: BookDetails): BookDetailType => {
@@ -84,7 +71,7 @@ interface BookDetailPageProps {
 }
 
 export default function BookInfoPage({
-  bookId = '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
+  bookId,
 }: BookDetailPageProps) {
   const { user } = useAuth(); // User is guaranteed to be authenticated
   const [book, setBook] = useState<BookDetailType | null>(null);
