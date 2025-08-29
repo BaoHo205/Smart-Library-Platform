@@ -19,16 +19,6 @@ export interface IRegistrationData {
   role?: UserRole;
 }
 
-// export interface IUserUpdate {
-//   username?: string;
-//   first_name?: string;
-//   last_name?: string;
-//   email?: string;
-//   role?: UserRole;
-// }
-
-// export interface IUserResponse extends Omit<IUser, 'password'> {}
-
 export enum UserRole {
   STAFF = 'staff',
   USER = 'user',
@@ -39,43 +29,6 @@ export interface ILoginData {
   password: string;
 }
 
-// export interface IJWTPayload {
-//     userId: string;
-//     issuedAt?: number;
-//     expiration?: number;
-// }
-
-// export interface IApiResponse<T = any> {
-//     success: boolean;
-//     message: string;
-//     data?: T;
-//     errors?: any[];
-//     pagination?: IPagination;
-// }
-
-// export interface IPagination {
-//   page: number;
-//   limit: number;
-//   total: number;
-//   totalPages: number;
-// }
-
-// export interface IChangePassword {
-//   currentPassword: string;
-//   newPassword: string;
-//   confirmPassword: string;
-// }
-
-// // Extend Express Request type to include user
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user?: IUser;        // Add user property to req object
-//     }
-//   }
-// }
-
-
 // Review interfaces
 export interface IReviewData {
   userId: string;
@@ -84,19 +37,8 @@ export interface IReviewData {
   comment: string;
 }
 
-export interface INewReviewData extends Omit<IReviewData, 'userId'> {
-  userId?: string;
-}
-
-export interface IUpdateReviewData {
-  reviewId: string;
-  userId: string;
-  rating?: number;
-  comment?: string;
-}
-
-export interface IUpdateReviewResponse {
-  id: string;
-  rating: number;
-  comment: string;
+export interface IReviewResponse {
+  success: number;
+  message: string;
+  reviewId: string | null;
 }
