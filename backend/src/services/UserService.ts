@@ -1,21 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import mysql from '../database/mysql/connection';
-import { RowDataPacket } from 'mysql2';
-import { UserRole } from '@/types';
+import { IReviewResponse, UserRole } from '@/types';
+import { IReviewData } from '@/types/index';
+import { AppError, ForbiddenError, NotFoundError, ValidationError } from '@/types/errors';
 
-interface IReviewData {
-  bookId: string;
-  userId: string;
-  rating: number;
-  comment: string;
-}
-
-interface IUpdateReviewData {
-  bookId: string;
-  userId: string;
-  rating?: number;
-  comment?: string;
-}
 
 interface UserProfile {
   id: string;
@@ -25,86 +12,6 @@ interface UserProfile {
   email: string;
   role: UserRole;
 }
-
-const addReview = async (reviewData: IReviewData) => {
-  try {
-    if (!reviewData) {
-      throw new Error('Review data is required');
-    }
-
-    // NOTE: Uncomment the following lines when the books table is available
-
-    const existingBook = (await mysql.executeQuery(
-      'SELECT * FROM books WHERE id = ?',
-      [reviewData.bookId]
-    )) as Array<{ bookId: string }>;
-    if (!existingBook || existingBook.length === 0) {
-      throw new Error('Book not found');
-    }
-
-    const reviewId = uuidv4();
-    const create_at = new Date();
-    const updated_at = new Date();
-    const query = `
-        INSERT INTO reviews (id, userId, bookId, rating, comment, createdAt, updatedAt) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const params = [
-      reviewId,
-      reviewData.userId,
-      reviewData.bookId,
-      reviewData.rating,
-      reviewData.comment,
-      create_at,
-      updated_at,
-    ];
-    const res = await mysql.executeQuery(query, params);
-    return { message: 'Review added successfully', res };
-  } catch (error) {
-    throw new Error(
-      `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
-  }
-};
-
-const updateReview = async (
-  reviewId: string,
-  updateData: IUpdateReviewData
-) => {
-  try {
-    const existingReview = (await mysql.executeQuery(
-      'SELECT * FROM reviews WHERE id = ?',
-      [reviewId]
-    )) as Array<{ id: string }>;
-    if (!existingReview || existingReview.length === 0) {
-      throw new Error('User not found');
-    }
-    const updatedAt = new Date();
-    const query = `
-        UPDATE reviews
-        SET rating = ?, comment = ?, updatedAt = ?
-        WHERE id = ? AND userId = ?
-        `;
-    const params = [
-      updateData.rating,
-      updateData.comment,
-      updatedAt,
-      reviewId,
-      updateData.userId,
-    ];
-    await mysql.executeQuery(query, params);
-
-    const res = (await mysql.executeQuery(
-      'SELECT * FROM reviews WHERE id = ?',
-      [reviewId]
-    )) as (IUpdateReviewData & RowDataPacket)[];
-
-    return { message: 'Review added successfully', res: res[0] };
-  } catch (error) {
-    throw new Error(
-      `Failed to add review: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
-  }
-};
 
 const getUserById = async (userId: string): Promise<UserProfile | null> => {
   try {
@@ -161,9 +68,49 @@ const searchUsers = async (query: string): Promise<UserProfile[]> => {
   }
 };
 
+
+const reviewBook = async (data: IReviewData): Promise<IReviewResponse> => {
+  try {
+
+    await mysql.executeQuery(
+      'CALL ReviewBook(?, ?, ?, ?, @p_success, @p_message, @p_reviewId)',
+      [data.userId, data.bookId , data.rating, data.comment.trim()]
+    );
+
+    // Get the output parameters
+    const result = (await mysql.executeQuery(
+      'SELECT @p_success as success, @p_message as message, @p_reviewId as reviewId'
+    )) as IReviewResponse[];
+
+    if (result[0].success == 0) {
+      if (result[0].message == "db error occurred while processing review") {
+        throw new AppError(result[0].message, 500, 'DATABASE_PROCEDURE_ERROR');
+      }
+      if (result[0].message == "You can only review books you have borrowed") {
+        throw new ForbiddenError(result[0].message);
+      }
+      if (result[0].message.includes('not found')) {
+        throw new NotFoundError(result[0].message);
+      }
+      if (result[0].message == "Rating must be between 1 and 5" || result[0].message == "Comment must be at least 4 characters long") {
+        throw new ValidationError(result[0].message);
+      }
+    }
+    return result[0];
+
+  } catch (error) {
+    // AppError
+    if (error instanceof AppError) {
+      throw error;
+    }
+    // Handle database errors
+    console.error('Database error in addReview:', error);
+    throw new Error('Failed to add review due to database error');
+  }
+}
+
 export default {
-  addReview,
-  updateReview,
+  reviewBook,
   getUserById,
   getAllUsers,
   searchUsers,

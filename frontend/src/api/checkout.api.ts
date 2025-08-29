@@ -1,17 +1,23 @@
 import axiosInstance from '@/config/axiosConfig';
-import { CheckoutResponse } from '@/types/checkout.type';
+import { CheckoutApiResponse, CheckoutResponse } from '@/types/checkout.type';
 
 const getAllCheckoutByUserId = async (
-  userId: string
+  // userId: string
 ): Promise<CheckoutResponse> => {
-  const response = await axiosInstance.get(`/api/v1/checkouts/${userId}`);
+  const response = await axiosInstance.get(`/api/v1/checkouts/`);
   return response.data;
 };
 
-const borrowBook = async (bookId: string): Promise<void> => {
-  await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, {
-    dueDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
-  });
+const borrowBook = async (bookId: string): Promise<CheckoutApiResponse> => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, {
+      dueDate: Date.now() + 14 * 24 * 60 * 60 * 1000, // 2 weeks from now
+    }) as CheckoutApiResponse;
+    return response;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
 };
 
 const returnBook = async (bookId: string): Promise<void> => {

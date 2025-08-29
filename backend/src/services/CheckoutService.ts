@@ -26,7 +26,8 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
       c.isReturned,
       c.isLate
     FROM checkouts c
-    JOIN books b ON c.bookId = b.id
+    JOIN books_copies bc ON c.copyId = bc.id
+    JOIN books b ON bc.bookId = b.id
     LEFT JOIN (
       SELECT 
         ba.bookId, 
