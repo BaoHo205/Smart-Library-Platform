@@ -1,5 +1,6 @@
 export interface CheckoutItem {
   bookId: string;
+  copyId: string;
   bookName: string;
   bookAuthors: string;
   bookGenres: string;

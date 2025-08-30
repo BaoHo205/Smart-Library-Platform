@@ -1,19 +1,15 @@
-'use client';
-import React from 'react';
-import useUserProfile from '@/hooks/useUserProfile';
-import LoanCard from './LoanCard';
+import ActiveLoanCard from './ActiveLoanCard';
+import PastLoanCard from './PastLoanCard';
 import type { CheckoutItem } from '@/types/checkout.type';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const MyLoan: React.FC = () => {
-  const {
-    checkouts,
-    setCheckouts,
-  }: {
-    checkouts: CheckoutItem[];
-    setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>>;
-  } = useUserProfile();
+export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
   const activeCheckouts: CheckoutItem[] = checkouts.filter(
     checkout => !checkout.isReturned
+  );
+
+  const pastCheckouts: CheckoutItem[] = checkouts.filter(
+    checkout => checkout.isReturned
   );
 
   return (
@@ -21,31 +17,59 @@ const MyLoan: React.FC = () => {
       <div className="mb-6">
         <h1 className="mb-2 text-2xl font-bold text-gray-900">My Loans</h1>
       </div>
+      <Tabs defaultValue="active" className="w-full">
+        <TabsList>
+          <TabsTrigger value="active">Active Checkout</TabsTrigger>
+          <TabsTrigger value="past">Past Checkout</TabsTrigger>
+        </TabsList>
+        <TabsContent value="active">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {activeCheckouts.length > 0 ? (
+              activeCheckouts.map(checkout => (
+                <ActiveLoanCard
+                  key={checkout.bookId}
+                  checkout={checkout}
+                />
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+                  <h3 className="mb-2 text-lg font-medium text-gray-900">
+                    No books checked out
+                  </h3>
+                  <p className="text-gray-500">
+                    Browse our library to find books to check out.
+                  </p>
+                </div>
+              </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {activeCheckouts.length > 0 ? (
-          activeCheckouts.map(checkout => (
-            <LoanCard
-              key={checkout.bookId}
-              checkout={checkout}
-              setCheckouts={setCheckouts}
-            />
-          ))
-        ) : (
-          <div className="col-span-full py-12 text-center">
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
-              <h3 className="mb-2 text-lg font-medium text-gray-900">
-                No books checked out
-              </h3>
-              <p className="text-gray-500">
-                Browse our library to find books to check out.
-              </p>
-            </div>
+            )}
           </div>
-        )}
-      </div>
+        </TabsContent>
+        <TabsContent value="past">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {pastCheckouts.length > 0 ? (
+              pastCheckouts.map(checkout => (
+                <PastLoanCard
+                  key={checkout.bookId}
+                  checkout={checkout}
+                />
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+                  <h3 className="mb-2 text-lg font-medium text-gray-900">
+                    No past loans
+                  </h3>
+                  <p className="text-gray-500">
+                    You have not returned any books yet.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
-
-export default MyLoan;

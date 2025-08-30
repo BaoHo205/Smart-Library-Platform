@@ -1,3 +1,7 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardHeader, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -6,13 +10,14 @@ import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
 import { returnBook } from '@/api/checkout.api';
 
-const LoanCard = ({
+const ActiveLoanCard = ({
   checkout,
-  setCheckouts,
 }: {
   checkout: CheckoutItem;
-  setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>>;
 }) => {
+  const router = useRouter();
+  const [isReturning, setIsReturning] = useState(false);
+
   const formatDateDMY = (iso?: string | null) => {
     if (!iso) return '—';
     try {
@@ -21,6 +26,20 @@ const LoanCard = ({
       return format(d, 'dd/MM/yyyy');
     } catch {
       return 'Invalid date';
+    }
+  };
+
+  const handleReturn = async (copyId: string) => {
+    try {
+      setIsReturning(true);
+      await returnBook(copyId);
+
+      // trigger a refresh of server components / data fetching on the current route
+      router.refresh();
+    } catch (err) {
+      console.error('Return failed', err);
+    } finally {
+      setIsReturning(false);
     }
   };
 
@@ -56,12 +75,9 @@ const LoanCard = ({
         </div>
         <Button
           onClick={() => {
-            returnBook(checkout.bookId);
-            setCheckouts(prev =>
-              prev.filter(c => c.bookId !== checkout.bookId)
-            );
+            handleReturn(checkout.copyId);
           }}
-          disabled={false}
+          disabled={isReturning}
         >
           Return
         </Button>
@@ -70,4 +86,4 @@ const LoanCard = ({
   );
 };
 
-export default LoanCard;
+export default ActiveLoanCard;
