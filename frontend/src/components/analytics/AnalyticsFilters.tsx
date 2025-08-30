@@ -88,7 +88,7 @@ export function AnalyticsFilters({
   );
 
   useEffect(() => {
-    if (viewMode === 'platform' && filters.userId && !selectedUser) {
+    if (viewMode === 'platform' && filters.userId && !selectedUser && users) {
       const user = users.find(u => u.id === filters.userId);
       if (user) {
         setSelectedUser(user);
@@ -684,7 +684,7 @@ export function AnalyticsFilters({
                                     ? 'Loading users...'
                                     : 'No users found.'}
                                 </CommandEmpty>
-                                {!usersLoading && (
+                                {!usersLoading && users && (
                                   <CommandGroup>
                                     <CommandItem
                                       key="clear"
