@@ -15,14 +15,10 @@ userRouter.get(
 );
 
 userRouter.post(
-  '/reviews/add',
+  '/reviewBook',
   authMiddleware.verifyStaffOrUser,
-  UserController.addReview
+  UserController.reviewBook
 );
-userRouter.put(
-  '/reviews/update/:reviewId',
-  authMiddleware.verifyStaffOrUser,
-  UserController.updateReview
-);
+
 
 export default userRouter;

@@ -7,40 +7,46 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
   // #swagger.summary = 'Get most borrowed books in a specific period'
   // #swagger.description = 'Retrieve statistics of the most frequently borrowed books. Staff access required.'
   try {
-    const { startDate, endDate, limit } = req.query;
+    const { startDate, endDate, limit, allTime } = req.query;
 
-    const startDateStr = String(startDate || '').trim();
-    const endDateStr = String(endDate || '').trim();
+    // Check if this is an all-time request
+    const isAllTime = allTime === 'true' || allTime === '1';
 
-    if (!startDateStr || !endDateStr) {
-      return res.status(400).json({
-        success: false,
-        message: 'Start date and end date are required',
-        data: {
-          received: { startDate: startDateStr, endDate: endDateStr },
-          format: 'Expected format: YYYY-MM-DD',
-        },
-      });
-    }
+    if (!isAllTime) {
+      // For time-based requests, validate dates
+      const startDateStr = String(startDate || '').trim();
+      const endDateStr = String(endDate || '').trim();
 
-    const startDateObj = new Date(startDateStr);
-    const endDateObj = new Date(endDateStr);
+      if (!startDateStr || !endDateStr) {
+        return res.status(400).json({
+          success: false,
+          message: 'Start date and end date are required for time-based requests',
+          data: {
+            received: { startDate: startDateStr, endDate: endDateStr },
+            format: 'Expected format: YYYY-MM-DD',
+          },
+        });
+      }
 
-    if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format. Please use YYYY-MM-DD format',
-        data: {
-          received: { startDate: startDateStr, endDate: endDateStr },
-        },
-      });
-    }
+      const startDateObj = new Date(startDateStr);
+      const endDateObj = new Date(endDateStr);
 
-    if (startDateObj > endDateObj) {
-      return res.status(400).json({
-        success: false,
-        message: 'Start date cannot be later than end date',
-      });
+      if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date format. Please use YYYY-MM-DD format',
+          data: {
+            received: { startDate: startDateStr, endDate: endDateStr },
+          },
+        });
+      }
+
+      if (startDateObj > endDateObj) {
+        return res.status(400).json({
+          success: false,
+          message: 'Start date cannot be later than end date',
+        });
+      }
     }
 
     const limitParam =
@@ -51,13 +57,14 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
           : undefined;
 
     const result = await StaffService.getMostBorrowedBooks(
-      String(startDate || '').trim(),
-      String(endDate || '').trim(),
-      limitParam
+      isAllTime ? '' : String(startDate || '').trim(),
+      isAllTime ? '' : String(endDate || '').trim(),
+      limitParam,
+      isAllTime
     );
     res.status(200).json({
       success: true,
-      message: 'Most borrowed books retrieved successfully',
+      message: isAllTime ? 'All-time most borrowed books retrieved successfully' : 'Most borrowed books retrieved successfully',
       data: result,
     });
   } catch (error) {
@@ -97,9 +104,16 @@ const getBooksWithLowAvailability = async (req: AuthRequest, res: Response) => {
   // #swagger.summary = 'Get books with low availability'
   // #swagger.description = 'Retrieve books that have low availability/stock levels. Staff access required.'
   try {
-    const response = await StaffService.getBooksWithLowAvailability(
-      req.query.interval ? Number(req.query.interval) : 60
-    );
+    const limitParam = req.query.lowAvailabilityLimit;
+    let limit: number | 'max';
+    
+    if (limitParam === 'max') {
+      limit = 'max';
+    } else {
+      limit = limitParam ? Number(limitParam) : 5;
+    }
+    
+    const response = await StaffService.getBooksWithLowAvailability(limit);
     res.status(200).json({
       success: true,
       message: 'Books with low availability retrieved successfully',
