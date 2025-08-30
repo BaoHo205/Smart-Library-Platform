@@ -3,6 +3,8 @@
 DROP TRIGGER IF EXISTS after_checkout_insert;
 DROP TRIGGER IF EXISTS after_checkout_update;
 DROP TRIGGER IF EXISTS after_review_insert;
+DROP TRIGGER IF EXISTS book_copy_delete;
+DROP TRIGGER IF EXISTS book_copy_insert;
 
 -- Trigger to automatically update book availability when a book is borrowed
 DELIMITER //
@@ -63,5 +65,44 @@ BEGIN
     ) WHERE b.id = NEW.bookId;
 
 END//
+
+DELIMITER ;
+
+DELIMITER $$
+
+-- This trigger automatically decrements the quantity and availableCopies
+-- in the books table whenever a book copy is deleted from books_copies.
+CREATE TRIGGER book_copy_delete
+BEFORE DELETE ON books_copies
+FOR EACH ROW
+BEGIN
+    -- We decrement both the quantity and availableCopies counts.
+    -- The WHERE clause uses OLD.bookId to identify the correct book.
+    UPDATE books
+    SET
+        quantity = quantity - 1,
+        availableCopies = availableCopies - 1
+    WHERE id = OLD.bookId;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+-- This trigger automatically increments the quantity and availableCopies
+-- in the books table whenever a new book copy is added to books_copies.
+CREATE TRIGGER book_copy_insert
+BEFORE INSERT ON books_copies
+FOR EACH ROW
+BEGIN
+    -- We increment both the quantity and availableCopies counts.
+    -- The WHERE clause uses NEW.bookId to identify the correct book.
+    UPDATE books
+    SET
+        quantity = quantity + 1,
+        availableCopies = availableCopies + 1
+    WHERE id = NEW.bookId;
+END$$
 
 DELIMITER ;

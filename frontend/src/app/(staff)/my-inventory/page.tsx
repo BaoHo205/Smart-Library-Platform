@@ -43,7 +43,7 @@ const page = () => {
   }, []);
 
   return (
-    <div className=' min-w-max p-5'>
+    <div className='min-h-screen max-w-max p-5'>
       <div className='flex flex-row justify-between'>
         <h1 className='py-3 text-black text-2xl font-bold'>My Inventory</h1>
         <div className="flex flex-row justify-center items-center p-3 gap-2 rounded-xl border-2 outline-offset-4 shadow-xl">
