@@ -3,19 +3,18 @@ import { Book } from '@/types/book.type';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { getAllBooks } from '@/api/books.api';
 
-const HomePage = () => {
+const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; total?: number } } }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  console.log(initialData);
 
   const currentGenre = searchParams.get('genre') ?? '';
   const searchParam = searchParams.get('searchBy') ?? 'title';
   const searchInput = searchParams.get('q') ?? '';
-  const [books, setBooks] = useState<Book[]>([]);
-  const [pages, setPages] = useState<number>(0);
   const [currentPageState, setCurrentPageState] = useState<number>(1);
 
   const currentPage = Number(searchParams.get('page') ?? currentPageState ?? 1);
@@ -26,9 +25,11 @@ const HomePage = () => {
       if (v === null || v === '') params.delete(k);
       else params.set(k, String(v));
     });
-    // push new params (relative URL)
+    // push new params (relative URL) and refresh so the server refetches
     const q = params.toString();
-    router.push(q ? `?${q}` : '/');
+    const url = q ? `?${q}` : '/';
+    router.push(url);
+    router.refresh();
   };
 
   const handleCurrentGenreChange = (genre: string): void => {
@@ -42,6 +43,9 @@ const HomePage = () => {
   const handleSearchInputChange = (input: string): void => {
     updateParams({ q: input, page: 1 });
   };
+
+  const books: Book[] = initialData?.data?.data || [];
+  const pages: number = Math.ceil((initialData?.data?.total || 0) / 9) || 0;
 
   const handleNextPage = (): void => {
     if (currentPage < pages) {
@@ -61,30 +65,6 @@ const HomePage = () => {
     updateParams({ page });
     setCurrentPageState(page);
   };
-
-  const fetchBooks = async (): Promise<void> => {
-    try {
-      const bookResponse = await getAllBooks(
-        currentGenre,
-        currentPage,
-        searchParam,
-        searchInput
-      );
-      setBooks(bookResponse.data);
-      setPages(Math.ceil(bookResponse.total / 9));
-      console.log('Books fetched:', bookResponse);
-      console.log('Current genre:', currentGenre);
-    } catch (error) {
-      console.error('Failed to fetch books:', error);
-      setBooks([]);
-      setPages(0);
-    }
-  };
-
-  // Re-fetch when URL search params change
-  useEffect(() => {
-    fetchBooks();
-  }, [searchParams?.toString()]);
 
   return (
     <div className="flex">

@@ -39,6 +39,7 @@ const BookCard: React.FC<Book> = ({
           isLate: 0,
         } as CheckoutItem,
       ]);
+      router.refresh();
       console.log('Book borrowed successfully');
       toast.success('Book borrowed successfully!');
     } catch (error) {
@@ -98,8 +99,8 @@ const BookCard: React.FC<Book> = ({
             handleBorrow();
           }}
           disabled={checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          )}
+            checkout => checkout.bookId === id && !checkout.isReturned 
+          ) || availableCopies === 0}
           className="w-full"
         >
           {checkouts.some(
