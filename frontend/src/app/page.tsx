@@ -3,11 +3,8 @@ import { headers } from 'next/headers';
 
 const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-export default async function Page({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-  const genre = (searchParams?.genre as string) ?? '';
-  const page = Number((searchParams?.page as string) ?? '1');
-  const searchBy = (searchParams?.searchBy as string) ?? 'title';
-  const q = (searchParams?.q as string) ?? '';
+export default async function Page({ searchParams }: { searchParams: { genre: string; page: number; searchBy: string; q?: string } }) {
+  const { genre = '', page = 1, searchBy = 'title', q = '' } = await searchParams;
 
   const params = new URLSearchParams();
   if (genre) params.set('genre', genre);
@@ -24,7 +21,6 @@ export default async function Page({ searchParams }: { searchParams?: { [key: st
     `${DEFAULT_BASE}/api/v1/books?pageSize=12&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(searchBy)}=${encodeURIComponent(q)}`,
     {
       headers: { cookie },
-      // tag-based cache so we can invalidate by this query
       next: { tags: [`books:${paramsString}`] },
     }
   );
@@ -37,7 +33,6 @@ export default async function Page({ searchParams }: { searchParams?: { [key: st
       initialData = null;
     }
   } else {
-    // non-OK (401/403/500): return null so client shows empty state or login prompt
     initialData = null;
   }
 
