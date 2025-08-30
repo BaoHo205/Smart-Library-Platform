@@ -47,7 +47,8 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
       JOIN genres g ON g.id = bg.genreId
       GROUP BY bg.bookId
     ) AS genres ON genres.bookId = b.id
-    WHERE c.userId = ?`,
+    WHERE c.userId = ?
+    ORDER BY c.checkoutDate DESC, c.dueDate ASC`,
     [userId]
   )) as Checkout[];
   return rows;

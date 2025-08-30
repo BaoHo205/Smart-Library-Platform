@@ -8,11 +8,14 @@ import { Button } from '../ui/button';
 import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
 import { borrowBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
-const ActiveLoanCard = ({
+const PastLoanCard = ({
   checkout,
+  isBorrowing,
 }: {
   checkout: CheckoutItem;
+  isBorrowing?: boolean;
 }) => {
   const router = useRouter();
 
@@ -30,9 +33,11 @@ const ActiveLoanCard = ({
   const handleReborrow = async (bookId: string) => {
     try {
       await borrowBook(bookId);
+      toast.success('Book reborrowed successfully!');
       router.refresh();
     } catch (err) {
-      console.error('Return failed', err);
+      console.error('Reborrow failed', err);
+      toast.error('Failed to reborrow book');
     }
   };
 
@@ -72,6 +77,7 @@ const ActiveLoanCard = ({
             onClick={() => {
               handleReborrow(checkout.bookId);
             }}
+            disabled={isBorrowing}
           >
             Reborrow
           </Button>
@@ -89,4 +95,4 @@ const ActiveLoanCard = ({
   );
 };
 
-export default ActiveLoanCard;
+export default PastLoanCard;

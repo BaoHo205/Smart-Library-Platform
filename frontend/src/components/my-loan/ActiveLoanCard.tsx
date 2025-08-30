@@ -9,6 +9,7 @@ import { Button } from '../ui/button';
 import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
 import { returnBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
 const ActiveLoanCard = ({
   checkout,
@@ -33,11 +34,12 @@ const ActiveLoanCard = ({
     try {
       setIsReturning(true);
       await returnBook(copyId);
-
+      toast.success('Book returned successfully!');
       // trigger a refresh of server components / data fetching on the current route
       router.refresh();
     } catch (err) {
       console.error('Return failed', err);
+      toast.error('Failed to return book');
     } finally {
       setIsReturning(false);
     }

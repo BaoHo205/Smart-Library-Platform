@@ -8,7 +8,7 @@ import BookReviews from '@/components/books/BookReviews';
 import { getBookInfoById, getReviewsByBookId, reviewBook, isBookBorrowed } from '@/api/books.api';
 import { borrowBook } from '@/api/checkout.api';
 import type { BookDetails, IReview, Review } from '@/types/book.type';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useAuth } from '../auth/useAuth';
 
 // Interface to match BookDetail component props
@@ -132,6 +132,18 @@ export default function BookInfoPage({
       }
     } catch (err) {
       console.error('Error borrowing book:', err);
+      // surface message via toast as well
+      let message = 'Failed to borrow book. Please try again.';
+      if (err instanceof Error) message = err.message;
+      else if (typeof err === 'string') message = err;
+      else {
+        try {
+          message = JSON.stringify(err);
+        } catch {
+          message = String(err);
+        }
+      }
+      toast.error(message);
       setError('Failed to borrow book. Please try again.');
     } finally {
       setBorrowing(false);

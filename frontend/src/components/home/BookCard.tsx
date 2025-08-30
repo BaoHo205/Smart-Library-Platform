@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { CheckoutItem } from '../../types/checkout.type';
 import { Book } from '@/types/book.type';
 import { borrowBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
 const BookCard: React.FC<Book> = ({
   id,
@@ -39,8 +40,10 @@ const BookCard: React.FC<Book> = ({
         } as CheckoutItem,
       ]);
       console.log('Book borrowed successfully');
+      toast.success('Book borrowed successfully!');
     } catch (error) {
       console.error('Error borrowing book:', error);
+      toast.error('Failed to borrow book');
     }
   };
 

@@ -12,6 +12,9 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
     checkout => checkout.isReturned
   );
 
+  // Precompute a set of active book IDs for a fast and type-safe lookup
+  const activeBookIds = new Set(activeCheckouts.map(c => String(c.bookId)));
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6">
@@ -49,10 +52,11 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
         <TabsContent value="past">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pastCheckouts.length > 0 ? (
-              pastCheckouts.map(checkout => (
+              pastCheckouts.map((checkout, key) => (
                 <PastLoanCard
-                  key={checkout.bookId}
+                  key={key}
                   checkout={checkout}
+                  isBorrowing={activeBookIds.has(String(checkout.bookId))}
                 />
               ))
             ) : (
