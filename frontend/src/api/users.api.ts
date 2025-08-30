@@ -3,7 +3,11 @@ import type { UserSearchResult } from '@/hooks/useUserSearch';
 
 export const getAllUsers = async (): Promise<UserSearchResult[]> => {
     const response = await axiosInstance.get('/api/v1/user/all');
-    return response.data.data.map((user: any) => ({
+    const users = response.data?.data;
+    if (!users || !Array.isArray(users)) {
+        return [];
+    }
+    return users.map((user: any) => ({
         id: user.id,
         userName: user.userName,
         firstName: user.firstName,
@@ -16,7 +20,11 @@ export const getAllUsers = async (): Promise<UserSearchResult[]> => {
 
 export const searchUsers = async (query: string): Promise<UserSearchResult[]> => {
     const response = await axiosInstance.get(`/api/v1/user/search?query=${encodeURIComponent(query)}`);
-    return response.data.data.map((user: any) => ({
+    const users = response.data?.data;
+    if (!users || !Array.isArray(users)) {
+        return [];
+    }
+    return users.map((user: any) => ({
         id: user.id,
         userName: user.userName,
         firstName: user.firstName,

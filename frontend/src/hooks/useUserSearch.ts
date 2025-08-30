@@ -20,13 +20,13 @@ export function useUserSearch(searchTerm: string) {
   const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
 
     useEffect(() => {
-        const searchUsers = async () => {
+        const performSearch = async () => {
             if (debouncedSearchTerm.length < 1) {
                 // Load all users alphabetically when no search term
                 setLoading(true);
                 try {
                     const response = await getAllUsers();
-                    setUsers(response);
+                    setUsers(Array.isArray(response) ? response : []);
                     setError(null);
                 } catch (err) {
                     setError('Failed to load users');
@@ -41,7 +41,7 @@ export function useUserSearch(searchTerm: string) {
                 setLoading(true);
                 try {
                     const response = await searchUsers(debouncedSearchTerm);
-                    setUsers(response);
+                    setUsers(Array.isArray(response) ? response : []);
                     setError(null);
                 } catch (err) {
                     setError('Failed to search users');
@@ -52,7 +52,7 @@ export function useUserSearch(searchTerm: string) {
             }
         };
 
-    searchUsers();
+    performSearch();
   }, [debouncedSearchTerm]);
 
   return { users, loading, error };
