@@ -1,0 +1,99 @@
+'use client';
+import { Book } from '@/types/book.type';
+import BookCardList from '@/components/home/BookCardList';
+import Header from '@/components/home/Header';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { getAllBooks } from '@/api/books.api';
+
+const HomePage = () => {
+  const [currentGenre, setCurrentGenre] = useState<string>('');
+  const [searchParam, setSearchParam] = useState<string>('title');
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [books, setBooks] = useState<Book[]>([]);
+  const [pages, setPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const handleCurrentGenreChange = (genre: string): void => {
+    setCurrentGenre(genre);
+  };
+
+  const handleSearchParamChange = (param: string): void => {
+    setSearchParam(param);
+  };
+
+  const handleSearchInputChange = (input: string): void => {
+    setSearchInput(input);
+  };
+
+  const handleNextPage = (): void => {
+    if (currentPage < pages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePrevPage = (): void => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page: number): void => {
+    setCurrentPage(page);
+  };
+
+  const fetchBooks = async (): Promise<void> => {
+    try {
+      const bookResponse = await getAllBooks(
+        currentGenre,
+        currentPage,
+        searchParam,
+        searchInput
+      );
+      setBooks(bookResponse.data);
+      setPages(Math.ceil(bookResponse.total / 9));
+      console.log('Books fetched:', bookResponse);
+      console.log('Current genre:', currentGenre);
+    } catch (error) {
+      console.error('Failed to fetch books:', error);
+      setBooks([]);
+      setPages(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, [currentGenre, searchParam, searchInput, currentPage]);
+
+  return (
+    <div className="flex">
+      <div className="flex w-full flex-col justify-center gap-6 p-6">
+        <Header
+          onCurrentGenreChange={handleCurrentGenreChange}
+          onSearchParamChange={handleSearchParamChange}
+          onSearchInputChange={handleSearchInputChange}
+          searchParam={searchParam}
+          searchInput={searchInput}
+          currentGenre={currentGenre}
+        />
+        <Image
+          src="/default-image.png"
+          alt="Banner Image"
+          width={100}
+          height={100}
+          className="h-full w-full"
+        />
+        <BookCardList
+          books={books}
+          pages={pages}
+          currentPage={currentPage}
+          onNextPage={handleNextPage}
+          onPrevPage={handlePrevPage}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default HomePage;

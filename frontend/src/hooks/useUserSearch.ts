@@ -1,32 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from './useDebounce';
-import api from '@/api/api';
+import { getAllUsers, searchUsers } from '@/api/users.api';
 
 export interface UserSearchResult {
-    id: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    displayName: string;
-    avatarUrl?: string;
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  displayName: string;
+  avatarUrl?: string;
 }
 
 export function useUserSearch(searchTerm: string) {
-    const [users, setUsers] = useState<UserSearchResult[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<UserSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
+  const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
 
     useEffect(() => {
-        const searchUsers = async () => {
+        const performSearch = async () => {
             if (debouncedSearchTerm.length < 1) {
                 // Load all users alphabetically when no search term
                 setLoading(true);
                 try {
-                    const response = await api.getAllUsers();
-                    setUsers(response);
+                    const response = await getAllUsers();
+                    setUsers(Array.isArray(response) ? response : []);
                     setError(null);
                 } catch (err) {
                     setError('Failed to load users');
@@ -40,8 +40,8 @@ export function useUserSearch(searchTerm: string) {
             if (debouncedSearchTerm.length >= 1) {
                 setLoading(true);
                 try {
-                    const response = await api.searchUsers(debouncedSearchTerm);
-                    setUsers(response);
+                    const response = await searchUsers(debouncedSearchTerm);
+                    setUsers(Array.isArray(response) ? response : []);
                     setError(null);
                 } catch (err) {
                     setError('Failed to search users');
@@ -52,8 +52,8 @@ export function useUserSearch(searchTerm: string) {
             }
         };
 
-        searchUsers();
-    }, [debouncedSearchTerm]);
+    performSearch();
+  }, [debouncedSearchTerm]);
 
-    return { users, loading, error };
+  return { users, loading, error };
 }

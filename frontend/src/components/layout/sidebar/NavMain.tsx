@@ -79,7 +79,7 @@ const staffData = {
     {
       title: 'My Report',
       icon: FileText,
-      url: '/reports',
+      url: '/my-reports',
     },
   ],
 };

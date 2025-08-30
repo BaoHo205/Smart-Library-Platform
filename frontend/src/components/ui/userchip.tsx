@@ -3,19 +3,19 @@
 import { Avatar } from '@/components/ui/avatar';
 
 interface User {
-    id: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: 'user' | 'staff';
-    name?: string;
-    avatarUrl?: string | null;
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'user' | 'staff';
+  name?: string;
+  avatarUrl?: string | null;
 }
 
 interface UserChipProps {
-    user?: User | null;
-    loading?: boolean;
+  user?: User | null;
+  loading?: boolean;
 }
 
 export function UserChip({ user, loading }: UserChipProps) {

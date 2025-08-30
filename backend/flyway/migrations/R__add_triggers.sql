@@ -1,29 +1,96 @@
 -- # Add Triggers
 
+DROP TRIGGER IF EXISTS after_book_copy_insert;
+DROP TRIGGER IF EXISTS after_book_copy_update;
+DROP TRIGGER IF EXISTS after_book_copy_delete;
 DROP TRIGGER IF EXISTS after_checkout_insert;
 DROP TRIGGER IF EXISTS after_checkout_update;
 DROP TRIGGER IF EXISTS after_review_insert;
 DROP TRIGGER IF EXISTS book_copy_delete;
 DROP TRIGGER IF EXISTS book_copy_insert;
 
--- Trigger to automatically update book availability when a book is borrowed
+-- Trigger to automatically update availableCopies when book copies are inserted
+DELIMITER //
+
+CREATE TRIGGER after_book_copy_insert
+AFTER INSERT ON books_copies
+FOR EACH ROW
+BEGIN
+    -- Update available copies count when a new copy is added
+    UPDATE books 
+    SET availableCopies = (
+        SELECT COUNT(*) 
+        FROM books_copies 
+        WHERE bookId = NEW.bookId AND isBorrowed = FALSE
+    )
+    WHERE id = NEW.bookId;
+END//
+
+DELIMITER ;
+
+-- Trigger to automatically update availableCopies when book copies are updated
+DELIMITER //
+
+CREATE TRIGGER after_book_copy_update
+AFTER UPDATE ON books_copies
+FOR EACH ROW
+BEGIN
+    -- Only update if isBorrowed status changed
+    IF OLD.isBorrowed != NEW.isBorrowed THEN
+        UPDATE books 
+        SET availableCopies = (
+            SELECT COUNT(*) 
+            FROM books_copies 
+            WHERE bookId = NEW.bookId AND isBorrowed = FALSE
+        )
+        WHERE id = NEW.bookId;
+    END IF;
+END//
+
+DELIMITER ;
+
+-- Trigger to automatically update availableCopies when book copies are deleted
+DELIMITER //
+
+CREATE TRIGGER after_book_copy_delete
+AFTER DELETE ON books_copies
+FOR EACH ROW
+BEGIN
+    -- Update available copies count when a copy is deleted
+    UPDATE books 
+    SET availableCopies = (
+        SELECT COUNT(*) 
+        FROM books_copies 
+        WHERE bookId = OLD.bookId AND isBorrowed = FALSE
+    ),
+    quantity = (
+        SELECT COUNT(*) 
+        FROM books_copies 
+        WHERE bookId = OLD.bookId
+    )
+    WHERE id = OLD.bookId;
+END//
+
+DELIMITER ;
+
+-- Trigger to automatically update book copy status when a book is borrowed
 DELIMITER //
 
 CREATE TRIGGER after_checkout_insert
 AFTER INSERT ON checkouts
 FOR EACH ROW
 BEGIN
-    -- Update available copies when a book is borrowed
+    -- Mark the copy as borrowed when a book is checked out
     IF NEW.isReturned = FALSE THEN
-        UPDATE books 
-        SET availableCopies = availableCopies - 1
-        WHERE id = NEW.copyId AND availableCopies > 0;
+        UPDATE books_copies
+        SET isBorrowed = TRUE, updatedAt = CURRENT_TIMESTAMP
+        WHERE id = NEW.copyId;
     END IF;
 END//
 
 DELIMITER ;
 
--- Trigger to automatically update book availability when a book is returned
+-- Trigger to automatically update book copy status when a book is returned
 DELIMITER //
 
 CREATE TRIGGER after_checkout_update
@@ -32,16 +99,18 @@ FOR EACH ROW
 BEGIN
     -- If the book was just returned (isReturned changed from FALSE to TRUE)
     IF OLD.isReturned = FALSE AND NEW.isReturned = TRUE THEN
-        UPDATE books 
-        SET availableCopies = availableCopies + 1
+        -- Mark the copy as not borrowed
+        UPDATE books_copies
+        SET isBorrowed = FALSE, updatedAt = CURRENT_TIMESTAMP
         WHERE id = NEW.copyId;
     END IF;
     
     -- If the book was un-returned (isReturned changed from TRUE to FALSE)
     IF OLD.isReturned = TRUE AND NEW.isReturned = FALSE THEN
-        UPDATE books 
-        SET availableCopies = availableCopies - 1
-        WHERE id = NEW.copyId AND availableCopies > 0;
+        -- Mark the copy as borrowed again
+        UPDATE books_copies
+        SET isBorrowed = TRUE, updatedAt = CURRENT_TIMESTAMP
+        WHERE id = NEW.copyId;
     END IF;
 END//
 
@@ -55,15 +124,12 @@ AFTER INSERT ON reviews
 FOR EACH ROW
 BEGIN
     UPDATE books b
-	SET avgRating = COALESCE(
-		(SELECT AVG(r.rating)
-		FROM reviews r
-        JOIN books_copies bc 
-        ON r.copyId = bc.id
-		WHERE bc.bookId = NEW.bookId), 
-	0
+    SET avgRating = COALESCE(
+        (SELECT AVG(r.rating)
+        FROM reviews r
+        WHERE r.bookId = NEW.bookId), 
+    0
     ) WHERE b.id = NEW.bookId;
-
 END//
 
 DELIMITER ;

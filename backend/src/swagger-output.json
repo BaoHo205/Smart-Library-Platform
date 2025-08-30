@@ -111,48 +111,36 @@
         }
       }
     },
-    "/user/reviews/add": {
+    "/user/reviewBook": {
       "post": {
         "tags": [
-          "Users"
+          "Reviews"
         ],
-        "summary": "Add book review",
-        "description": "Add a review for a book. Requires user or staff authentication.",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/user/reviews/update/{reviewId}": {
-      "put": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Update book review",
-        "description": "Update an existing book review by review ID. Requires user or staff authentication.",
+        "summary": "Review book",
+        "description": "Add or Update a review for a book. User must have borrowed and returned the book first.",
         "parameters": [
           {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "Review ID to update"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bookId": {
+                  "example": "any"
+                },
+                "rating": {
+                  "example": "any"
+                },
+                "comment": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
+          "200": {
+            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"
@@ -175,6 +163,16 @@
           },
           {
             "name": "endDate",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "allTime",
             "in": "query",
             "type": "string"
           }
@@ -230,7 +228,7 @@
         "description": "Retrieve books that have low availability/stock levels. Staff access required.",
         "parameters": [
           {
-            "name": "interval",
+            "name": "lowAvailabilityLimit",
             "in": "query",
             "type": "string"
           }
@@ -369,6 +367,30 @@
         }
       }
     },
+    "/books/{bookId}/isBorrowed": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/books/borrow/{bookId}": {
       "post": {
         "description": "",
@@ -377,6 +399,7 @@
             "name": "bookId",
             "in": "path",
             "required": true,
+<<<<<<< HEAD
             "type": "string"
           },
           {
@@ -417,6 +440,10 @@
             "in": "path",
             "required": true,
             "type": "string"
+=======
+            "type": "string",
+            "description": "Book ID to borrow"
+>>>>>>> dev
           }
         ],
         "responses": {
@@ -540,6 +567,38 @@
         }
       }
     },
+    "/books/return/{bookId}": {
+      "put": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Return a book",
+        "description": "Return a borrowed book by its ID. Requires user authentication.",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Book ID to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/books/inventory/{id}": {
       "put": {
         "description": "",
@@ -603,6 +662,7 @@
         }
       }
     },
+<<<<<<< HEAD
     "/books/{bookId}/isBorrowed": {
       "get": {
         "description": "",
@@ -628,6 +688,9 @@
       }
     },
     "/books/{bookId}/copies": {
+=======
+    "/genres/": {
+>>>>>>> dev
       "get": {
         "description": "",
         "parameters": [

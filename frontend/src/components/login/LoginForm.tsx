@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import api from '@/api/api';
+import { login } from '@/api/auth.api';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -51,7 +51,7 @@ export function LoginForm({
     setError('');
 
     try {
-      const response = await api.login(formData);
+      const response = await login(formData);
 
       if (response.success) {
         router.refresh(); // Reload to update auth state

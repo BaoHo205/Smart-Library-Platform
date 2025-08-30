@@ -24,10 +24,12 @@ CREATE PROCEDURE BorrowBook(
 )
 proc: BEGIN
     DECLARE v_available_copies INT DEFAULT 0;
-    DECLARE v_book_status VARCHAR(20);
+    DECLARE v_book_retired VARCHAR(20);
     DECLARE v_user_exists INT DEFAULT 0;
     DECLARE v_active_checkout_count INT DEFAULT 0;
     DECLARE v_is_available BOOLEAN;
+    DECLARE v_copyId VARCHAR(36) DEFAULT NULL;
+
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
@@ -54,8 +56,9 @@ proc: BEGIN
 
     -- Check if user already has this book checked out
     SELECT COUNT(*) INTO v_active_checkout_count
-    FROM checkouts 
-    WHERE userId = p_userId AND bookId = p_bookId AND isReturned = FALSE;
+    FROM checkouts c
+    JOIN books_copies bc ON c.copyId = bc.id
+    WHERE c.userId = p_userId AND bc.bookId = p_bookId AND c.isReturned = FALSE;
     
     IF v_active_checkout_count > 0 THEN
         SET p_success = FALSE;
@@ -77,7 +80,7 @@ proc: BEGIN
     END IF;
 
     -- Lock the book record for update to prevent race conditions
-    SELECT availableCopies, status INTO v_available_copies, v_book_status
+    SELECT availableCopies, isRetired INTO v_available_copies, v_book_retired
     FROM books 
     WHERE id = p_bookId 
     FOR UPDATE;
@@ -91,9 +94,9 @@ proc: BEGIN
         LEAVE proc;
     END IF;
 
-    IF v_book_status != 'available' THEN
+    IF v_book_retired = TRUE THEN
         SET p_success = FALSE;
-        SET p_message = 'Book is not available for checkout';
+        SET p_message = 'Book has been retired and cannot be borrowed';
         SET p_checkoutId = NULL;
         ROLLBACK;
         LEAVE proc;
@@ -107,14 +110,30 @@ proc: BEGIN
         LEAVE proc;
     END IF;
 
+    -- Find an available copy and lock it
+    SELECT id INTO v_copyId
+    FROM books_copies
+    WHERE bookId = p_bookId AND isBorrowed = FALSE
+    ORDER BY createdAt ASC
+    LIMIT 1
+    FOR UPDATE;
+
+    IF v_copyId IS NULL THEN
+        SET p_success = FALSE;
+        SET p_message = 'No available copy found for checkout';
+        SET p_checkoutId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+
     -- Generate checkout ID
     SET p_checkoutId = UUID();
 
     -- Create checkout record
     INSERT INTO checkouts (
-        id, userId, bookId, checkoutDate, dueDate, isReturned, isLate
+        id, userId, copyId, checkoutDate, dueDate, isReturned, isLate
     ) VALUES (
-        p_checkoutId, p_userId, p_bookId, CURDATE(), p_dueDate, FALSE, FALSE
+        p_checkoutId, p_userId, v_copyId, CURDATE(), p_dueDate, FALSE, FALSE
     );
 
     -- Set success values
@@ -593,9 +612,8 @@ END $$
 DELIMITER ;
 
 -- Create stored procedure for reviewing a book
-DELIMITER //
-
-CREATE PROCEDURE ReviewBook(
+DELIMITER $$
+CREATE DEFINER=`root`@`%` PROCEDURE `ReviewBook`(
     IN p_userId VARCHAR(36),
     IN p_bookId VARCHAR(36),
     IN p_rating INT,
@@ -648,8 +666,10 @@ proc: BEGIN
     
     -- Check user has borrowed this book before
     SELECT COUNT(*) INTO v_has_borrowed
-    FROM checkouts 
-    WHERE userId = p_userId AND bookId = p_bookId;
+    FROM checkouts c
+    JOIN books_copies bc
+		ON c.copyId = bc.id
+    WHERE c.userId = p_userId AND bc.bookId = p_bookId AND c.checkoutDate IS NOT NULL;
     
     IF v_has_borrowed = 0 THEN
         SET p_success = FALSE;
@@ -663,6 +683,15 @@ proc: BEGIN
     IF p_rating < 1 OR p_rating > 5 THEN
         SET p_success = FALSE;
         SET p_message = 'Rating must be between 1 and 5';
+        SET p_reviewId = NULL;
+        ROLLBACK;
+        LEAVE proc;
+    END IF;
+    
+    -- Check comment is valid
+    IF LENGTH(p_comment) < 4 THEN
+        SET p_success = FALSE;
+        SET p_message = 'Comment must be more than 4 characters long';
         SET p_reviewId = NULL;
         ROLLBACK;
         LEAVE proc;
@@ -683,10 +712,19 @@ proc: BEGIN
         SET rating = p_rating,
             comment = p_comment,
             updatedAt = CURRENT_TIMESTAMP
-        WHERE userId = p_userId AND bookId = p_bookId;
+        WHERE id = p_reviewId;
         
-        SET p_success = TRUE;
-        SET p_message = 'Review updated successfully';
+        IF ROW_COUNT() > 0 THEN
+            SET p_success = TRUE;
+            SET p_message = 'Review updated successfully';
+        ELSE
+            -- This case should be rare since we already checked for the review's existence
+            SET p_success = FALSE;
+            SET p_message = 'Failed to update review. Review not found.';
+            SET p_reviewId = NULL;
+            ROLLBACK;
+            LEAVE proc;
+        END IF;
     ELSE
         SET p_reviewId = UUID();
         INSERT INTO reviews (
@@ -694,14 +732,20 @@ proc: BEGIN
         ) VALUES (
             p_reviewId, p_userId, p_bookId, p_rating, p_comment
         );
-        
-        SET p_success = TRUE;
-        SET p_message = 'Review submitted successfully';
+        IF ROW_COUNT() > 0 THEN
+            SET p_success = TRUE;
+            SET p_message = 'Review submitted successfully';
+        ELSE
+            SET p_success = FALSE;
+            SET p_message = 'Failed to submit review.';
+            SET p_reviewId = NULL;
+            ROLLBACK;
+            LEAVE proc;
+        END IF;
     END IF;
     
     COMMIT;
-END//
-
+END$$
 DELIMITER ;
 
 -- Create stored procedure for returning a book with concurrency control
@@ -709,7 +753,7 @@ DELIMITER //
 
 CREATE PROCEDURE ReturnBook(
     IN p_userId VARCHAR(36),
-    IN p_bookId VARCHAR(36),
+    IN p_copyId VARCHAR(36),
     OUT p_success BOOLEAN,
     OUT p_message VARCHAR(500),
     OUT p_isLate BOOLEAN
@@ -736,7 +780,7 @@ proc: BEGIN
     -- First check if checkout exists
     SELECT COUNT(*) INTO v_checkoutExists
     FROM checkouts 
-    WHERE userId = p_userId AND bookId = p_bookId AND isReturned = FALSE;
+    WHERE userId = p_userId AND copyId = p_copyId AND isReturned = FALSE;
     
     IF v_checkoutExists = 0 THEN
         SET p_success = FALSE;
@@ -749,7 +793,7 @@ proc: BEGIN
     -- Get the checkout details with FOR UPDATE lock
     SELECT id, dueDate INTO v_checkoutId, v_dueDate
     FROM checkouts 
-    WHERE userId = p_userId AND bookId = p_bookId AND isReturned = FALSE
+    WHERE userId = p_userId AND copyId = p_copyId AND isReturned = FALSE
     ORDER BY checkoutDate DESC
     LIMIT 1
     FOR UPDATE;

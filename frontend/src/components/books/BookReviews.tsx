@@ -1,52 +1,47 @@
 'use client';
 
+import { z } from 'zod';
 import { useState } from 'react';
 import { Star, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
+import { BookReviewsProps, Review } from '@/types/book.type';
 
-interface Review {
-  id: string;
-  userId: string;
-  bookId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
-  userName: string;
-  name: string;
-  userAvatar?: string;
-}
-
-interface BookReviewsProps {
-  reviews: Review[] | null;
-  onAddReview: (rating: number, comment: string) => void;
-  onUpdateReview: (reviewId: string, rating: number, comment: string) => void;
-  currentUserId?: string; // Add this to identify the current authenticated user
-}
+const reviewSchema = z.object({
+  comment: z.string().min(4, 'Comment must be at least 4 characters long'),
+});
 
 export default function BookReviews({
+  bookId,
   reviews,
   onAddReview,
   onUpdateReview,
   currentUserId,
+  isBorrowed
 }: BookReviewsProps) {
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
   const [hoveredStar, setHoveredStar] = useState(0);
+  const [addReviewError, setAddReviewError] = useState<string | null>(null);
 
   // Edit state management
-  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editingReviewId, setEditingReviewId] = useState<string>('');
   const [editReviewText, setEditReviewText] = useState('');
   const [editReviewRating, setEditReviewRating] = useState(0);
   const [editHoveredStar, setEditHoveredStar] = useState(0);
+  const [editReviewError, setEditReviewError] = useState<string | null>(null);
 
   const handleAddReview = () => {
-    if (!newReview.trim() || newRating === 0) return;
-
-    onAddReview(newRating, newReview);
+    const result = reviewSchema.safeParse({ comment: newReview });
+    if (!result.success) {
+      // Set the error message and prevent submission
+      setAddReviewError(result.error.issues[0].message);
+      return;
+    }
+    setAddReviewError(null); // Clear any previous error
+    onAddReview(bookId, newRating, newReview);
     setNewReview('');
     setNewRating(0);
   };
@@ -55,22 +50,28 @@ export default function BookReviews({
     setEditingReviewId(review.id);
     setEditReviewText(review.comment);
     setEditReviewRating(review.rating);
+    setEditReviewError(null);
   };
 
   const handleSaveEdit = () => {
-    if (!editReviewText.trim() || editReviewRating === 0 || !editingReviewId)
+    const result = reviewSchema.safeParse({ comment: editReviewText });
+    if (!result.success) {
+      // Set the error message and prevent submission
+      setEditReviewError(result.error.issues[0].message);
       return;
-
-    onUpdateReview(editingReviewId, editReviewRating, editReviewText);
-    setEditingReviewId(null);
+    }
+    setEditReviewError(null);
+    onUpdateReview(bookId, editReviewRating, editReviewText);
+    setEditingReviewId('');
     setEditReviewText('');
     setEditReviewRating(0);
   };
 
   const handleCancelEdit = () => {
-    setEditingReviewId(null);
+    setEditingReviewId('');
     setEditReviewText('');
     setEditReviewRating(0);
+    setEditReviewError(null);
   };
 
   const renderStars = (
@@ -87,11 +88,10 @@ export default function BookReviews({
         {[1, 2, 3, 4, 5].map(star => (
           <Star
             key={star}
-            className={`h-5 w-5 ${
-              star <= (interactive ? hoverState || rating : rating)
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+            className={`h-5 w-5 ${star <= (interactive ? hoverState || rating : rating)
+              ? 'fill-yellow-400 text-yellow-400'
+              : 'text-gray-300'
+              } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
             onClick={() => interactive && onStarClick?.(star)}
             onMouseEnter={() => interactive && setHoverState(star)}
             onMouseLeave={() => interactive && setHoverState(0)}
@@ -122,39 +122,45 @@ export default function BookReviews({
       </div>
 
       {/* Add Review Form */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
-            <Avatar>
-              <AvatarImage src="/placeholder.svg?height=40&width=40" />
-              <AvatarFallback>CU</AvatarFallback>
-            </Avatar>
+      {isBorrowed && (
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CU</AvatarFallback>
+              </Avatar>
 
-            <div className="flex-1 space-y-4">
-              <div className="flex items-center gap-2">
-                {renderStars(newRating, true, setNewRating)}
-              </div>
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-2">
+                  {renderStars(newRating, true, setNewRating)}
+                </div>
 
-              <Textarea
-                placeholder="Type your message here"
-                value={newReview}
-                onChange={e => setNewReview(e.target.value)}
-                className="min-h-[100px]"
-              />
+                <Textarea
+                  placeholder="Type your message here"
+                  value={newReview}
+                  onChange={e => setNewReview(e.target.value)}
+                  className="min-h-[100px]"
+                />
 
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleAddReview}
-                  disabled={!newReview.trim() || newRating === 0}
-                  className="bg-slate-800 hover:bg-slate-700"
-                >
-                  Add Review
-                </Button>
+                {addReviewError && (
+                  <p className="text-red-500 text-sm mt-1">{addReviewError}</p>
+                )}
+
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleAddReview}
+                    disabled={!newReview.trim() || newRating === 0}
+                    className="bg-slate-800 hover:bg-slate-700"
+                  >
+                    Add Review
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Reviews List */}
       <div className="space-y-4">
@@ -203,6 +209,10 @@ export default function BookReviews({
                           className="min-h-[100px]"
                         />
                       </div>
+
+                      {editReviewError && (
+                        <p className="text-red-500 text-sm mt-1">{editReviewError}</p>
+                      )}
 
                       <div className="flex gap-2">
                         <Button

@@ -88,6 +88,105 @@ const getBooks = async (
   }
 };
 
+const borrowBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Borrow a book'
+  // #swagger.description = 'Borrow a specific book by its ID. Requires user authentication.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to borrow', type: 'string' }
+  try {
+    const { bookId } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated',
+      });
+      return;
+    }
+
+    if (!bookId) {
+      res.status(400).json({
+        success: false,
+        message: 'Book ID is required',
+      });
+      return;
+    }
+
+    const result = await BookService.borrowBook(userId, bookId);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          checkoutId: result.checkoutId,
+          userId,
+          bookId,
+          checkoutDate: new Date().toISOString().split('T')[0],
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Error borrowing book:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while borrowing book',
+    });
+  }
+};
+
+const returnBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Books']
+  // #swagger.summary = 'Return a book'
+  // #swagger.description = 'Return a borrowed book by its ID. Requires user authentication.'
+  // #swagger.parameters['bookId'] = { description: 'Book ID to return', type: 'string' }
+  try {
+    const { bookId } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      res
+        .status(401)
+        .json({ success: false, message: 'User not authenticated' });
+      return;
+    }
+
+    if (!bookId) {
+      res.status(400).json({ success: false, message: 'Book ID is required' });
+      return;
+    }
+
+    const result = await BookService.returnBook(userId, bookId);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          isLate: result.isLate,
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.error('Error in returnBook controller:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 const getBookInfoById = async (
   req: AuthRequest,
   res: Response
