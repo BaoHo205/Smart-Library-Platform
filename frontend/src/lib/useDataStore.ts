@@ -1,4 +1,4 @@
-import { BookShow } from "@/components/admin/books/columns";
+import { BookShow } from "@/components/admin/books/EditBookDialog";
 import { Copies } from "@/components/admin/copies/columns";
 import { create } from "zustand";
 
@@ -61,12 +61,9 @@ export const useDataStore = create<DataState>((set) => ({
     retireBook: (bookId) =>
         set((state) => ({
             books: state.books.map((book) =>
-                // Find the book with the matching ID
                 book.id === bookId
-                    ? // If found, return a new object with the `isRetired` property updated
-                    { ...book, status: "unavailable" }
-                    : // Otherwise, return the book unchanged
-                    book
+                    ? { ...book, isRetired: 1 } // <-- match what your column expects
+                    : book
             ),
         })),
 
