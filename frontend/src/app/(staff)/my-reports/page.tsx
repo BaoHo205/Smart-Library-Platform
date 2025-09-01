@@ -12,7 +12,7 @@ import {
 } from '@/components/reports';
 import { useAuth } from '@/components/auth/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getMostBorrowedBooks, getBooksWithLowAvailability, getTopActiveReaders } from '@/api/staffReports.api';
+import { getMostBorrowedBooks, getBooksWithLowAvailability, getTopActiveReaders, getAllBooksForCategories } from '@/api/staffReports.api';
 import {
     MostBorrowedBook,
     TopActiveReader,
@@ -20,17 +20,38 @@ import {
     StaffReportsFiltersState,
 } from '@/types/reports.type';
 
+// Helper function to calculate date range based on months back
+const calculateDateRange = (monthsBack: number | 'all') => {
+  if (monthsBack === 'all') {
+    // For all-time, return empty strings (will be handled by API)
+    return {
+      startDate: '',
+      endDate: ''
+    };
+  }
+  
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - monthsBack);
+  
+  return {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0]
+  };
+};
+
 export default function StaffReportsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Calculate initial date range for last 6 months
+  const initialDateRange = calculateDateRange(6);
+
   const [filters, setFilters] = useState<StaffReportsFiltersState>({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0], // 30 days ago
-    endDate: new Date().toISOString().split('T')[0], // today
+    startDate: initialDateRange.startDate,
+    endDate: initialDateRange.endDate,
     monthsBack: 6,
-    interval: 60,
+    lowAvailabilityLimit: 5,
     mostBorrowedLimit: 5,
     topReadersLimit: 10,
   });
@@ -43,6 +64,9 @@ export default function StaffReportsPage() {
     MostBorrowedBook[]
   >([]);
   const [lowAvailabilityBooks, setLowAvailabilityBooks] = useState<
+    BookAvailability[]
+  >([]);
+  const [allBooksForCategories, setAllBooksForCategories] = useState<
     BookAvailability[]
   >([]);
   const [topActiveReaders, setTopActiveReaders] = useState<TopActiveReader[]>(
@@ -73,24 +97,28 @@ export default function StaffReportsPage() {
 
         console.log('Fetching data with filters:', filters);
 
-                const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    getMostBorrowedBooks(
-                        filters.startDate,
-                        filters.endDate,
-                        filters.mostBorrowedLimit
-                    ),
-                    getBooksWithLowAvailability(filters.interval),
-                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
-                ]);
+        const [mostBorrowedData, lowAvailabilityData, allBooksData, topReadersData] = await Promise.all([
+            getMostBorrowedBooks(
+                filters.startDate,
+                filters.endDate,
+                filters.mostBorrowedLimit,
+                filters.monthsBack === 'all'
+            ),
+            getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getAllBooksForCategories(),
+            getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
+        ]);
 
         console.log('Data fetched:', {
           mostBorrowedData,
           lowAvailabilityData,
+          allBooksData,
           topReadersData,
         });
 
         setMostBorrowedBooks(mostBorrowedData);
         setLowAvailabilityBooks(lowAvailabilityData);
+        setAllBooksForCategories(allBooksData);
         setTopActiveReaders(topReadersData);
 
         initialLoadComplete.current = true;
@@ -118,18 +146,21 @@ export default function StaffReportsPage() {
         setLowAvailabilityLoading(true);
         setTopReadersLoading(true);
 
-                const [mostBorrowedData, lowAvailabilityData, topReadersData] = await Promise.all([
-                    getMostBorrowedBooks(
-                        filters.startDate,
-                        filters.endDate,
-                        filters.mostBorrowedLimit
-                    ),
-                    getBooksWithLowAvailability(filters.interval),
-                    getTopActiveReaders(filters.monthsBack, filters.topReadersLimit)
-                ]);
+        const [mostBorrowedData, lowAvailabilityData, allBooksData, topReadersData] = await Promise.all([
+            getMostBorrowedBooks(
+                filters.startDate,
+                filters.endDate,
+                filters.mostBorrowedLimit,
+                filters.monthsBack === 'all'
+            ),
+            getBooksWithLowAvailability(filters.lowAvailabilityLimit),
+            getAllBooksForCategories(),
+            getTopActiveReaders(filters.monthsBack === 'all' ? 999 : filters.monthsBack, filters.topReadersLimit)
+        ]);
 
         setMostBorrowedBooks(mostBorrowedData);
         setLowAvailabilityBooks(lowAvailabilityData);
+        setAllBooksForCategories(allBooksData);
         setTopActiveReaders(topReadersData);
       } catch (error) {
         console.error('Failed to load filtered staff reports data:', error);
@@ -146,7 +177,18 @@ export default function StaffReportsPage() {
 
   const handleFiltersChange = useCallback(
     (newFilters: Partial<StaffReportsFiltersState>) => {
-      setFilters(prev => ({ ...prev, ...newFilters }));
+      setFilters(prev => {
+        const updatedFilters = { ...prev, ...newFilters };
+        
+        // If monthsBack changed, recalculate the date range
+        if (newFilters.monthsBack !== undefined && newFilters.monthsBack !== prev.monthsBack) {
+          const newDateRange = calculateDateRange(newFilters.monthsBack);
+          updatedFilters.startDate = newDateRange.startDate;
+          updatedFilters.endDate = newDateRange.endDate;
+        }
+        
+        return updatedFilters;
+      });
     },
     []
   );
@@ -232,8 +274,8 @@ export default function StaffReportsPage() {
             <div className="xl:col-span-7">
               <LowAvailabilityChart
                 books={lowAvailabilityBooks}
+                allBooksForCategories={allBooksForCategories}
                 loading={lowAvailabilityLoading}
-                interval={filters.interval}
               />
             </div>
 
