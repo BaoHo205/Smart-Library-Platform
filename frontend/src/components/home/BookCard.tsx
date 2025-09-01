@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { CheckoutItem } from '../../types/checkout.type';
 import { Book } from '@/types/book.type';
 import { borrowBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
 const BookCard: React.FC<Book> = ({
   id,
@@ -38,15 +39,23 @@ const BookCard: React.FC<Book> = ({
           isLate: 0,
         } as CheckoutItem,
       ]);
-      console.log('Book borrowed successfully');
+      router.refresh();
+      toast.success('Book borrowed successfully!');
     } catch (error) {
       console.error('Error borrowing book:', error);
+      toast.error('Failed to borrow book');
     }
   };
 
   const directToBookDetail = () => {
     router.push(`/books/${id}`);
   };
+
+  const isAlreadyBorrowed = checkouts.some(
+    checkout => checkout.bookId === id && !checkout.isReturned
+  );
+
+  const isOutOfStock = availableCopies === 0;
 
   return (
     <Card
@@ -94,16 +103,14 @@ const BookCard: React.FC<Book> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          )}
+          disabled={isAlreadyBorrowed || isOutOfStock}
           className="w-full"
         >
-          {checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          )
+          {isAlreadyBorrowed
             ? 'Borrowed'
-            : 'Borrow'}
+            : isOutOfStock
+              ? 'Unavailable'
+              : 'Borrow'}
         </Button>
       </CardFooter>
     </Card>

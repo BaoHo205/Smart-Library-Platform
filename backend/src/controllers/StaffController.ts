@@ -22,7 +22,8 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
       if (!startDateStr || !endDateStr) {
         return res.status(400).json({
           success: false,
-          message: 'Start date and end date are required for time-based requests',
+          message:
+            'Start date and end date are required for time-based requests',
           data: {
             received: { startDate: startDateStr, endDate: endDateStr },
             format: 'Expected format: YYYY-MM-DD',
@@ -66,7 +67,9 @@ const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
     );
     res.status(200).json({
       success: true,
-      message: isAllTime ? 'All-time most borrowed books retrieved successfully' : 'Most borrowed books retrieved successfully',
+      message: isAllTime
+        ? 'All-time most borrowed books retrieved successfully'
+        : 'Most borrowed books retrieved successfully',
       data: result,
     });
   } catch (error) {

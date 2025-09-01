@@ -106,20 +106,18 @@ const searchUsers = async (req: Request, res: Response) => {
   }
 };
 
-
 const reviewBook = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Reviews']
   // #swagger.summary = 'Review book'
   // #swagger.description = 'Add or Update a review for a book. User must have borrowed and returned the book first.'
-  
+
   const { bookId, rating, comment } = req.body;
   const userId = req.userId;
-
 
   try {
     const review: IReviewData = {
       bookId: bookId,
-      userId: userId!, 
+      userId: userId!,
       rating: rating,
       comment: comment.toString(),
     };
@@ -130,9 +128,8 @@ const reviewBook = async (req: AuthRequest, res: Response) => {
     return res.status(200).json({
       success: result.success === 1,
       message: result.message,
-      data: result.reviewId
+      data: result.reviewId,
     });
-
   } catch (error) {
     console.error('Error updating review:', error);
 
@@ -142,8 +139,8 @@ const reviewBook = async (req: AuthRequest, res: Response) => {
         success: false,
         error: {
           code: error.code,
-          message: error.message
-        }
+          message: error.message,
+        },
       });
     }
 
@@ -152,8 +149,8 @@ const reviewBook = async (req: AuthRequest, res: Response) => {
       success: false,
       error: {
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'An unexpected error occurred'
-      }
+        message: 'An unexpected error occurred',
+      },
     });
   }
 };

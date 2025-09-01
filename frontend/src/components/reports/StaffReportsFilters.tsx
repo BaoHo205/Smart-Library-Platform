@@ -58,7 +58,9 @@ export function StaffReportsFilters({
   });
 
   const [localMostBorrowedLimit, setLocalMostBorrowedLimit] = useState(
-    filters.mostBorrowedLimit === 'max' ? 'max' : filters.mostBorrowedLimit.toString()
+    filters.mostBorrowedLimit === 'max'
+      ? 'max'
+      : filters.mostBorrowedLimit.toString()
   );
   const [localTopReadersLimit, setLocalTopReadersLimit] = useState(
     filters.topReadersLimit.toString()
@@ -72,7 +74,7 @@ export function StaffReportsFilters({
       setLocalMostBorrowedLimit(filters.mostBorrowedLimit.toString());
     }
     setLocalTopReadersLimit(filters.topReadersLimit.toString());
-    
+
     // Set date range based on filters
     if (filters.startDate && filters.endDate) {
       setDateRange({
@@ -80,7 +82,12 @@ export function StaffReportsFilters({
         to: new Date(filters.endDate),
       });
     }
-  }, [filters.mostBorrowedLimit, filters.topReadersLimit, filters.startDate, filters.endDate]);
+  }, [
+    filters.mostBorrowedLimit,
+    filters.topReadersLimit,
+    filters.startDate,
+    filters.endDate,
+  ]);
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
     setDateRange(newDateRange);
@@ -104,9 +111,9 @@ export function StaffReportsFilters({
       const endDate = new Date();
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 6);
-      onFiltersChange({ 
+      onFiltersChange({
         startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0]
+        endDate: endDate.toISOString().split('T')[0],
       });
     }
   };
@@ -137,7 +144,7 @@ export function StaffReportsFilters({
         },
       });
     }
-    
+
     // Note: The parent component will handle recalculating the date range
     // based on the new monthsBack value
   };
@@ -275,7 +282,7 @@ export function StaffReportsFilters({
     const endDate = new Date();
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 6);
-    
+
     const defaultFilters: StaffReportsFiltersState = {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
@@ -310,7 +317,7 @@ export function StaffReportsFilters({
     if (filters.lowAvailabilityLimit !== 5) count++;
     if (filters.mostBorrowedLimit !== 5) count++;
     if (filters.topReadersLimit !== 10) count++;
-    
+
     // Check if custom date range is applied (not the calculated range from monthsBack)
     if (filters.monthsBack !== 'all') {
       const today = new Date();
@@ -318,12 +325,15 @@ export function StaffReportsFilters({
       calculatedStartDate.setMonth(today.getMonth() - filters.monthsBack);
       const expectedStartDate = calculatedStartDate.toISOString().split('T')[0];
       const expectedEndDate = today.toISOString().split('T')[0];
-      
-      if (filters.startDate !== expectedStartDate || filters.endDate !== expectedEndDate) {
+
+      if (
+        filters.startDate !== expectedStartDate ||
+        filters.endDate !== expectedEndDate
+      ) {
         count++;
       }
     }
-    
+
     return count;
   };
 
@@ -642,7 +652,9 @@ export function StaffReportsFilters({
                             }
                             onKeyDown={e => {
                               if (e.key === 'Enter') {
-                                handleTopReadersLimitChange(localTopReadersLimit);
+                                handleTopReadersLimitChange(
+                                  localTopReadersLimit
+                                );
                               }
                             }}
                             className="h-9 border-gray-200 bg-white transition-colors hover:border-gray-300"
@@ -710,45 +722,50 @@ export function StaffReportsFilters({
                     readers
                   </Badge>
                 )}
-                
+
                 {(() => {
-                  
                   if (filters.monthsBack !== 'all') {
-                    
                     const today = new Date();
                     const calculatedStartDate = new Date();
-                    calculatedStartDate.setMonth(today.getMonth() - filters.monthsBack);
-                    const expectedStartDate = calculatedStartDate.toISOString().split('T')[0];
+                    calculatedStartDate.setMonth(
+                      today.getMonth() - filters.monthsBack
+                    );
+                    const expectedStartDate = calculatedStartDate
+                      .toISOString()
+                      .split('T')[0];
                     const expectedEndDate = today.toISOString().split('T')[0];
-                    
-                    
-                    if (filters.startDate && filters.endDate && 
-                        (filters.startDate !== expectedStartDate || filters.endDate !== expectedEndDate)) {
+
+                    if (
+                      filters.startDate &&
+                      filters.endDate &&
+                      (filters.startDate !== expectedStartDate ||
+                        filters.endDate !== expectedEndDate)
+                    ) {
                       const startDate = new Date(filters.startDate);
                       const endDate = new Date(filters.endDate);
-                      const isSameDay = startDate.toDateString() === endDate.toDateString();
-                      
+                      const isSameDay =
+                        startDate.toDateString() === endDate.toDateString();
+
                       return (
                         <Badge
                           variant="outline"
                           className="border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
                         >
-                          {isSameDay 
-                            ? startDate.toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
+                          {isSameDay
+                            ? startDate.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
                               })
-                            : `${startDate.toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                              })} - ${endDate.toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                              })}`
-                          }
+                            : `${startDate.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })} - ${endDate.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}`}
                         </Badge>
                       );
                     }

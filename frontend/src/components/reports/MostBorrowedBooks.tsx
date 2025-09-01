@@ -38,17 +38,19 @@ export function MostBorrowedBooks({
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {Array.from({ length: typeof limit === 'number' ? limit : 5 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full rounded" />
-                  <Skeleton className="h-3 w-3/4 rounded" />
-                  <Skeleton className="h-6 w-16 rounded-full" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {Array.from({ length: typeof limit === 'number' ? limit : 5 }).map(
+              (_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full rounded" />
+                    <Skeleton className="h-3 w-3/4 rounded" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </CardContent>
       </Card>
@@ -74,7 +76,9 @@ export function MostBorrowedBooks({
           <div className="flex items-center space-x-1 text-sm text-gray-500">
             <CalendarIcon className="h-4 w-4" />
             {startDate && endDate ? (
-              <span>{formatDate(startDate)} - {formatDate(endDate)}</span>
+              <span>
+                {formatDate(startDate)} - {formatDate(endDate)}
+              </span>
             ) : (
               <span>All time</span>
             )}
@@ -82,7 +86,7 @@ export function MostBorrowedBooks({
           {onShowAll && (
             <button
               onClick={onShowAll}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm font-medium text-blue-600 hover:text-blue-800"
             >
               Show all
             </button>
@@ -90,54 +94,54 @@ export function MostBorrowedBooks({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {(limit === 'max' ? books : books.slice(0, limit)).map((book, index) => (
-            <div
-              key={book.bookId}
-              className="group cursor-pointer space-y-3"
-              onClick={() => onBookClick(book.bookId)}
-            >
-              <div className="relative">
-                <div className="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
-                  {book.coverUrl ? (
-                    <img
-                      src={book.coverUrl}
-                      alt={book.title}
-                      className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <BookOpenIcon className="h-12 w-12 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-                <Badge
-                  className="absolute top-2 left-2 bg-gray-800 text-white hover:bg-gray-700"
-                >
-                  #{index + 1}
-                </Badge>
-                <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-sm">
-                  <BookOpenIcon className="h-4 w-4 text-gray-600" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {book.title}
-                </h3>
-                <p className="text-xs text-gray-500 line-clamp-1">
-                  by {book.authors}
-                </p>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-xs">
-                    {book.total_checkouts.toLocaleString()} checkouts
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {(limit === 'max' ? books : books.slice(0, limit)).map(
+            (book, index) => (
+              <div
+                key={book.bookId}
+                className="group cursor-pointer space-y-3"
+                onClick={() => onBookClick(book.bookId)}
+              >
+                <div className="relative">
+                  <div className="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
+                    {book.coverUrl ? (
+                      <img
+                        src={book.coverUrl}
+                        alt={book.title}
+                        className="h-full w-full object-cover object-center transition-transform duration-200 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <BookOpenIcon className="h-12 w-12 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  <Badge className="absolute top-2 left-2 bg-gray-800 text-white hover:bg-gray-700">
+                    #{index + 1}
                   </Badge>
-                  <span className="text-xs text-gray-500">
-                    {book.availableCopies}/{book.quantity} available
-                  </span>
+                  <div className="absolute top-2 right-2 rounded-full bg-white p-1 shadow-sm">
+                    <BookOpenIcon className="h-4 w-4 text-gray-600" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="line-clamp-2 text-sm font-medium text-gray-900 transition-colors group-hover:text-blue-600">
+                    {book.title}
+                  </h3>
+                  <p className="line-clamp-1 text-xs text-gray-500">
+                    by {book.authors}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="text-xs">
+                      {book.total_checkouts.toLocaleString()} checkouts
+                    </Badge>
+                    <span className="text-xs text-gray-500">
+                      {book.availableCopies}/{book.quantity} available
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       </CardContent>
     </Card>

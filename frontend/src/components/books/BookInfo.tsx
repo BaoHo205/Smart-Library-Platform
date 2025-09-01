@@ -5,10 +5,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookDetail from '@/components/books/BookDetail';
 import BookReviews from '@/components/books/BookReviews';
-import { getBookInfoById, getReviewsByBookId, reviewBook, isBookBorrowed } from '@/api/books.api';
+import {
+  getBookInfoById,
+  getReviewsByBookId,
+  reviewBook,
+  isBookBorrowed,
+} from '@/api/books.api';
 import { borrowBook } from '@/api/checkout.api';
 import type { BookDetails, IReview, Review } from '@/types/book.type';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useAuth } from '../auth/useAuth';
 
 // Interface to match BookDetail component props
@@ -25,7 +30,6 @@ interface BookDetailType {
   offlineLocation?: string;
   availableCopies: number;
 }
-
 
 // Adapter function to convert BookDetails to BookDetailType
 const adaptBookDetails = (book: BookDetails): BookDetailType => {
@@ -70,9 +74,7 @@ interface BookDetailPageProps {
   bookId: string;
 }
 
-export default function BookInfoPage({
-  bookId,
-}: BookDetailPageProps) {
+export default function BookInfoPage({ bookId }: BookDetailPageProps) {
   const { user } = useAuth(); // User is guaranteed to be authenticated
   const [book, setBook] = useState<BookDetailType | null>(null);
   const [reviews, setReviews] = useState<Review[] | []>([]);
@@ -124,6 +126,7 @@ export default function BookInfoPage({
     setBorrowing(true);
     try {
       const result = await borrowBook(bookId);
+      console.log('result: ', result);
       if (result.success) {
         setIsBorrowed(true);
         toast.success('Book borrowed successfully!');
@@ -132,13 +135,29 @@ export default function BookInfoPage({
       }
     } catch (err) {
       console.error('Error borrowing book:', err);
+      // surface message via toast as well
+      let message = 'Failed to borrow book. Please try again.';
+      if (err instanceof Error) message = err.message;
+      else if (typeof err === 'string') message = err;
+      else {
+        try {
+          message = JSON.stringify(err);
+        } catch {
+          message = String(err);
+        }
+      }
+      toast.error(message);
       setError('Failed to borrow book. Please try again.');
     } finally {
       setBorrowing(false);
     }
   };
 
-  const handleReviewBook = async (bookId: string, rating: number, comment: string) => {
+  const handleReviewBook = async (
+    bookId: string,
+    rating: number,
+    comment: string
+  ) => {
     try {
       await reviewBook(bookId, rating, comment);
 

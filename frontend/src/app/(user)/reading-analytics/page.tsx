@@ -10,13 +10,17 @@ import { BooksModal } from '@/components/analytics/BooksModal';
 import { AnalyticsFilters as AnalyticsFiltersComponent } from '@/components/analytics/AnalyticsFilters';
 import { useAuth } from '@/components/auth/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getMostHighlightedBooksWithDetails, getTopBooksByReadTimeWithDetails, getReadingTrends } from '@/api/readingSessions.api';
 import {
-    UserProfile,
-    MostHighlightedBook,
-    TopBookByReadingTime,
-    ReadingTrend,
-    AnalyticsFiltersState,
+  getMostHighlightedBooksWithDetails,
+  getTopBooksByReadTimeWithDetails,
+  getReadingTrends,
+} from '@/api/readingSessions.api';
+import {
+  UserProfile,
+  MostHighlightedBook,
+  TopBookByReadingTime,
+  ReadingTrend,
+  AnalyticsFiltersState,
 } from '@/types/reading-session.type';
 
 export default function ReadingAnalyticsPage() {
@@ -205,15 +209,16 @@ export default function ReadingAnalyticsPage() {
         setTopBooksLoading(true);
         setChartLoading(true);
 
-                const [highlightedBooksData, topBooksData, chartTrendsData] = await Promise.all([
-                    getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
-                    getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
-                    getReadingTrends(
-                        viewMode === 'personal' ? user.id : undefined,
-                        filters.months === 'all' ? 'all' : filters.months,
-                        filters.dateRange
-                    )
-                ]);
+        const [highlightedBooksData, topBooksData, chartTrendsData] =
+          await Promise.all([
+            getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
+            getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
+            getReadingTrends(
+              viewMode === 'personal' ? user.id : undefined,
+              filters.months === 'all' ? 'all' : filters.months,
+              filters.dateRange
+            ),
+          ]);
 
         console.log('API Response Data:', {
           highlightedBooks: highlightedBooksData,
@@ -268,15 +273,16 @@ export default function ReadingAnalyticsPage() {
         setTopBooksLoading(true);
         setChartLoading(true);
 
-                const [highlightedBooksData, topBooksData, chartTrendsData] = await Promise.all([
-                    getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
-                    getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
-                    getReadingTrends(
-                        viewMode === 'personal' ? user.id : undefined,
-                        filters.months === 'all' ? 'all' : filters.months,
-                        filters.dateRange
-                    )
-                ]);
+        const [highlightedBooksData, topBooksData, chartTrendsData] =
+          await Promise.all([
+            getMostHighlightedBooksWithDetails(filters.highlightedBooksLimit),
+            getTopBooksByReadTimeWithDetails(filters.topBooksLimit),
+            getReadingTrends(
+              viewMode === 'personal' ? user.id : undefined,
+              filters.months === 'all' ? 'all' : filters.months,
+              filters.dateRange
+            ),
+          ]);
 
         console.log('API Response Data:', {
           highlightedBooks: highlightedBooksData,

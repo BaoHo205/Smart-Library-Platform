@@ -1,3 +1,7 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardHeader, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -5,14 +9,12 @@ import { Button } from '../ui/button';
 import { CheckoutItem } from '@/types/checkout.type';
 import { format, parseISO, isValid } from 'date-fns';
 import { returnBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
-const LoanCard = ({
-  checkout,
-  setCheckouts,
-}: {
-  checkout: CheckoutItem;
-  setCheckouts: React.Dispatch<React.SetStateAction<CheckoutItem[]>>;
-}) => {
+const ActiveLoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
+  const router = useRouter();
+  const [isReturning, setIsReturning] = useState(false);
+
   const formatDateDMY = (iso?: string | null) => {
     if (!iso) return '—';
     try {
@@ -21,6 +23,20 @@ const LoanCard = ({
       return format(d, 'dd/MM/yyyy');
     } catch {
       return 'Invalid date';
+    }
+  };
+
+  const handleReturn = async (copyId: string) => {
+    try {
+      setIsReturning(true);
+      await returnBook(copyId);
+      toast.success('Book returned successfully!');
+      router.refresh();
+    } catch (err) {
+      console.error('Return failed', err);
+      toast.error('Failed to return book');
+    } finally {
+      setIsReturning(false);
     }
   };
 
@@ -43,7 +59,7 @@ const LoanCard = ({
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={'/default-image.png'}
+          src={checkout.bookThumbnail || '/default-image.png'}
           width={100}
           height={100}
           alt={'title'}
@@ -51,17 +67,18 @@ const LoanCard = ({
         />
       </CardContent>
       <CardFooter className="flex items-center justify-between">
-        <div className="flex gap-1.5">
-          <span className="text-xs font-bold">{`Due by ${formatDateDMY(checkout.dueDate)}`}</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs">Due by</span>
+          <span className="text-s font-bold">
+            {formatDateDMY(checkout.dueDate)}
+          </span>
         </div>
         <Button
           onClick={() => {
-            returnBook(checkout.bookId);
-            setCheckouts(prev =>
-              prev.filter(c => c.bookId !== checkout.bookId)
-            );
+            handleReturn(checkout.copyId);
           }}
-          disabled={false}
+          disabled={isReturning}
+          className="w-24"
         >
           Return
         </Button>
@@ -70,4 +87,4 @@ const LoanCard = ({
   );
 };
 
-export default LoanCard;
+export default ActiveLoanCard;

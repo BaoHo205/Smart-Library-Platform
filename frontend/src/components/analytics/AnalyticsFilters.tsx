@@ -47,7 +47,10 @@ import {
 } from '@/components/ui/collapsible';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
-import { AnalyticsFiltersState, DeviceType } from '@/types/reading-session.type';
+import {
+  AnalyticsFiltersState,
+  DeviceType,
+} from '@/types/reading-session.type';
 import { useUserSearch, UserSearchResult } from '@/hooks/useUserSearch';
 
 import { DateRange } from 'react-day-picker';
@@ -843,22 +846,23 @@ export function AnalyticsFilters({
                     {(() => {
                       const startDate = new Date(filters.dateRange.from!);
                       const endDate = new Date(filters.dateRange.to!);
-                      const isSameDay = startDate.toDateString() === endDate.toDateString();
-                      
-                      return isSameDay 
-                        ? startDate.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
+                      const isSameDay =
+                        startDate.toDateString() === endDate.toDateString();
+
+                      return isSameDay
+                        ? startDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
                           })
-                        : `${startDate.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
-                          })} - ${endDate.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
+                        : `${startDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })} - ${endDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
                           })}`;
                     })()}
                   </Badge>
