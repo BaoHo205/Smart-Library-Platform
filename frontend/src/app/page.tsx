@@ -1,10 +1,16 @@
-import HomePage from '@/components/home/Homepage';
+import { Book } from '@/types/book.type';
+import BookCardList from '@/components/home/BookCardList';
+import Header from '@/components/home/Header';
+import Image from 'next/image';
 import { headers } from 'next/headers';
 
 const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-export default async function Page({ searchParams }: { searchParams: { genre: string; page: number; searchBy: string; q?: string } }) {
-  const { genre = '', page = 1, searchBy = 'title', q = '' } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Record<string, string> }) {
+  const genre = searchParams?.genre ?? '';
+  const page = Number(searchParams?.page ?? 1);
+  const searchBy = searchParams?.searchBy ?? 'title';
+  const q = searchParams?.q ?? '';
 
   const params = new URLSearchParams();
   if (genre) params.set('genre', genre);
@@ -17,8 +23,11 @@ export default async function Page({ searchParams }: { searchParams: { genre: st
   const headersList = await headers();
   const cookie = headersList.get('cookie') ?? '';
 
+  const pageSize = 12;
   const res = await fetch(
-    `${DEFAULT_BASE}/api/v1/books?pageSize=12&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(searchBy)}=${encodeURIComponent(q)}`,
+    `${DEFAULT_BASE}/api/v1/books?pageSize=${pageSize}&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(
+      searchBy
+    )}=${encodeURIComponent(q)}`,
     {
       headers: { cookie },
       next: { tags: [`books:${paramsString}`] },
@@ -36,5 +45,23 @@ export default async function Page({ searchParams }: { searchParams: { genre: st
     initialData = null;
   }
 
-  return <HomePage initialData={initialData} />;
+  const books: Book[] = initialData?.data?.data || [];
+  const total = initialData?.data?.total || 0;
+  const pages: number = Math.max(1, Math.ceil(total / pageSize));
+
+  return (
+    <div className="flex">
+      <div className="flex w-full flex-col justify-center gap-6 p-6">
+        <Header />
+        <Image
+          src="/default-image.png"
+          alt="Banner Image"
+          width={100}
+          height={100}
+          className="h-full w-full"
+        />
+        <BookCardList books={books} pages={pages} />
+      </div>
+    </div>
+  );
 }
