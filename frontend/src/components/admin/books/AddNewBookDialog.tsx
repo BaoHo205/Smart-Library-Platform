@@ -114,7 +114,7 @@ export const AddNewBookDialog = () => {
         status: "available",
         authorIds: values.author.join(','),
         genreIds: values.genre.join(','),
-        avgRating: values.avgRating, // Added avgRating to the payload
+        avgRating: 0.0, // Added avgRating to the payload
         staffId: user?.id,
       };
       const response = await axiosInstance.post('/api/v1/books/add', newBookData);
@@ -337,7 +337,7 @@ export const AddNewBookDialog = () => {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="avgRating"
                 render={({ field }) => (
@@ -364,7 +364,7 @@ export const AddNewBookDialog = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
             <FormField
               control={form.control}
