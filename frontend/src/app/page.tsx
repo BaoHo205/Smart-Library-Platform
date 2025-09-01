@@ -45,8 +45,8 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
     initialData = null;
   }
 
-  const books: Book[] = initialData?.data?.data || [];
-  const total = initialData?.data?.total || 0;
+  const books: Book[] = initialData?.result?.data || [];
+  const total = initialData?.result?.total || 0;
   const pages: number = Math.max(1, Math.ceil(total / pageSize));
 
   return (

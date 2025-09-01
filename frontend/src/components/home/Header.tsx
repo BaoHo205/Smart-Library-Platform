@@ -16,12 +16,12 @@ import {
 } from '@/components/ui/select';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-type Option = { value: string; label: string };
+type Option = { id: string; name: string };
 
 const options: Option[] = [
-  { value: 'title', label: 'Title' },
-  { value: 'author', label: 'Author' },
-  { value: 'publisher', label: 'Publisher' },
+  { id: 'title', name: 'Title' },
+  { id: 'author', name: 'Author' },
+  { id: 'publisher', name: 'Publisher' },
 ];
 
 const Header: React.FC = () => {
@@ -51,8 +51,9 @@ const Header: React.FC = () => {
     let mounted = true;
     const fetchGenres = async () => {
       try {
-        const response = await axiosInstance.get<Option[]>('/api/v1/genres');
-        if (mounted) setGenres(response.data || []);
+        const response = await axiosInstance.get('/api/v1/genres');
+        console.log('Fetched genres:', response);
+        if (mounted) setGenres(response.data.data || []);
       } catch (error) {
         console.error('Failed to fetch genres:', error);
         if (mounted) setGenres([]);
@@ -78,14 +79,14 @@ const Header: React.FC = () => {
     <header className="flex items-center justify-between">
       <div className="flex h-full gap-5">
         <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
-          <Select value={searchParam} onValueChange={v => setParamAndPush('searchBy', v)}>
+          <Select value={searchParam} onValueChange={searchCategory => setParamAndPush('searchBy', searchCategory)}>
             <SelectTrigger className="m-0 h-full w-[10rem] rounded-md bg-neutral-100 font-medium">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {options.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                <SelectItem key={option.id} value={option.name}>
+                  {option.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -101,7 +102,7 @@ const Header: React.FC = () => {
           />
         </div>
         <Combobox
-          options={genres.map(genre => ({ value: genre.value, label: genre.label }))}
+          options={genres.map(genre => ({ value: genre.id, label: genre.name }))}
           optionName="genre"
           className="h-full w-[12vw] rounded-lg"
           onValueChange={selectedGenre => setParamAndPush('genre', selectedGenre)}
