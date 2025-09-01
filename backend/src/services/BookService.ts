@@ -121,9 +121,18 @@ export interface ReturnBookResult {
 async function searchBooks(
   filters: BookSearchFilters
 ): Promise<BookSearchResult> {
-  const page = Math.max(1, Number(filters.page) || 1);
-  const pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
-  const offset = (page - 1) * pageSize;
+  let page = 1;
+  let pageSize = 10;
+  let offset = 0;
+  let paginationSql = '';
+
+  // Only apply pagination if page or pageSize are provided by the user.
+  if (filters.page || filters.pageSize) {
+    page = Math.max(1, Number(filters.page) || 1);
+    pageSize = Math.min(100, Math.max(1, Number(filters.pageSize) || 10));
+    offset = (page - 1) * pageSize;
+    paginationSql = `LIMIT ${pageSize} OFFSET ${offset}`;
+  }
 
   // Define clause
   const where: string[] = [];
@@ -202,13 +211,15 @@ async function searchBooks(
       b.quantity,
       b.availableCopies,
       b.avgRating,
+      b.description,
+      b.isRetired,
       p.name AS publisherName,
       COALESCE(authors.authors, '') AS authors,
       COALESCE(genres.genres, '') AS genres
     ${baseFrom}
     ${whereSql}
     ORDER BY ${sortCol} ${order}
-    LIMIT ${pageSize} OFFSET ${offset}
+    ${paginationSql}
   `;
 
   // Count query
@@ -434,10 +445,10 @@ const addNewBook = async (
       bookData.isbn || null,
       bookData.quantity || null,
       bookData.quantity || null,
-      bookData.pageCount || null,
+      bookData.pageCount || 500,
       bookData.publisherId || null,
       bookData.description || null,
-      bookData.status || 'available',
+      bookData.avgRating,
       bookData.authorIds,
       bookData.genreIds,
       staffId,
@@ -447,14 +458,20 @@ const addNewBook = async (
     await mysqlConnection.executeQuery(procedure, params);
 
     // Retrieve the OUT parameter
-    const selectRows = (await mysqlConnection.executeQuery(
+    const result = (await mysqlConnection.executeQuery(
       'SELECT @new_book_id AS id'
     )) as unknown as IdRow;
 
-    if (!selectRows) {
+    if (!result) {
       throw new Error('Failed to retrieve new book ID from procedure');
     }
-    return selectRows.id;
+
+    console.log(result.id)
+
+    const book = await getBookInfoById(result.id);
+    console.log(book)
+
+    return result.id;
   } catch (error) {
     console.error('Error in bookService.addNewBook:', error);
     if (error instanceof Error) {
@@ -464,6 +481,79 @@ const addNewBook = async (
     }
   }
 };
+
+const addNewCopy = async (
+  bookId: string,
+  staffId: string
+): Promise<BookCopy> => {
+  try {
+    const procedure =
+      'CALL AddBookCopy(?, ?, @new_copy_id)';
+    const params = [
+      bookId,
+      staffId
+    ];
+
+    // Execute the stored procedure (returns OkPacket or similar)
+    await mysqlConnection.executeQuery(procedure, params);
+
+    // Retrieve the OUT parameter
+    const result = (await mysqlConnection.executeQuery(
+      'SELECT @new_copy_id AS id'
+    )) as unknown as IdRow[];
+
+    if (!result) {
+      throw new Error('Failed to retrieve new book ID from procedure');
+    }
+
+    console.log(result[0].id)
+
+    const book = await getBookCopyById(result[0].id);
+    console.log(book)
+
+    return book;
+  } catch (error) {
+    console.error('Error in bookService.addNewCopy:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not create book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not create book copy: ${String(error)}`);
+    }
+  }
+};
+interface BookCopy {
+  id: string;
+  isBorrowed: number
+}
+const getBookCopyById = async (id: string) => {
+  try {
+    const query = 'SELECT id, isBorrowed FROM books_copies WHERE id = ?';
+    const result = await mysqlConnection.executeQuery(query, [id]) as unknown as BookCopy[];
+    return result[0];
+  } catch (error) {
+    console.error('Error in bookService.getBookCopyById:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not get book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not get book copy: ${String(error)}`);
+    }
+  }
+}
+
+const deleteBookCopyById = async (copyId: string, staffId: string) => {
+  try {
+    const query = 'CALL DeleteBookCopy(?, ?)';
+    await mysqlConnection.executeQuery(query, [copyId, staffId]);
+    return true;
+  } catch (error) {
+    console.error('Error in bookService.getBookCopyById:', error);
+    if (error instanceof Error) {
+      throw new Error(`Could not get book copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not get book copy: ${String(error)}`);
+    }
+  }
+}
 
 /**
  * Updates the quantity and availableCopies of a specific book by calling the `UpdateBookInventory`
@@ -484,9 +574,6 @@ const updateBookInventory = async (
 
     const results = await mysqlConnection.executeQuery(procedure, params);
 
-    // Stored procedures don't return affectedRows directly, so we'll assume success if no error is thrown
-    // and handle logic in the procedure itself. We can check the result set for a status if the procedure provides one.
-    // For now, we'll return true on successful execution.
     return true;
   } catch (error) {
     console.error(
@@ -518,13 +605,33 @@ const retireBook = async (
     const params = [bookId, staffId];
 
     const results = await mysqlConnection.executeQuery(procedure, params);
-    return true; // Assume success if the procedure call doesn't throw an error
+    return true;
   } catch (error) {
     console.error(`Error in bookService.retireBook for ID ${bookId}:`, error);
     if (error instanceof Error) {
       throw new Error(`Could not retire book: ${error.message}`);
     } else {
       throw new Error(`Could not retire book: ${String(error)}`);
+    }
+  }
+};
+
+const retireCopy = async (
+  bookId: string,
+  staffId: string
+): Promise<boolean> => {
+  try {
+    const procedure = 'CALL RetireBookCopy(?, ?)';
+    const params = [bookId, staffId];
+
+    const results = await mysqlConnection.executeQuery(procedure, params);
+    return true;
+  } catch (error) {
+    console.error(`Error in bookService.retireCopy for CopyID ${bookId}:`, error);
+    if (error instanceof Error) {
+      throw new Error(`Could not retire copy: ${error.message}`);
+    } else {
+      throw new Error(`Could not retire copy: ${String(error)}`);
     }
   }
 };
@@ -585,6 +692,67 @@ const isBookBorrowed = async (
   }
 };
 
+const updateBook = async (
+  bookData: NewBook,
+  bookId: string,
+  staffId: string
+): Promise<void> => {
+  try {
+    const query = `
+            CALL UpdateBook(
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            );
+        `;
+
+    // The array of parameters must be in the exact order the stored procedure expects.
+    const params = [
+      bookId,
+      bookData.title || null,
+      bookData.thumbnailUrl || null,
+      bookData.isbn || null,
+      bookData.quantity || null,
+      bookData.pageCount || null,
+      bookData.publisherId || null,
+      bookData.description || null,
+      bookData.avgRating,
+      bookData.authorIds,
+      bookData.genreIds,
+      staffId
+    ];
+
+    // The `executeQuery` function handles connection pooling and prepared statements for us.
+    await mysqlConnection.executeQuery(query, params);
+
+    console.log(`Book with ID ${bookData} updated successfully.`);
+  } catch (error) {
+    console.error('Error in BookService.updateBook:', error);
+    throw new Error('Failed to update book in the database.');
+  }
+};
+
+interface BookCopiesRow {
+  id: string;
+  isBorrowed: number;
+}
+
+const getBookCopies = async (bookId: string) => {
+  const query = `
+    SELECT id, isBorrowed
+    FROM books_copies
+    WHERE bookId = ?
+  `
+
+  const param = [bookId]
+
+  try {
+    const result = await mysqlConnection.executeQuery(query, param) as unknown as BookCopiesRow;
+    return result;
+  } catch (error) {
+    console.error('Error in BookService.getBookCopies:', error);
+    throw new Error('Failed to get book copies in the database.');
+  }
+}
+
 export default {
   searchBooks,
   borrowBook,
@@ -596,4 +764,9 @@ export default {
   retireBook,
   getAllReviewsByBookId,
   isBookBorrowed,
+  updateBook,
+  getBookCopies,
+  retireCopy,
+  deleteBookCopyById,
+  addNewCopy
 };

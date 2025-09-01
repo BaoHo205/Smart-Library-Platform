@@ -245,11 +245,7 @@
     },
     "/books/": {
       "get": {
-        "tags": [
-          "Books"
-        ],
-        "summary": "Get books",
-        "description": "Search and retrieve books based on query parameters such as title, author, and genre.",
+        "description": "",
         "parameters": [
           {
             "name": "page",
@@ -397,18 +393,26 @@
     },
     "/books/borrow/{bookId}": {
       "post": {
-        "tags": [
-          "Books"
-        ],
-        "summary": "Borrow a book",
-        "description": "Borrow a specific book by its ID. Requires user authentication.",
+        "description": "",
         "parameters": [
           {
             "name": "bookId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "description": "Book ID to borrow"
+<<<<<<< HEAD
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "dueDate": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -420,6 +424,100 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/return/{bookId}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+=======
+            "type": "string",
+            "description": "Book ID to borrow"
+>>>>>>> dev
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/update/{bookId}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "thumbnailUrl": {
+                  "example": "any"
+                },
+                "isbn": {
+                  "example": "any"
+                },
+                "quantity": {
+                  "example": "any"
+                },
+                "pageCount": {
+                  "example": "any"
+                },
+                "publisherId": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "authorIds": {
+                  "example": "any"
+                },
+                "genreIds": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "avgRating": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"
@@ -564,16 +662,64 @@
         }
       }
     },
-    "/genres/": {
+<<<<<<< HEAD
+    "/books/{bookId}/isBorrowed": {
       "get": {
-        "tags": [
-          "Genres"
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
         ],
-        "summary": "Get all genres",
-        "description": "Retrieve a list of all book genres.",
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/{bookId}/copies": {
+=======
+    "/genres/": {
+>>>>>>> dev
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/genres/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -958,6 +1104,95 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/authors/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/authors/create": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/publishers/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/publishers/create": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"

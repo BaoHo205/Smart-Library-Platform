@@ -45,6 +45,8 @@ const Combobox: React.FC<ComboboxProps> = ({
       onValueChange(newValue);
     }
   };
+  console.log(Array.isArray(options), options);
+  console.log(options)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
