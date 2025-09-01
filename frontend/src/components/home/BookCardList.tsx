@@ -36,8 +36,6 @@ const BookCardList: React.FC<BookCardListProps> = ({
     );
   }
 
-
-
   // Handle pagination logic
   const totalPages = Math.floor(pages);
   const showPagination = totalPages > 1;

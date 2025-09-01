@@ -3,8 +3,17 @@ import { headers } from 'next/headers';
 
 const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-export default async function Page({ searchParams }: { searchParams: { genre: string; page: number; searchBy: string; q?: string } }) {
-  const { genre = '', page = 1, searchBy = 'title', q = '' } = await searchParams;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { genre: string; page: number; searchBy: string; q?: string };
+}) {
+  const {
+    genre = '',
+    page = 1,
+    searchBy = 'title',
+    q = '',
+  } = await searchParams;
 
   const params = new URLSearchParams();
   if (genre) params.set('genre', genre);

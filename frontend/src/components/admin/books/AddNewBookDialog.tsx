@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -22,47 +22,64 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Plus, Minus } from "lucide-react";
-import { ComboboxWithCreate } from "./ComboboxWithCreate";
-import axiosInstance from "@/config/axiosConfig";
+} from '@/components/ui/form';
+import { Plus, Minus } from 'lucide-react';
+import { ComboboxWithCreate } from './ComboboxWithCreate';
+import axiosInstance from '@/config/axiosConfig';
 import { useDataStore } from '@/lib/useDataStore';
-import { toast } from "sonner";
-import { useAuth } from "@/components/auth/useAuth";
+import { toast } from 'sonner';
+import { useAuth } from '@/components/auth/useAuth';
 
 const formSchema = z.object({
-  bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
-  isbn: z.string({ message: "ISBN is required" }).min(5, { message: "ISBN is at least 5 chars." }),
-  publisher: z.string().min(1, { message: "Publisher is required." }),
-  author: z.array(z.string()).min(1, { message: "At least one author is required." }),
-  genre: z.array(z.string()).min(1, { message: "At least one genre is required." }),
-  thumbnailLink: z.string().url({ message: "Invalid URL." }).optional(),
-  bookQuantity: z.number({ message: "Quantity is required." }).min(1, { message: "Quantity cannot be negative." }),
-  description: z.string({ message: "Book description is required." }).min(200, { message: "Book description must above 200 chars" }),
-  pageCount: z.number({ message: "Page count is required." }).min(10, { message: "The number of book pages is larger than 10" }),
-  avgRating: z.number({ message: "Average rating is required." }).min(0, { message: "Rating cannot be negative." }).max(5, { message: "Rating cannot exceed 5." })
+  bookTitle: z
+    .string()
+    .min(2, { message: 'Book title must be at least 2 characters.' }),
+  isbn: z
+    .string({ message: 'ISBN is required' })
+    .min(5, { message: 'ISBN is at least 5 chars.' }),
+  publisher: z.string().min(1, { message: 'Publisher is required.' }),
+  author: z
+    .array(z.string())
+    .min(1, { message: 'At least one author is required.' }),
+  genre: z
+    .array(z.string())
+    .min(1, { message: 'At least one genre is required.' }),
+  thumbnailLink: z.string().url({ message: 'Invalid URL.' }).optional(),
+  bookQuantity: z
+    .number({ message: 'Quantity is required.' })
+    .min(1, { message: 'Quantity cannot be negative.' }),
+  description: z
+    .string({ message: 'Book description is required.' })
+    .min(200, { message: 'Book description must above 200 chars' }),
+  pageCount: z
+    .number({ message: 'Page count is required.' })
+    .min(10, { message: 'The number of book pages is larger than 10' }),
+  avgRating: z
+    .number({ message: 'Average rating is required.' })
+    .min(0, { message: 'Rating cannot be negative.' })
+    .max(5, { message: 'Rating cannot exceed 5.' }),
 });
 
 export const AddNewBookDialog = () => {
   const [open, setOpen] = useState(false);
-  const publisherList = useDataStore((s) => s.publisherList);
-  const authorList = useDataStore((s) => s.authorList);
-  const genreList = useDataStore((s) => s.genreList);
-  const addPublisher = useDataStore((s) => s.addPublisher);
-  const addAuthor = useDataStore((s) => s.addAuthor);
+  const publisherList = useDataStore(s => s.publisherList);
+  const authorList = useDataStore(s => s.authorList);
+  const genreList = useDataStore(s => s.genreList);
+  const addPublisher = useDataStore(s => s.addPublisher);
+  const addAuthor = useDataStore(s => s.addAuthor);
   const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      bookTitle: "",
-      isbn: "",
-      publisher: "",
+      bookTitle: '',
+      isbn: '',
+      publisher: '',
       author: [],
       genre: [],
-      thumbnailLink: "",
+      thumbnailLink: '',
       bookQuantity: 0,
-      description: "",
+      description: '',
       pageCount: 0,
       avgRating: 0, // Added default value for avgRating
     },
@@ -70,15 +87,18 @@ export const AddNewBookDialog = () => {
 
   const handleCreatePublisher = async (name: string) => {
     try {
-      const createdPublisher = await axiosInstance.post("/api/v1/publishers/create", { name });
+      const createdPublisher = await axiosInstance.post(
+        '/api/v1/publishers/create',
+        { name }
+      );
 
       addPublisher(createdPublisher.data.data[0]);
-      const publisherId = createdPublisher.data.data[0].id
+      const publisherId = createdPublisher.data.data[0].id;
 
-      form.setValue("publisher", publisherId);
-      toast.success("Publisher created successfully.");
+      form.setValue('publisher', publisherId);
+      toast.success('Publisher created successfully.');
     } catch (error) {
-      toast.error("Failed to create publisher: " + error);
+      toast.error('Failed to create publisher: ' + error);
     }
   };
 
@@ -86,22 +106,25 @@ export const AddNewBookDialog = () => {
     const [firstName, ...lastNameParts] = fullName.split(' ');
     const lastName = lastNameParts.join(' ');
     try {
-      const created = await axiosInstance.post("/api/v1/authors/create", { firstName, lastName });
-      const authorId = created.data.data[0].id
+      const created = await axiosInstance.post('/api/v1/authors/create', {
+        firstName,
+        lastName,
+      });
+      const authorId = created.data.data[0].id;
 
       addAuthor(created.data.data[0]);
 
-      const currentAuthors = form.getValues("author");
-      form.setValue("author", [...currentAuthors, authorId]);
+      const currentAuthors = form.getValues('author');
+      form.setValue('author', [...currentAuthors, authorId]);
 
-      toast.success("Author created successfully.");
+      toast.success('Author created successfully.');
     } catch (error) {
-      toast.error("Failed to create author: " + error);
+      toast.error('Failed to create author: ' + error);
     }
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Submitting values:", values);
+    console.log('Submitting values:', values);
     try {
       const newBookData = {
         title: values.bookTitle,
@@ -111,37 +134,40 @@ export const AddNewBookDialog = () => {
         pageCount: values.pageCount,
         publisherId: values.publisher,
         description: values.description || null,
-        status: "available",
+        status: 'available',
         authorIds: values.author.join(','),
         genreIds: values.genre.join(','),
         avgRating: values.avgRating, // Added avgRating to the payload
         staffId: user?.id,
       };
-      const response = await axiosInstance.post('/api/v1/books/add', newBookData);
-      console.log("Book created successfully:", response.data);
+      const response = await axiosInstance.post(
+        '/api/v1/books/add',
+        newBookData
+      );
+      console.log('Book created successfully:', response.data);
       form.reset();
       setOpen(false);
-      toast.success("Book added successfully!"); // Added success toast
+      toast.success('Book added successfully!'); // Added success toast
     } catch (error) {
       console.error('Error creating new book:', error);
-      toast.error("Failed to add book."); // Added error toast
+      toast.error('Failed to add book.'); // Added error toast
     }
-  }
+  };
 
   const handleQuantityChange = (delta: number) => {
-    const currentQuantity = form.getValues("bookQuantity");
-    form.setValue("bookQuantity", Math.max(0, currentQuantity + delta));
+    const currentQuantity = form.getValues('bookQuantity');
+    form.setValue('bookQuantity', Math.max(0, currentQuantity + delta));
   };
 
   const handlePageChange = (delta: number) => {
-    const currentPage = form.getValues("pageCount");
-    form.setValue("pageCount", Math.max(0, currentPage + delta));
+    const currentPage = form.getValues('pageCount');
+    form.setValue('pageCount', Math.max(0, currentPage + delta));
   };
 
   const handleRatingChange = (delta: number) => {
-    const currentRating = form.getValues("avgRating");
+    const currentRating = form.getValues('avgRating');
     const newRating = Math.max(0, Math.min(5, currentRating + delta)); // Clamp between 0 and 5
-    form.setValue("avgRating", Number(newRating.toFixed(1))); // Format to one decimal place
+    form.setValue('avgRating', Number(newRating.toFixed(1))); // Format to one decimal place
   };
 
   const publisherOptions = publisherList.map(p => ({
@@ -162,7 +188,7 @@ export const AddNewBookDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button onClick={() => setOpen(true)}>Add New Book</Button>
-      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Add new Book</DialogTitle>
         </DialogHeader>
@@ -254,7 +280,7 @@ export const AddNewBookDialog = () => {
                         items={genreOptions}
                         value={field.value}
                         onValueChange={field.onChange}
-                        onNewItem={() => { }}
+                        onNewItem={() => {}}
                         placeholder="Select or add genre(s)..."
                         searchPlaceholder="Search genre(s)..."
                         emptyMessage="No genre found."
@@ -288,7 +314,12 @@ export const AddNewBookDialog = () => {
                   <FormItem>
                     <FormLabel htmlFor="bookQuantity">Book Quantity</FormLabel>
                     <div className="flex items-center space-x-2">
-                      <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleQuantityChange(-1)}
+                      >
                         <Minus className="h-4 w-4" />
                       </Button>
                       <FormControl>
@@ -296,11 +327,16 @@ export const AddNewBookDialog = () => {
                           id="bookQuantity"
                           type="number"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={e => field.onChange(Number(e.target.value))}
                           className="w-16 text-center"
                         />
                       </FormControl>
-                      <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleQuantityChange(1)}
+                      >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -317,7 +353,12 @@ export const AddNewBookDialog = () => {
                   <FormItem>
                     <FormLabel htmlFor="pageCount">Book Pages</FormLabel>
                     <div className="flex items-center space-x-2">
-                      <Button type="button" variant="outline" size="icon" onClick={() => handlePageChange(-1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handlePageChange(-1)}
+                      >
                         <Minus className="h-4 w-4" />
                       </Button>
                       <FormControl>
@@ -325,11 +366,16 @@ export const AddNewBookDialog = () => {
                           id="pageCount"
                           type="number"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={e => field.onChange(Number(e.target.value))}
                           className="w-16 text-center"
                         />
                       </FormControl>
-                      <Button type="button" variant="outline" size="icon" onClick={() => handlePageChange(1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handlePageChange(1)}
+                      >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -344,7 +390,12 @@ export const AddNewBookDialog = () => {
                   <FormItem>
                     <FormLabel htmlFor="avgRating">Average Rating</FormLabel>
                     <div className="flex items-center space-x-2">
-                      <Button type="button" variant="outline" size="icon" onClick={() => handleRatingChange(-0.1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRatingChange(-0.1)}
+                      >
                         <Minus className="h-4 w-4" />
                       </Button>
                       <FormControl>
@@ -353,11 +404,16 @@ export const AddNewBookDialog = () => {
                           type="number"
                           step="0.1"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={e => field.onChange(Number(e.target.value))}
                           className="w-16 text-center"
                         />
                       </FormControl>
-                      <Button type="button" variant="outline" size="icon" onClick={() => handleRatingChange(0.1)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRatingChange(0.1)}
+                      >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -373,14 +429,21 @@ export const AddNewBookDialog = () => {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Enter book description..." {...field} />
+                    <Textarea
+                      placeholder="Enter book description..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-2 mt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Add new Book</Button>

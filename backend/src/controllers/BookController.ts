@@ -80,7 +80,7 @@ const getBooks = async (
 
     res.status(200).json({
       success: true,
-      result
+      result,
     });
   } catch (err) {
     console.error('Error retrieving books:', err);
@@ -324,30 +324,59 @@ const addNewBook = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 
   // Validate that all required fields are present
-  if (!bookData.title || !bookData.authorIds || !bookData.genreIds || !bookData.publisherId) {
-    res.status(400).json({ message: 'Book title, author IDs, genre IDs, and publisher ID are required' });
+  if (
+    !bookData.title ||
+    !bookData.authorIds ||
+    !bookData.genreIds ||
+    !bookData.publisherId
+  ) {
+    res
+      .status(400)
+      .json({
+        message:
+          'Book title, author IDs, genre IDs, and publisher ID are required',
+      });
     return;
   }
 
   try {
-    const addedBook = await BookService.addNewBook(bookData, userId ? userId : PLACEHOLDER_STAFF_ID);
-    res.status(201).json({ message: 'Book created successfully', book: addedBook });
+    const addedBook = await BookService.addNewBook(
+      bookData,
+      userId ? userId : PLACEHOLDER_STAFF_ID
+    );
+    res
+      .status(201)
+      .json({ message: 'Book created successfully', book: addedBook });
   } catch (error: unknown) {
     console.error('Error in bookController.createBook:', error);
     if (error instanceof Error) {
       // Check for specific MySQL errors like foreign key constraints or duplicates
       if (error.message.includes('Duplicate entry')) {
-        res.status(409).json({ message: 'Conflict: A book with this ID or ISBN already exists.', error: error.message });
+        res
+          .status(409)
+          .json({
+            message: 'Conflict: A book with this ID or ISBN already exists.',
+            error: error.message,
+          });
       } else if (error.message.includes('Foreign key constraint failed')) {
-        res.status(400).json({ message: 'Bad request: Invalid author, genre, or publisher ID.', error: error.message });
+        res
+          .status(400)
+          .json({
+            message: 'Bad request: Invalid author, genre, or publisher ID.',
+            error: error.message,
+          });
       } else {
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res
+          .status(500)
+          .json({ message: 'Internal server error', error: error.message });
       }
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 /**
  * Handles PUT /api/books/:id/inventory requests to update book quantity.
@@ -355,32 +384,55 @@ const addNewBook = async (req: AuthRequest, res: Response): Promise<void> => {
  * @param {Request} req The Express request object.
  * @param {Response} res The Express response object.
  */
-const updateBookInventory = async (req: Request, res: Response): Promise<void> => {
+const updateBookInventory = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { bookId } = req.params;
   const { quantity } = req.body;
 
   // Basic validation
   if (typeof quantity !== 'number' || quantity < 0) {
-    res.status(400).json({ message: 'Invalid quantity provided. Quantity must be a non-negative number.' });
+    res
+      .status(400)
+      .json({
+        message:
+          'Invalid quantity provided. Quantity must be a non-negative number.',
+      });
     return;
   }
 
   try {
-    const updated = await BookService.updateBookInventory(bookId, quantity, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.updateBookInventory(
+      bookId,
+      quantity,
+      PLACEHOLDER_STAFF_ID
+    );
     if (updated) {
-      res.status(200).json({ message: `Book ${bookId} inventory updated successfully to ${quantity}.` });
+      res
+        .status(200)
+        .json({
+          message: `Book ${bookId} inventory updated successfully to ${quantity}.`,
+        });
     } else {
       res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.updateBookInventoryController for ID ${bookId}:`, error);
+    console.error(
+      `Error in bookController.updateBookInventoryController for ID ${bookId}:`,
+      error
+    );
     if (error instanceof Error) {
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 /**
  * Handles PUT /api/books/:id/status requests to retire/change book status.
@@ -393,87 +445,137 @@ const retireBook = async (req: AuthRequest, res: Response): Promise<void> => {
   const staffId = req.userId;
 
   try {
-    const updated = await BookService.retireBook(bookId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.retireBook(
+      bookId,
+      staffId ? staffId : PLACEHOLDER_STAFF_ID
+    );
     if (updated) {
-      res.status(200).json({ message: `Book ${bookId} status updated successfully to 'unavailable'.` });
+      res
+        .status(200)
+        .json({
+          message: `Book ${bookId} status updated successfully to 'unavailable'.`,
+        });
     } else {
       res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.retireBookController for ID ${bookId}:`, error);
+    console.error(
+      `Error in bookController.retireBookController for ID ${bookId}:`,
+      error
+    );
     if (error instanceof Error) {
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 const addCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { bookId } = req.params;
   const staffId = req.userId;
 
   try {
-    const result = await BookService.addNewCopy(bookId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
-    res.status(201).json({ message: `Book Copy has been created.`, data: result });
-
+    const result = await BookService.addNewCopy(
+      bookId,
+      staffId ? staffId : PLACEHOLDER_STAFF_ID
+    );
+    res
+      .status(201)
+      .json({ message: `Book Copy has been created.`, data: result });
   } catch (error: unknown) {
     console.error(`Error in bookController.addCopy for ID ${bookId}:`, error);
     if (error instanceof Error) {
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 const deleteCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { copyId } = req.params;
   const staffId = req.userId;
 
   try {
-    const updated = await BookService.deleteBookCopyById(copyId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.deleteBookCopyById(
+      copyId,
+      staffId ? staffId : PLACEHOLDER_STAFF_ID
+    );
     if (updated) {
-      res.status(200).json({ message: `Book Copy ${copyId} has been deleted.` });
+      res
+        .status(200)
+        .json({ message: `Book Copy ${copyId} has been deleted.` });
     } else {
-      res.status(404).json({ message: `Book Copy with ID ${copyId} not found.` });
+      res
+        .status(404)
+        .json({ message: `Book Copy with ID ${copyId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.deleteCopy for ID ${copyId}:`, error);
+    console.error(
+      `Error in bookController.deleteCopy for ID ${copyId}:`,
+      error
+    );
     if (error instanceof Error) {
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 const retireCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { copyId } = req.params;
   const staffId = req.userId;
 
   try {
-    const updated = await BookService.retireCopy(copyId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.retireCopy(
+      copyId,
+      staffId ? staffId : PLACEHOLDER_STAFF_ID
+    );
     if (updated) {
-      res.status(200).json({ message: `Book ${copyId} status updated successfully to 'unavailable'.` });
+      res
+        .status(200)
+        .json({
+          message: `Book ${copyId} status updated successfully to 'unavailable'.`,
+        });
     } else {
       res.status(404).json({ message: `Book with ID ${copyId} not found.` });
     }
   } catch (error: unknown) {
-    console.error(`Error in bookController.retireCopyController for ID ${copyId}:`, error);
+    console.error(
+      `Error in bookController.retireCopyController for ID ${copyId}:`,
+      error
+    );
     if (error instanceof Error) {
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: error.message });
     } else {
-      res.status(500).json({ message: 'Internal server error', error: String(error) });
+      res
+        .status(500)
+        .json({ message: 'Internal server error', error: String(error) });
     }
   }
-}
+};
 
 const updateBook = async (req: AuthRequest, res: Response) => {
   try {
     const { bookId } = req.params;
     const userId = req.userId;
-    console.log(bookId)
+    console.log(bookId);
     const {
       title,
       thumbnailUrl,
@@ -485,7 +587,7 @@ const updateBook = async (req: AuthRequest, res: Response) => {
       authorIds,
       genreIds,
       status,
-      avgRating
+      avgRating,
     } = req.body;
 
     // Call the service function to execute the stored procedure.
@@ -501,7 +603,7 @@ const updateBook = async (req: AuthRequest, res: Response) => {
         description,
         authorIds,
         genreIds,
-        avgRating
+        avgRating,
       },
       bookId,
       userId ? userId : PLACEHOLDER_STAFF_ID
@@ -512,7 +614,7 @@ const updateBook = async (req: AuthRequest, res: Response) => {
     console.error('Error updating book:', error);
     res.status(500).json({ message: 'Failed to update book.', error: error });
   }
-}
+};
 
 const getBookCopies = async (req: Request, res: Response) => {
   try {
@@ -525,13 +627,13 @@ const getBookCopies = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: 'Get book copies successfully.',
-      result: result
+      result: result,
     });
   } catch (error) {
     console.error('Error getting book copies:', error);
     res.status(500).json({ message: 'Failed get book copies.', error: error });
   }
-}
+};
 
 export default {
   borrowBook,
@@ -547,5 +649,5 @@ export default {
   updateBook,
   retireCopy,
   addCopy,
-  deleteCopy
+  deleteCopy,
 };

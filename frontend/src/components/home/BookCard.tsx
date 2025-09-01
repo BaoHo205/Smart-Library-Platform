@@ -109,8 +109,8 @@ const BookCard: React.FC<Book> = ({
           {isAlreadyBorrowed
             ? 'Borrowed'
             : isOutOfStock
-            ? 'Unavailable'
-            : 'Borrow'}
+              ? 'Unavailable'
+              : 'Borrow'}
         </Button>
       </CardFooter>
     </Card>

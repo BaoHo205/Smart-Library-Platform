@@ -20,5 +20,4 @@ userRouter.post(
   UserController.reviewBook
 );
 
-
 export default userRouter;

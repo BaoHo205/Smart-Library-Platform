@@ -26,7 +26,7 @@ export interface CheckoutApiResponse {
   message: string;
   data: CheckoutSummary;
 }
-  // Alternative with boolean conversion helpers
+// Alternative with boolean conversion helpers
 export interface CheckoutItemWithBooleans
   extends Omit<CheckoutItem, 'isReturned' | 'isLate'> {
   isReturned: boolean;

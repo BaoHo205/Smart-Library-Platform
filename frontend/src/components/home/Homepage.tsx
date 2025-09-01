@@ -6,7 +6,11 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-const HomePage = ({ initialData }: { initialData?: { result?: { data: Book[]; total?: number } } }) => {
+const HomePage = ({
+  initialData,
+}: {
+  initialData?: { result?: { data: Book[]; total?: number } };
+}) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentGenre = searchParams.get('genre') ?? '';

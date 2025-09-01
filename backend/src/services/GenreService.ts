@@ -13,6 +13,6 @@ const getGenres = async () => {
       `Failed to get authors: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
-}
+};
 
-export default { getGenres }
+export default { getGenres };
