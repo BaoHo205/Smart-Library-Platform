@@ -105,9 +105,7 @@ const Header: React.FC<HeaderProps> = ({
           onValueChange={onCurrentGenreChange}
         />
       </div>
-      <div className="flex items-center gap-3 rounded-lg border px-2.5 py-1.5 shadow-sm">
-        <UserChip user={user} loading={authLoading} />
-      </div>
+      <UserChip user={user} loading={authLoading} />
     </header>
   );
 };
