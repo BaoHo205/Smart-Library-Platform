@@ -2,7 +2,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from "@/components/ui/sonner"
 import './globals.css';
 import AuthProvider from '@/components/auth/AuthProvider';
-// import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import {
   SidebarInset,
   SidebarProvider,
@@ -42,7 +43,8 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster />
+        <Toaster position="top-right" />
+        <SonnerToaster position="top-right" />
         <AuthProvider>
           {shouldHideSidebar ? (
             <main>{children}</main>

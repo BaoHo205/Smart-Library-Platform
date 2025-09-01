@@ -3,67 +3,67 @@ import { Book } from '@/types/book.type';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { getAllBooks } from '@/api/books.api';
+import { useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-const HomePage = () => {
-  const [currentGenre, setCurrentGenre] = useState<string>('');
-  const [searchParam, setSearchParam] = useState<string>('title');
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [books, setBooks] = useState<Book[]>([]);
-  const [pages, setPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; total?: number } } }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  console.log(initialData);
+
+  const currentGenre = searchParams.get('genre') ?? '';
+  const searchParam = searchParams.get('searchBy') ?? 'title';
+  const searchInput = searchParams.get('q') ?? '';
+  const [currentPageState, setCurrentPageState] = useState<number>(1);
+
+  const currentPage = Number(searchParams.get('page') ?? currentPageState ?? 1);
+
+  const updateParams = (updates: Record<string, string | number | null>) => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    Object.entries(updates).forEach(([k, v]) => {
+      if (v === null || v === '') params.delete(k);
+      else params.set(k, String(v));
+    });
+    const q = params.toString();
+    const url = q ? `?${q}` : '/';
+    router.push(url);
+    router.refresh();
+  };
 
   const handleCurrentGenreChange = (genre: string): void => {
-    setCurrentGenre(genre);
+    updateParams({ genre, page: 1 });
   };
 
   const handleSearchParamChange = (param: string): void => {
-    setSearchParam(param);
+    updateParams({ searchBy: param, page: 1 });
   };
 
   const handleSearchInputChange = (input: string): void => {
-    setSearchInput(input);
+    updateParams({ q: input, page: 1 });
   };
+
+  const books: Book[] = initialData?.data?.data || [];
+  const pages: number = Math.floor((initialData?.data?.total || 0) / 9) || 0;
 
   const handleNextPage = (): void => {
     if (currentPage < pages) {
-      setCurrentPage(prev => prev + 1);
+      updateParams({ page: currentPage + 1 });
+      setCurrentPageState(currentPage + 1);
     }
   };
 
   const handlePrevPage = (): void => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      updateParams({ page: currentPage - 1 });
+      setCurrentPageState(currentPage - 1);
     }
   };
 
   const handlePageChange = (page: number): void => {
-    setCurrentPage(page);
+    updateParams({ page });
+    setCurrentPageState(page);
   };
-
-  const fetchBooks = async (): Promise<void> => {
-    try {
-      const bookResponse = await getAllBooks(
-        currentGenre,
-        currentPage,
-        searchParam,
-        searchInput
-      );
-      setBooks(bookResponse.data);
-      setPages(Math.ceil(bookResponse.total / 9));
-      console.log('Books fetched:', bookResponse);
-      console.log('Current genre:', currentGenre);
-    } catch (error) {
-      console.error('Failed to fetch books:', error);
-      setBooks([]);
-      setPages(0);
-    }
-  };
-
-  useEffect(() => {
-    fetchBooks();
-  }, [currentGenre, searchParam, searchInput, currentPage]);
 
   return (
     <div className="flex">

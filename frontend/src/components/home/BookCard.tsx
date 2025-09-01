@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { CheckoutItem } from '../../types/checkout.type';
 import { Book } from '@/types/book.type';
 import { borrowBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
 const BookCard: React.FC<Book> = ({
   id,
@@ -38,9 +39,12 @@ const BookCard: React.FC<Book> = ({
           isLate: 0,
         } as CheckoutItem,
       ]);
+      router.refresh();
       console.log('Book borrowed successfully');
+      toast.success('Book borrowed successfully!');
     } catch (error) {
       console.error('Error borrowing book:', error);
+      toast.error('Failed to borrow book');
     }
   };
 
@@ -95,8 +99,8 @@ const BookCard: React.FC<Book> = ({
             handleBorrow();
           }}
           disabled={checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          )}
+            checkout => checkout.bookId === id && !checkout.isReturned 
+          ) || availableCopies === 0}
           className="w-full"
         >
           {checkouts.some(

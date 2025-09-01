@@ -1,6 +1,8 @@
 export interface CheckoutItem {
   bookId: string;
+  copyId: string;
   bookName: string;
+  bookThumbnail: string;
   bookAuthors: string;
   bookGenres: string;
   checkoutDate: string; // ISO date string
