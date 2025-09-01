@@ -678,7 +678,7 @@ const isBookBorrowed = async (
       SELECT COUNT(*) as count
       FROM checkouts c
       JOIN books_copies bc ON c.copyId = bc.id
-      WHERE bc.bookId = ? AND c.userId = ? AND c.returnDate IS NULL
+      WHERE bc.bookId = ? AND c.userId = ? 
     `;
 
     const result = (await mysqlConnection.executeQuery(query, [
