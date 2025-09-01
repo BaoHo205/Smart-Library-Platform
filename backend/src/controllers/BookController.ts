@@ -314,8 +314,9 @@ export interface NewBook {
   avgRating: number;
 }
 
-const addNewBook = async (req: Request, res: Response): Promise<void> => {
+const addNewBook = async (req: AuthRequest, res: Response): Promise<void> => {
   const bookData: NewBook = req.body;
+  const userId = req.userId;
 
   if (!bookData.title) {
     res.status(400).json({ message: 'Book title is required' });
@@ -329,7 +330,7 @@ const addNewBook = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const addedBook = await BookService.addNewBook(bookData, PLACEHOLDER_STAFF_ID);
+    const addedBook = await BookService.addNewBook(bookData, userId ? userId : PLACEHOLDER_STAFF_ID);
     res.status(201).json({ message: 'Book created successfully', book: addedBook });
   } catch (error: unknown) {
     console.error('Error in bookController.createBook:', error);
@@ -355,8 +356,8 @@ const addNewBook = async (req: Request, res: Response): Promise<void> => {
  * @param {Response} res The Express response object.
  */
 const updateBookInventory = async (req: Request, res: Response): Promise<void> => {
-  const { bookId } = req.params; // Book ID from URL
-  const { quantity } = req.body; // New quantity from request body
+  const { bookId } = req.params;
+  const { quantity } = req.body;
 
   // Basic validation
   if (typeof quantity !== 'number' || quantity < 0) {
@@ -387,11 +388,12 @@ const updateBookInventory = async (req: Request, res: Response): Promise<void> =
  * @param {Request} req The Express request object.
  * @param {Response} res The Express response object.
  */
-const retireBook = async (req: Request, res: Response): Promise<void> => {
+const retireBook = async (req: AuthRequest, res: Response): Promise<void> => {
   const { bookId } = req.params;
+  const staffId = req.userId;
 
   try {
-    const updated = await BookService.retireBook(bookId, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.retireBook(bookId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
     if (updated) {
       res.status(200).json({ message: `Book ${bookId} status updated successfully to 'unavailable'.` });
     } else {
@@ -407,11 +409,12 @@ const retireBook = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const addCopy = async (req: Request, res: Response): Promise<void> => {
+const addCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { bookId } = req.params;
+  const staffId = req.userId;
 
   try {
-    const result = await BookService.addNewCopy(bookId, PLACEHOLDER_STAFF_ID);
+    const result = await BookService.addNewCopy(bookId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
     res.status(201).json({ message: `Book Copy has been created.`, data: result });
 
   } catch (error: unknown) {
@@ -424,11 +427,12 @@ const addCopy = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const deleteCopy = async (req: Request, res: Response): Promise<void> => {
+const deleteCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { copyId } = req.params;
+  const staffId = req.userId;
 
   try {
-    const updated = await BookService.deleteBookCopyById(copyId, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.deleteBookCopyById(copyId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
     if (updated) {
       res.status(200).json({ message: `Book Copy ${copyId} has been deleted.` });
     } else {
@@ -444,11 +448,12 @@ const deleteCopy = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const retireCopy = async (req: Request, res: Response): Promise<void> => {
+const retireCopy = async (req: AuthRequest, res: Response): Promise<void> => {
   const { copyId } = req.params;
+  const staffId = req.userId;
 
   try {
-    const updated = await BookService.retireCopy(copyId, PLACEHOLDER_STAFF_ID);
+    const updated = await BookService.retireCopy(copyId, staffId ? staffId : PLACEHOLDER_STAFF_ID);
     if (updated) {
       res.status(200).json({ message: `Book ${copyId} status updated successfully to 'unavailable'.` });
     } else {
@@ -464,9 +469,10 @@ const retireCopy = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const updateBook = async (req: Request, res: Response) => {
+const updateBook = async (req: AuthRequest, res: Response) => {
   try {
     const { bookId } = req.params;
+    const userId = req.userId;
     console.log(bookId)
     const {
       title,
@@ -498,7 +504,7 @@ const updateBook = async (req: Request, res: Response) => {
         avgRating
       },
       bookId,
-      PLACEHOLDER_STAFF_ID
+      userId ? userId : PLACEHOLDER_STAFF_ID
     );
 
     res.status(200).json({ message: 'Book updated successfully.' });

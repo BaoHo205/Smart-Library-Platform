@@ -28,6 +28,7 @@ import { ComboboxWithCreate } from "./ComboboxWithCreate";
 import axiosInstance from "@/config/axiosConfig";
 import { useDataStore } from '@/lib/useDataStore';
 import { toast } from "sonner";
+import { useAuth } from "@/components/auth/useAuth";
 
 const formSchema = z.object({
   bookTitle: z.string().min(2, { message: "Book title must be at least 2 characters." }),
@@ -49,6 +50,7 @@ export const AddNewBookDialog = () => {
   const genreList = useDataStore((s) => s.genreList);
   const addPublisher = useDataStore((s) => s.addPublisher);
   const addAuthor = useDataStore((s) => s.addAuthor);
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -113,7 +115,7 @@ export const AddNewBookDialog = () => {
         authorIds: values.author.join(','),
         genreIds: values.genre.join(','),
         avgRating: values.avgRating, // Added avgRating to the payload
-        staffId: "",
+        staffId: user?.id,
       };
       const response = await axiosInstance.post('/api/v1/books/add', newBookData);
       console.log("Book created successfully:", response.data);

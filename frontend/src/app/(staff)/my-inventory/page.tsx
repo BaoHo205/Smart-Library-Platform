@@ -11,6 +11,7 @@ import { DataTable } from "@/components/admin/books/data-table"
 import axiosInstance from '@/config/axiosConfig';
 import { useDataStore } from '@/lib/useDataStore';
 import { BookShow } from '@/components/admin/books/EditBookDialog';
+import { useAuth } from '@/components/auth/useAuth';
 
 const page = () => {
   const setBooks = useDataStore((s) => s.setBooks);
