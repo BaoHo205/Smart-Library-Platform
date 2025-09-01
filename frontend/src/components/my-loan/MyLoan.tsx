@@ -26,7 +26,7 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
           <TabsTrigger value="past">Past Checkout</TabsTrigger>
         </TabsList>
         <TabsContent value="active">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {activeCheckouts.length > 0 ? (
               activeCheckouts.map(checkout => (
                 <ActiveLoanCard
@@ -50,7 +50,7 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
           </div>
         </TabsContent>
         <TabsContent value="past">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {pastCheckouts.length > 0 ? (
               pastCheckouts.map((checkout, key) => (
                 <PastLoanCard

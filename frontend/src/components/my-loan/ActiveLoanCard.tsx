@@ -35,7 +35,6 @@ const ActiveLoanCard = ({
       setIsReturning(true);
       await returnBook(copyId);
       toast.success('Book returned successfully!');
-      // trigger a refresh of server components / data fetching on the current route
       router.refresh();
     } catch (err) {
       console.error('Return failed', err);
@@ -64,7 +63,7 @@ const ActiveLoanCard = ({
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={'/default-image.png'}
+          src={checkout.bookThumbnail ||'/default-image.png'}
           width={100}
           height={100}
           alt={'title'}
@@ -72,14 +71,16 @@ const ActiveLoanCard = ({
         />
       </CardContent>
       <CardFooter className="flex items-center justify-between">
-        <div className="flex gap-1.5">
-          <span className="text-xs font-bold">{`Due by ${formatDateDMY(checkout.dueDate)}`}</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs">Due by</span>
+          <span className="text-s font-bold">{formatDateDMY(checkout.dueDate)}</span>
         </div>
         <Button
           onClick={() => {
             handleReturn(checkout.copyId);
           }}
           disabled={isReturning}
+          className='w-24'
         >
           Return
         </Button>

@@ -19,6 +19,7 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
     `SELECT 
       b.id AS bookId,
       b.title AS bookName,
+      b.thumbnailUrl AS bookThumbnail,
       COALESCE(authors.authors, '') AS bookAuthors,
       COALESCE(genres.genres, '') AS bookGenres,
       bc.id AS copyId,

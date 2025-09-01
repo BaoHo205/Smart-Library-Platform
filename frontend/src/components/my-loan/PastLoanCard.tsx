@@ -60,7 +60,7 @@ const PastLoanCard = ({
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={'/default-image.png'}
+          src={checkout.bookThumbnail ||'/default-image.png'}
           width={100}
           height={100}
           alt={'title'}
