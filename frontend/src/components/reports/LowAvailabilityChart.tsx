@@ -90,7 +90,7 @@ export function LowAvailabilityChart({
       book =>
         book.availability_percentage > 25 && book.availability_percentage <= 50
     ),
-    Good: allBooksForCategories.filter(
+    'High Availability': allBooksForCategories.filter(
       book => book.availability_percentage > 50
     ),
   };
@@ -117,7 +117,7 @@ export function LowAvailabilityChart({
       textColor: 'text-yellow-700',
       borderColor: 'border-yellow-200',
     },
-    Good: {
+    'High Availability': {
       icon: CheckCircleIcon,
       color: 'bg-green-500',
       bgColor: 'bg-green-50',
