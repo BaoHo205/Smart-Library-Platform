@@ -64,7 +64,7 @@ const PastLoanCard = ({
           width={100}
           height={100}
           alt={'title'}
-          className="aspect-[3/2] w-full rounded-none"
+          className="aspect-[5/6] w-full rounded-none"
         />
       </CardContent>
       <CardFooter className="flex flex-col gap-3">

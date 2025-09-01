@@ -63,7 +63,7 @@ const ActiveLoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
           width={100}
           height={100}
           alt={'title'}
-          className="aspect-[3/2] w-full rounded-none"
+          className="aspect-[5/6] w-full rounded-none"
         />
       </CardContent>
       <CardFooter className="flex items-center justify-between">
