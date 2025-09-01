@@ -27,6 +27,7 @@ const BookCardList: React.FC<BookCardListProps> = ({
   onPrevPage,
   onPageChange,
 }) => {
+  console.log(books);
   // Safety check for books array
   if (!books || !Array.isArray(books)) {
     return (
@@ -36,8 +37,10 @@ const BookCardList: React.FC<BookCardListProps> = ({
     );
   }
 
+
+
   // Handle pagination logic
-  const totalPages = Math.ceil(pages);
+  const totalPages = Math.floor(pages);
   const showPagination = totalPages > 1;
 
   // Generate page numbers to display

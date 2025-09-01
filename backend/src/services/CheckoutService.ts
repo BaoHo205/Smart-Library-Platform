@@ -6,6 +6,7 @@ export interface Checkout extends RowDataPacket {
   bookName: string;
   bookAuthors: string;
   bookGenres: string;
+  copyId: string;
   checkoutDate: Date;
   dueDate: Date;
   returnDate: Date | null;
@@ -18,15 +19,18 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
     `SELECT 
       b.id AS bookId,
       b.title AS bookName,
+      b.thumbnailUrl AS bookThumbnail,
       COALESCE(authors.authors, '') AS bookAuthors,
       COALESCE(genres.genres, '') AS bookGenres,
+      bc.id AS copyId,
       c.checkoutDate,
       c.dueDate,
       c.returnDate,
       c.isReturned,
       c.isLate
     FROM checkouts c
-    JOIN books_copies bc ON c.copyId = bc.id
+    JOIN books_copies bc
+    ON c.copyId = bc.id
     JOIN books b ON bc.bookId = b.id
     LEFT JOIN (
       SELECT 
@@ -44,7 +48,8 @@ async function getAllCheckoutsByUserId(userId: string): Promise<Checkout[]> {
       JOIN genres g ON g.id = bg.genreId
       GROUP BY bg.bookId
     ) AS genres ON genres.bookId = b.id
-    WHERE c.userId = ?`,
+    WHERE c.userId = ?
+    ORDER BY c.checkoutDate DESC, c.dueDate ASC`,
     [userId]
   )) as Checkout[];
   return rows;
