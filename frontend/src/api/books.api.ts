@@ -5,27 +5,29 @@ import type { GetAllBooksResponse } from '@/types/book.type';
 
 // List
 export const getAllBooks = async (
-    currentGenre: string,
-    currentPage: number,
-    searchParam: string,
-    searchInput: string
+  currentGenre: string,
+  currentPage: number,
+  searchParam: string,
+  searchInput: string
 ): Promise<GetAllBooksResponse> => {
-    const response = await axiosInstance.get(
-        `api/v1/books?pageSize=12&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
-    );
-    return response.data.data || [];
+  const response = await axiosInstance.get(
+    `api/v1/books?pageSize=12&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
+  );
+  return response.data.data || [];
 };
 
 // Details
 export const getBookInfoById = async (bookId: string): Promise<BookDetails> => {
-    const response = await axiosInstance.get(`/api/v1/books/${bookId}`);
-    return response.data.data as BookDetails;
+  const response = await axiosInstance.get(`/api/v1/books/${bookId}`);
+  return response.data.data as BookDetails;
 };
 
 // Reviews
-export const getReviewsByBookId = async (bookId: string): Promise<IReview[]> => {
-    const response = await axiosInstance.get(`/api/v1/books/${bookId}/reviews`);
-    return response.data.data as IReview[];
+export const getReviewsByBookId = async (
+  bookId: string
+): Promise<IReview[]> => {
+  const response = await axiosInstance.get(`/api/v1/books/${bookId}/reviews`);
+  return response.data.data as IReview[];
 };
 
 // export const addReview = async (
@@ -54,27 +56,30 @@ export const getReviewsByBookId = async (bookId: string): Promise<IReview[]> => 
 // };
 
 export const reviewBook = async (
-    bookId: string,
-    rating: number,
-    comment: string
+  bookId: string,
+  rating: number,
+  comment: string
 ): Promise<IReview> => {
-    const response = await axiosInstance.post(`/api/v1/user/reviewBook`, {
-        bookId,
-        rating,
-        comment,
-    });
-    return response.data.data as IReview;
+  const response = await axiosInstance.post(`/api/v1/user/reviewBook`, {
+    bookId,
+    rating,
+    comment,
+  });
+  return response.data.data as IReview;
 };
 
 // Borrow status
 export const isBookBorrowed = async (bookId: string): Promise<boolean> => {
-    try {
-        const response = await axiosInstance.get(`/api/v1/books/${bookId}/isBorrowed`);
-        return response.data.isBorrowed || false;
-    } catch (error) {
-        console.error(`Failed to check borrow status for book ID ${bookId}:`, error);
-        return false;
-    }
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1/books/${bookId}/isBorrowed`
+    );
+    return response.data.isBorrowed || false;
+  } catch (error) {
+    console.error(
+      `Failed to check borrow status for book ID ${bookId}:`,
+      error
+    );
+    return false;
+  }
 };
-
-

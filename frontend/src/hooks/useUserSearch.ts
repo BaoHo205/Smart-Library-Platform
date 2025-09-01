@@ -19,38 +19,38 @@ export function useUserSearch(searchTerm: string) {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
 
-    useEffect(() => {
-        const performSearch = async () => {
-            if (debouncedSearchTerm.length < 1) {
-                // Load all users alphabetically when no search term
-                setLoading(true);
-                try {
-                    const response = await getAllUsers();
-                    setUsers(Array.isArray(response) ? response : []);
-                    setError(null);
-                } catch (err) {
-                    setError('Failed to load users');
-                    setUsers([]);
-                } finally {
-                    setLoading(false);
-                }
-                return;
-            }
+  useEffect(() => {
+    const performSearch = async () => {
+      if (debouncedSearchTerm.length < 1) {
+        // Load all users alphabetically when no search term
+        setLoading(true);
+        try {
+          const response = await getAllUsers();
+          setUsers(Array.isArray(response) ? response : []);
+          setError(null);
+        } catch (err) {
+          setError('Failed to load users');
+          setUsers([]);
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
 
-            if (debouncedSearchTerm.length >= 1) {
-                setLoading(true);
-                try {
-                    const response = await searchUsers(debouncedSearchTerm);
-                    setUsers(Array.isArray(response) ? response : []);
-                    setError(null);
-                } catch (err) {
-                    setError('Failed to search users');
-                    setUsers([]);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
+      if (debouncedSearchTerm.length >= 1) {
+        setLoading(true);
+        try {
+          const response = await searchUsers(debouncedSearchTerm);
+          setUsers(Array.isArray(response) ? response : []);
+          setError(null);
+        } catch (err) {
+          setError('Failed to search users');
+          setUsers([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
     performSearch();
   }, [debouncedSearchTerm]);

@@ -60,7 +60,7 @@ const PastLoanCard = ({
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={checkout.bookThumbnail ||'/default-image.png'}
+          src={checkout.bookThumbnail || '/default-image.png'}
           width={100}
           height={100}
           alt={'title'}
@@ -68,35 +68,40 @@ const PastLoanCard = ({
         />
       </CardContent>
       <CardFooter className="flex flex-col gap-3">
-      <div className="w-full flex flex-col items-start">
-        <span className="text-xs text-muted-foreground">Returned Date: </span>
-        <div className="w-full flex justify-between">
-            <span className="text-s font-bold">{formatDateDMY(checkout.returnDate)}</span>
-            <Badge variant={'secondary'} className={`bg-${checkout.isLate ? 'red' : 'green'}-100 text-${checkout.isLate ? 'red' : 'green'}-600 text-s`}>
+        <div className="flex w-full flex-col items-start">
+          <span className="text-muted-foreground text-xs">Returned Date: </span>
+          <div className="flex w-full justify-between">
+            <span className="text-s font-bold">
+              {formatDateDMY(checkout.returnDate)}
+            </span>
+            <Badge
+              variant={'secondary'}
+              className={`bg-${checkout.isLate ? 'red' : 'green'}-100 text-${checkout.isLate ? 'red' : 'green'}-600 text-s`}
+            >
               {checkout.isLate ? 'Late' : 'On time'}
             </Badge>
+          </div>
         </div>
-      </div>
-      <div className='w-full flex flex-col gap-3'>
-        <Button
-          onClick={() => {
-            handleReborrow(checkout.bookId);
-          }}
-          disabled={isBorrowing}
-        >
-          Reborrow
-        </Button>
-        <Button
-          variant={'outline'}
-          onClick={() => {
-            router.push(`/books/${checkout.bookId}`);
-          }}
-        >
-          Review
-        </Button>
-      </div>
-    </CardFooter>
-    </Card >
+        <div className="flex w-full flex-col gap-3">
+          <Button
+            onClick={() => {
+              handleReborrow(checkout.bookId);
+            }}
+            disabled={isBorrowing}
+          >
+            Reborrow
+          </Button>
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              router.push(`/books/${checkout.bookId}`);
+            }}
+          >
+            Review
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 };
 

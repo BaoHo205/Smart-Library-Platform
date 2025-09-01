@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { handleGetAllGenres } from '../controllers/GenreController';
+import GenreController from '@/controllers/GenreController';
 
 const genreRouter = Router();
 
-genreRouter.get('/', handleGetAllGenres);
+genreRouter.get('/', GenreController.getGenres);
 
 export default genreRouter;

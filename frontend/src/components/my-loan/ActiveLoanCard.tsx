@@ -11,11 +11,7 @@ import { format, parseISO, isValid } from 'date-fns';
 import { returnBook } from '@/api/checkout.api';
 import { toast } from 'sonner';
 
-const ActiveLoanCard = ({
-  checkout,
-}: {
-  checkout: CheckoutItem;
-}) => {
+const ActiveLoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
   const router = useRouter();
   const [isReturning, setIsReturning] = useState(false);
 
@@ -63,7 +59,7 @@ const ActiveLoanCard = ({
       </CardHeader>
       <CardContent className="p-0">
         <Image
-          src={checkout.bookThumbnail ||'/default-image.png'}
+          src={checkout.bookThumbnail || '/default-image.png'}
           width={100}
           height={100}
           alt={'title'}
@@ -73,14 +69,16 @@ const ActiveLoanCard = ({
       <CardFooter className="flex items-center justify-between">
         <div className="flex flex-col gap-1.5">
           <span className="text-xs">Due by</span>
-          <span className="text-s font-bold">{formatDateDMY(checkout.dueDate)}</span>
+          <span className="text-s font-bold">
+            {formatDateDMY(checkout.dueDate)}
+          </span>
         </div>
         <Button
           onClick={() => {
             handleReturn(checkout.copyId || "");
           }}
           disabled={isReturning}
-          className='w-24'
+          className="w-24"
         >
           Return
         </Button>

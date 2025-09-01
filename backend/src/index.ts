@@ -48,6 +48,7 @@ app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(authMiddleware.verifyJWT); // require jwt for all routes below
 app.use('/api/v1', apiRouter);
+// app.use('/api/books', bookRouter)
 
 const run = async () => {
   try {

@@ -43,7 +43,6 @@ const BookCard: React.FC<Book> = ({
         newCheckout
       ]);
       router.refresh();
-      console.log('Book borrowed successfully');
       toast.success('Book borrowed successfully!');
     } catch (error) {
       console.error('Error borrowing book:', error);
@@ -54,6 +53,12 @@ const BookCard: React.FC<Book> = ({
   const directToBookDetail = () => {
     router.push(`/books/${id}`);
   };
+
+  const isAlreadyBorrowed = checkouts.some(
+    checkout => checkout.bookId === id && !checkout.isReturned
+  );
+
+  const isOutOfStock = availableCopies === 0;
 
   return (
     <Card
@@ -106,11 +111,11 @@ const BookCard: React.FC<Book> = ({
           ) || availableCopies === 0}
           className="w-full"
         >
-          {checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          )
+          {isAlreadyBorrowed
             ? 'Borrowed'
-            : 'Borrow'}
+            : isOutOfStock
+              ? 'Unavailable'
+              : 'Borrow'}
         </Button>
       </CardFooter>
     </Card>

@@ -13,7 +13,6 @@ export default function NavFooter() {
   const { logout } = useAuth();
   const handleLogout = async () => {
     try {
-      console.log('Logging out...');
       await logout();
     } catch (error) {
       console.error('Logout failed:', error);

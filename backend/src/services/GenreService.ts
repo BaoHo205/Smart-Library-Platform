@@ -1,16 +1,18 @@
-import pool from '../database/mysql/connection';
-import { RowDataPacket } from 'mysql2/typings/mysql/lib/protocol/packets/RowDataPacket';
+import mysql from '../database/mysql/connection';
 
-export interface GenreSelect extends RowDataPacket {
-  value: string;
-  label: string;
-}
+const getGenres = async () => {
+  try {
+    const query = `
+                SELECT id, name
+                FROM genres;
+            `;
+    const result = await mysql.executeQuery(query);
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to get authors: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
 
-async function getAllGenres(): Promise<GenreSelect[]> {
-  const rows = (await pool.executeQuery(
-    'SELECT id as value, name as label FROM genres'
-  )) as GenreSelect[];
-  return rows;
-}
-
-export { getAllGenres };
+export default { getGenres };
