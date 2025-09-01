@@ -25,7 +25,6 @@ const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; tota
       if (v === null || v === '') params.delete(k);
       else params.set(k, String(v));
     });
-    // push new params (relative URL) and refresh so the server refetches
     const q = params.toString();
     const url = q ? `?${q}` : '/';
     router.push(url);
