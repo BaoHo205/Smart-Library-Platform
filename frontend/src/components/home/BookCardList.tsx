@@ -27,7 +27,6 @@ const BookCardList: React.FC<BookCardListProps> = ({
   onPrevPage,
   onPageChange,
 }) => {
-  console.log(books);
   // Safety check for books array
   if (!books || !Array.isArray(books)) {
     return (

@@ -12,8 +12,8 @@ const borrowBook = async (bookId: string): Promise<CheckoutApiResponse> => {
   try {
     const response = await axiosInstance.post(`/api/v1/books/borrow/${bookId}`, {
       dueDate: Date.now() + 14 * 24 * 60 * 60 * 1000, // 2 weeks from now
-    }) as CheckoutApiResponse;
-    return response;
+    });
+    return response.data as CheckoutApiResponse;
   } catch (error) {
     return Promise.reject(error);
   }

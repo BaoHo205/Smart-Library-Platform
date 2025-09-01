@@ -6,12 +6,9 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; total?: number } } }) => {
+const HomePage = ({ initialData }: { initialData?: { result?: { data: Book[]; total?: number } } }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  console.log(initialData);
-
   const currentGenre = searchParams.get('genre') ?? '';
   const searchParam = searchParams.get('searchBy') ?? 'title';
   const searchInput = searchParams.get('q') ?? '';
@@ -43,8 +40,8 @@ const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; tota
     updateParams({ q: input, page: 1 });
   };
 
-  const books: Book[] = initialData?.data?.data || [];
-  const pages: number = Math.floor((initialData?.data?.total || 0) / 9) || 0;
+  const books: Book[] = initialData?.result?.data || [];
+  const pages: number = Math.floor((initialData?.result?.total || 0) / 9) || 0;
 
   const handleNextPage = (): void => {
     if (currentPage < pages) {

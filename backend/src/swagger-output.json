@@ -393,26 +393,18 @@
     },
     "/books/borrow/{bookId}": {
       "post": {
-        "description": "",
+        "tags": [
+          "Books"
+        ],
+        "summary": "Borrow a book",
+        "description": "Borrow a specific book by its ID. Requires user authentication.",
         "parameters": [
           {
             "name": "bookId",
             "in": "path",
             "required": true,
-<<<<<<< HEAD
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dueDate": {
-                  "example": "any"
-                }
-              }
-            }
+            "type": "string",
+            "description": "Book ID to borrow"
           }
         ],
         "responses": {
@@ -431,19 +423,68 @@
         }
       }
     },
+    "/books/add": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "authorIds": {
+                  "example": "any"
+                },
+                "genreIds": {
+                  "example": "any"
+                },
+                "publisherId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/books/return/{bookId}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Books"
+        ],
+        "summary": "Return a book",
+        "description": "Return a borrowed book by its ID. Requires user authentication.",
         "parameters": [
           {
             "name": "bookId",
             "in": "path",
             "required": true,
-            "type": "string"
-=======
             "type": "string",
-            "description": "Book ID to borrow"
->>>>>>> dev
+            "description": "Book ID to return"
           }
         ],
         "responses": {
@@ -519,79 +560,11 @@
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/books/add": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "any"
-                },
-                "authorIds": {
-                  "example": "any"
-                },
-                "genreIds": {
-                  "example": "any"
-                },
-                "publisherId": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "409": {
-            "description": "Conflict"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/books/return/{bookId}": {
-      "put": {
-        "tags": [
-          "Books"
-        ],
-        "summary": "Return a book",
-        "description": "Return a borrowed book by its ID. Requires user authentication.",
-        "parameters": [
-          {
-            "name": "bookId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "Book ID to return"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -638,33 +611,8 @@
         }
       }
     },
-    "/books/retired/{id}": {
+    "/books/retired/{bookId}": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-<<<<<<< HEAD
-    "/books/{bookId}/isBorrowed": {
-      "get": {
         "description": "",
         "parameters": [
           {
@@ -678,8 +626,101 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/copy/retired/{copyId}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "copyId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/copy/create/{bookId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/books/copy/delete/{copyId}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "copyId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -688,9 +729,6 @@
       }
     },
     "/books/{bookId}/copies": {
-=======
-    "/genres/": {
->>>>>>> dev
       "get": {
         "description": "",
         "parameters": [

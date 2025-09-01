@@ -63,9 +63,6 @@ export default function BookDetail({
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   priority={true}
-                  onError={() => {
-                    console.log('Failed to load book cover image');
-                  }}
                 />
               ) : (
                 <div className="flex h-full min-h-[400px] w-full items-center justify-center">

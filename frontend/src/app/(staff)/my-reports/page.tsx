@@ -239,7 +239,7 @@ export default function StaffReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="w-full max-w-none px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">

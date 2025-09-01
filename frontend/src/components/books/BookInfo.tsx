@@ -124,6 +124,7 @@ export default function BookInfoPage({
     setBorrowing(true);
     try {
       const result = await borrowBook(bookId);
+      console.log("result: ", result);
       if (result.success) {
         setIsBorrowed(true);
         toast.success('Book borrowed successfully!');
