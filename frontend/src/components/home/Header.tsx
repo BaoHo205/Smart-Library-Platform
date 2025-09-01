@@ -65,11 +65,11 @@ const Header: React.FC<HeaderProps> = ({ genres }) => {
         <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
           <Select value={searchParam} onValueChange={searchCategory => setParamAndPush('searchBy', searchCategory)}>
             <SelectTrigger className="m-0 h-full w-[10rem] rounded-md bg-neutral-100 font-medium">
-              <SelectValue key={options[0].id}>{options[0].name}</SelectValue>
+              <SelectValue></SelectValue>
             </SelectTrigger>
             <SelectContent>
               {options.map(option => (
-                <SelectItem key={option.id} value={option.name}>
+                <SelectItem key={option.id} value={option.id}>
                   {option.name}
                 </SelectItem>
               ))}
