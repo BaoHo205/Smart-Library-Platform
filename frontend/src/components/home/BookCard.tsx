@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { Card, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -25,19 +27,20 @@ const BookCard: React.FC<Book> = ({
   const handleBorrow = async () => {
     try {
       await borrowBook(id);
+      const newCheckout: CheckoutItem = {
+        bookId: id,
+        bookName: title,
+        bookAuthors: authors,
+        bookGenres: genres,
+        checkoutDate: new Date().toISOString(),
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        returnDate: null,
+        isReturned: 0,
+        isLate: 0,
+      };
       setCheckouts(prevCheckouts => [
         ...prevCheckouts,
-        {
-          bookId: id,
-          bookName: title,
-          bookAuthors: authors,
-          bookGenres: genres,
-          checkoutDate: new Date().toISOString(),
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          returnDate: null,
-          isReturned: 0,
-          isLate: 0,
-        } as CheckoutItem,
+        newCheckout
       ]);
       router.refresh();
       toast.success('Book borrowed successfully!');
@@ -103,7 +106,9 @@ const BookCard: React.FC<Book> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={isAlreadyBorrowed || isOutOfStock}
+          disabled={checkouts.some(
+            checkout => checkout.bookId === id && !checkout.isReturned
+          ) || availableCopies === 0}
           className="w-full"
         >
           {isAlreadyBorrowed

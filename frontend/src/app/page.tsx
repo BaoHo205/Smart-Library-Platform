@@ -1,19 +1,16 @@
-import HomePage from '@/components/home/Homepage';
+import { Book } from '@/types/book.type';
+import BookCardList from '@/components/home/BookCardList';
+import Header from '@/components/home/Header';
+import Image from 'next/image';
 import { headers } from 'next/headers';
 
 const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { genre: string; page: number; searchBy: string; q?: string };
-}) {
-  const {
-    genre = '',
-    page = 1,
-    searchBy = 'title',
-    q = '',
-  } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Record<string, string> }) {
+  const genre = searchParams?.genre ?? '';
+  const page = Number(searchParams?.page ?? 1);
+  const searchBy = searchParams?.searchBy ?? 'title';
+  const q = searchParams?.q ?? '';
 
   const params = new URLSearchParams();
   if (genre) params.set('genre', genre);
@@ -26,24 +23,64 @@ export default async function Page({
   const headersList = await headers();
   const cookie = headersList.get('cookie') ?? '';
 
-  const res = await fetch(
-    `${DEFAULT_BASE}/api/v1/books?pageSize=12&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(searchBy)}=${encodeURIComponent(q)}`,
+  const pageSize = 12;
+  const bookResponse = await fetch(
+    `${DEFAULT_BASE}/api/v1/books?pageSize=${pageSize}&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(
+      searchBy
+    )}=${encodeURIComponent(q)}`,
     {
       headers: { cookie },
       next: { tags: [`books:${paramsString}`] },
     }
   );
 
-  let initialData = null;
-  if (res.ok) {
+  let bookData = null;
+  if (bookResponse.ok) {
     try {
-      initialData = await res.json();
+      bookData = await bookResponse.json();
     } catch {
-      initialData = null;
+      bookData = null;
     }
   } else {
-    initialData = null;
+    bookData = null;
   }
 
-  return <HomePage initialData={initialData} />;
+  const books: Book[] = bookData?.result?.data || [];
+  const total = bookData?.result?.total || 0;
+  const pages: number = Math.max(1, Math.ceil(total / pageSize));
+
+  const genreResponse = await fetch(
+    `${DEFAULT_BASE}/api/v1/genres`,
+    {
+      headers: { cookie },
+      next: { tags: [`books:${paramsString}`] },
+    }
+  );
+
+  let genreData = null;
+  if (genreResponse.ok) {
+    try {
+      genreData = await genreResponse.json();
+    } catch {
+      genreData = null;
+    }
+  } else {
+    genreData = null;
+  }
+
+  return (
+    <div className="flex">
+      <div className="flex w-full flex-col justify-center gap-6 p-6">
+        <Header genres={genreData?.data || []} />
+        <Image
+          src="/default-image.png"
+          alt="Banner Image"
+          width={100}
+          height={100}
+          className="h-full w-full"
+        />
+        <BookCardList books={books} pages={pages} />
+      </div>
+    </div>
+  );
 }
