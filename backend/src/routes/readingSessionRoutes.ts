@@ -15,7 +15,7 @@ import {
 
 const router = Router();
 
-// management (route nhe )
+// management
 router.post('/start', startReadingSession);
 router.post('/end/:sessionId', endReadingSession);
 
