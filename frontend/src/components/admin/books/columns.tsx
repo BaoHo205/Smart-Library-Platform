@@ -1,7 +1,6 @@
 // components/columns.tsx
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { EditBookDialog } from "./EditBookDialog"
@@ -15,10 +14,12 @@ export const columns: ColumnDef<BookShow>[] = [
     cell: ({ row }) => {
       const url = row.getValue("thumbnailUrl") as string;
       return (
-        <img
+        <Image
           src={url}
           alt="Book Thumbnail"
           className="h-16 w-auto rounded-md object-cover"
+          width={64}
+          height={64}
         />
       );
     },
@@ -37,9 +38,9 @@ export const columns: ColumnDef<BookShow>[] = [
     cell: ({ row }) => {
       const authors: string[] = (row.getValue("authors") as string).split(", ");
       return (
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-2 items-center justify-center">
           {authors.map((author, index) => (
-            <Badge key={index} variant="outline">
+            <Badge key={index} variant="outline" className="truncate">
               {author.trim()}
             </Badge>
           ))}
@@ -57,9 +58,9 @@ export const columns: ColumnDef<BookShow>[] = [
     cell: ({ row }) => {
       const genres: string[] = (row.getValue("genres") as string).split(", ");
       return (
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-2 items-center justify-center">
           {genres.map((genre, index) => (
-            <Badge key={index} variant="outline">
+            <Badge key={index} variant="outline" className="truncate">
               {genre.trim()}
             </Badge>
           ))}

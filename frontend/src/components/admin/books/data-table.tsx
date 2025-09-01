@@ -37,6 +37,21 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
+const getColumnSpanClass = (columnId: string) => {
+  const spanMap: Record<string, string> = {
+    thumbnailUrl: 'col-span-1',
+    isbn: 'col-span-1', 
+    title: 'col-span-2',
+    authors: 'col-span-2',
+    publisherName: 'col-span-1',
+    genres: 'col-span-2',
+    isRetired: 'col-span-1',
+    quantity: 'col-span-1',
+    edit: 'col-span-1'
+  };
+  return spanMap[columnId] || 'col-span-1';
+};
+
 export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
@@ -69,7 +84,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   };
 
   return (
-    <div>
+    <div className='w-full'>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter book name..."
@@ -80,13 +95,16 @@ export function DataTable<TData extends { id: string }, TValue>({
           className="max-w-sm"
         />
       </div>
-      <div className="overflow-hidden rounded-md border min-w-max">
+      <div className="max-w-full overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className='grid grid-cols-12'>
                 {headerGroup.headers.map(header => (
-                  <TableHead key={header.id} className="text-center">
+                  <TableHead 
+                    key={header.id} 
+                    className={`flex items-center justify-center ${getColumnSpanClass(header.column.id)}`}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -104,13 +122,14 @@ export function DataTable<TData extends { id: string }, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="text-center cursor-pointer hover:bg-gray-100"
+                  className="grid grid-cols-12 text-center cursor-pointer hover:bg-gray-100"
                   onClick={event => handleRowClick(event, row.original.id)}
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell
                       key={cell.id}
                       data-column-id={cell.column.id}
+                      className={`whitespace-normal flex items-center justify-center ${getColumnSpanClass(cell.column.id)}`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -121,17 +140,17 @@ export function DataTable<TData extends { id: string }, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='grid grid-cols-12'>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 col-span-10 text-center"
                 >
                   No results.
                 </TableCell>
               </TableRow>
             )}
-            <TableRow className="border-t text-center">
-              <TableCell colSpan={columns.length}>
+            <TableRow className="grid border-t text-center">
+              <TableCell className="col-span-10">
                 <AddNewBookDialog />
               </TableCell>
             </TableRow>

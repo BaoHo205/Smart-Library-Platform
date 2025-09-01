@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Avatar,
   AvatarFallback,
@@ -10,8 +10,6 @@ import { columns } from "@/components/admin/books/columns"
 import { DataTable } from "@/components/admin/books/data-table"
 import axiosInstance from '@/config/axiosConfig';
 import { useDataStore } from '@/lib/useDataStore';
-import { BookShow } from '@/components/admin/books/EditBookDialog';
-import { useAuth } from '@/components/auth/useAuth';
 
 const page = () => {
   const setBooks = useDataStore((s) => s.setBooks);
@@ -44,7 +42,7 @@ const page = () => {
   }, []);
 
   return (
-    <div className='min-h-screen max-w-max p-5'>
+    <div className='p-5'>
       <div className='flex flex-row justify-between'>
         <h1 className='py-3 text-black text-2xl font-bold'>My Inventory</h1>
         <div className="flex flex-row justify-center items-center p-3 gap-2 rounded-xl border-2 outline-offset-4 shadow-xl">
