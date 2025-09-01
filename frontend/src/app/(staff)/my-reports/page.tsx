@@ -271,7 +271,7 @@ export default function StaffReportsPage() {
           />
 
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-            <div className="xl:col-span-7">
+            <div className="xl:col-span-7 h-full">
               <LowAvailabilityChart
                 books={lowAvailabilityBooks}
                 allBooksForCategories={allBooksForCategories}
@@ -279,7 +279,7 @@ export default function StaffReportsPage() {
               />
             </div>
 
-            <div className="xl:col-span-5">
+            <div className="xl:col-span-5 h-full">
               <TopActiveReaders
                 readers={topActiveReaders}
                 loading={topReadersLoading}

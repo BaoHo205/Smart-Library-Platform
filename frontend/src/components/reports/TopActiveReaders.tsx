@@ -18,7 +18,7 @@ export function TopActiveReaders({
 }: TopActiveReadersProps) {
   if (loading) {
     return (
-      <Card className="h-fit">
+      <Card className="h-full">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-semibold text-gray-900">
             Top Active Readers
@@ -47,14 +47,14 @@ export function TopActiveReaders({
   const readersToShow = limit === 'max' ? readers : readers.slice(0, limit);
 
   return (
-    <Card className="h-fit">
+    <Card className="h-full">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-gray-900">
           Top Active Readers
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[520px] overflow-y-auto space-y-2 pr-2">
+        <div className="max-h-[520px] overflow-y-auto space-y-2 pr-2">
           {readers.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-sm text-gray-500">No active readers found</p>

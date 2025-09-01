@@ -24,7 +24,7 @@ export function LowAvailabilityChart({
 
   if (loading) {
     return (
-      <Card className="h-fit">
+      <Card className="h-full">
         <CardHeader>
           <Skeleton className="h-6 w-48 rounded" />
         </CardHeader>
@@ -101,7 +101,7 @@ export function LowAvailabilityChart({
   };
 
   return (
-    <Card className="h-fit">
+    <Card className="h-full">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-gray-900">
           Books with Low Availability
@@ -121,7 +121,7 @@ export function LowAvailabilityChart({
           </TabsList>
 
           <TabsContent value="books" className="mt-4">
-            <div className="h-[520px] overflow-y-auto space-y-2 px-6 pb-6">
+            <div className="max-h-[520px] overflow-y-auto space-y-2 px-6 pb-6">
               {books.length === 0 ? (
                 <div className="py-8 text-center">
                   <p className="text-sm text-gray-500">
