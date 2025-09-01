@@ -24,7 +24,7 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
   const cookie = headersList.get('cookie') ?? '';
 
   const pageSize = 12;
-  const res = await fetch(
+  const bookResponse = await fetch(
     `${DEFAULT_BASE}/api/v1/books?pageSize=${pageSize}&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(
       searchBy
     )}=${encodeURIComponent(q)}`,
@@ -34,25 +34,44 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
     }
   );
 
-  let initialData = null;
-  if (res.ok) {
+  let bookData = null;
+  if (bookResponse.ok) {
     try {
-      initialData = await res.json();
+      bookData = await bookResponse.json();
     } catch {
-      initialData = null;
+      bookData = null;
     }
   } else {
-    initialData = null;
+    bookData = null;
   }
 
-  const books: Book[] = initialData?.result?.data || [];
-  const total = initialData?.result?.total || 0;
+  const books: Book[] = bookData?.result?.data || [];
+  const total = bookData?.result?.total || 0;
   const pages: number = Math.max(1, Math.ceil(total / pageSize));
+
+  const genreResponse = await fetch(
+    `${DEFAULT_BASE}/api/v1/genres`,
+    {
+      headers: { cookie },
+      next: { tags: [`books:${paramsString}`] },
+    }
+  );
+
+  let genreData = null;
+  if (genreResponse.ok) {
+    try {
+      genreData = await genreResponse.json();
+    } catch {
+      genreData = null;
+    }
+  } else {
+    genreData = null;
+  }
 
   return (
     <div className="flex">
       <div className="flex w-full flex-col justify-center gap-6 p-6">
-        <Header />
+        <Header genres={genreData?.data || []} />
         <Image
           src="/default-image.png"
           alt="Banner Image"

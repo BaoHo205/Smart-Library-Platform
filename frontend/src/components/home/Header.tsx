@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { UserChip } from '../ui/userchip';
 import { Input } from '../ui/input';
 import Combobox from './ComboBox';
-import axiosInstance from '@/config/axiosConfig';
 import debounce from 'lodash.debounce';
 import { useAuth } from '../auth/useAuth';
 import {
@@ -24,14 +23,17 @@ const options: Option[] = [
   { id: 'publisher', name: 'Publisher' },
 ];
 
-const Header: React.FC = () => {
+interface HeaderProps { 
+  genres: Option[];
+}
+
+const Header: React.FC<HeaderProps> = ({ genres }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const searchParam = String(searchParams.get('searchBy') ?? 'title');
   const searchInput = String(searchParams.get('q') ?? '');
   const { user, loading: authLoading } = useAuth();
-  const [genres, setGenres] = useState<Option[]>([]);
   const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
 
   const debouncedSearchInputChange = useCallback(
@@ -46,24 +48,6 @@ const Header: React.FC = () => {
     }, 500),
     [searchParams, router]
   );
-
-  useEffect(() => {
-    let mounted = true;
-    const fetchGenres = async () => {
-      try {
-        const response = await axiosInstance.get('/api/v1/genres');
-        console.log('Fetched genres:', response);
-        if (mounted) setGenres(response.data.data || []);
-      } catch (error) {
-        console.error('Failed to fetch genres:', error);
-        if (mounted) setGenres([]);
-      }
-    };
-    fetchGenres();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const setParamAndPush = (key: string, value: string | null) => {
     const params = new URLSearchParams(Array.from(searchParams.entries()));
