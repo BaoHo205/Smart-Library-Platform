@@ -38,10 +38,7 @@ const BookCard: React.FC<Book> = ({
         isReturned: 0,
         isLate: 0,
       };
-      setCheckouts(prevCheckouts => [
-        ...prevCheckouts,
-        newCheckout
-      ]);
+      setCheckouts(prevCheckouts => [...prevCheckouts, newCheckout]);
       router.refresh();
       toast.success('Book borrowed successfully!');
     } catch (error) {
@@ -106,9 +103,11 @@ const BookCard: React.FC<Book> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={checkouts.some(
-            checkout => checkout.bookId === id && !checkout.isReturned
-          ) || availableCopies === 0}
+          disabled={
+            checkouts.some(
+              checkout => checkout.bookId === id && !checkout.isReturned
+            ) || availableCopies === 0
+          }
           className="w-full"
         >
           {isAlreadyBorrowed

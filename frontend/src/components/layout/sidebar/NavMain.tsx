@@ -15,7 +15,14 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '@radix-ui/react-collapsible';
-import { BookOpen, ChevronDown, FileText, Search, User, List } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronDown,
+  FileText,
+  Search,
+  User,
+  List,
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface NavMainProps {
@@ -85,7 +92,7 @@ const staffData = {
       title: 'Activity Logs',
       icon: List,
       url: '/activity-logs',
-    }
+    },
   ],
 };
 

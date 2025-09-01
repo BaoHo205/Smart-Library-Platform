@@ -1,69 +1,82 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ActivityIcon, UserIcon, ClockIcon } from "lucide-react"
+import { useState, useEffect } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ActivityIcon, UserIcon, ClockIcon } from 'lucide-react';
 
 interface ActivityLog {
-  id: string
-  userName: string
-  actionType: string
-  actionDetails: string
-  createdAt: string
+  id: string;
+  userName: string;
+  actionType: string;
+  actionDetails: string;
+  createdAt: string;
 }
 
 interface ActivityLogTableProps {
-  logs: ActivityLog[]
+  logs: ActivityLog[];
 }
 
 function getActionTypeVariant(actionType: string) {
   switch (actionType.toUpperCase()) {
-    case "CREATE":
-      return "default"
-    case "UPDATE":
-      return "secondary"
-    case "DELETE":
-      return "destructive"
+    case 'CREATE':
+      return 'default';
+    case 'UPDATE':
+      return 'secondary';
+    case 'DELETE':
+      return 'destructive';
     default:
-      return "outline"
+      return 'outline';
   }
 }
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  })
+  return new Date(dateString).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
 }
 
 export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
-  const [logs, setLogs] = useState<ActivityLog[]>(initialLogs || [])
+  const [logs, setLogs] = useState<ActivityLog[]>(initialLogs || []);
 
   // Listen for custom events to update logs
   useEffect(() => {
     const handleUpdateLogs = (event: CustomEvent) => {
-      setLogs(event.detail.logs)
-    }
+      setLogs(event.detail.logs);
+    };
 
-    window.addEventListener('updateActivityLogs', handleUpdateLogs as EventListener)
+    window.addEventListener(
+      'updateActivityLogs',
+      handleUpdateLogs as EventListener
+    );
 
     return () => {
-      window.removeEventListener('updateActivityLogs', handleUpdateLogs as EventListener)
-    }
-  }, [])
+      window.removeEventListener(
+        'updateActivityLogs',
+        handleUpdateLogs as EventListener
+      );
+    };
+  }, []);
 
   // Update logs when initialLogs prop changes
   useEffect(() => {
     if (initialLogs) {
-      setLogs(initialLogs)
+      setLogs(initialLogs);
     }
-  }, [initialLogs])
+  }, [initialLogs]);
 
   if (!logs || !Array.isArray(logs) || logs.length === 0) {
     return (
@@ -75,14 +88,16 @@ export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <ActivityIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <div className="text-muted-foreground py-8 text-center">
+            <ActivityIcon className="mx-auto mb-4 h-12 w-12 opacity-50" />
             <p className="text-lg font-medium">No activity logs found</p>
-            <p className="text-sm">Try adjusting your date range or check back later.</p>
+            <p className="text-sm">
+              Try adjusting your date range or check back later.
+            </p>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -90,7 +105,8 @@ export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ActivityIcon className="h-5 w-5" />
-          Activity Logs ({logs.length} {logs.length === 1 ? "entry" : "entries"})
+          Activity Logs ({logs.length} {logs.length === 1 ? 'entry' : 'entries'}
+          )
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -114,15 +130,21 @@ export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
             <TableBody>
               {logs.map((log, index) => (
                 <TableRow key={log.id}>
-                  <TableCell className="font-medium text-muted-foreground">{index + 1}</TableCell>
+                  <TableCell className="text-muted-foreground font-medium">
+                    {index + 1}
+                  </TableCell>
                   <TableCell className="font-medium">{log.userName}</TableCell>
                   <TableCell>
-                    <Badge variant={getActionTypeVariant(log.actionType)}>{log.actionType}</Badge>
+                    <Badge variant={getActionTypeVariant(log.actionType)}>
+                      {log.actionType}
+                    </Badge>
                   </TableCell>
                   <TableCell className="max-w-md">
-                    <div className="break-words text-sm leading-relaxed">{log.actionDetails}</div>
+                    <div className="text-sm leading-relaxed break-words">
+                      {log.actionDetails}
+                    </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                  <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
                     {formatDate(log.createdAt)}
                   </TableCell>
                 </TableRow>
@@ -132,5 +154,5 @@ export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -6,7 +6,11 @@ import { headers } from 'next/headers';
 
 const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-export default async function Page({ searchParams }: { searchParams: Record<string, string> }) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string, string>;
+}) {
   const genre = searchParams?.genre ?? '';
   const page = Number(searchParams?.page ?? 1);
   const searchBy = searchParams?.searchBy ?? 'title';
@@ -49,13 +53,10 @@ export default async function Page({ searchParams }: { searchParams: Record<stri
   const total = bookData?.result?.total || 0;
   const pages: number = Math.max(1, Math.ceil(total / pageSize));
 
-  const genreResponse = await fetch(
-    `${DEFAULT_BASE}/api/v1/genres`,
-    {
-      headers: { cookie },
-      next: { tags: [`books:${paramsString}`] },
-    }
-  );
+  const genreResponse = await fetch(`${DEFAULT_BASE}/api/v1/genres`, {
+    headers: { cookie },
+    next: { tags: [`books:${paramsString}`] },
+  });
 
   let genreData = null;
   if (genreResponse.ok) {

@@ -14,12 +14,14 @@ interface BookCardListProps {
 const BookCardList: React.FC<BookCardListProps> = ({
   books,
   pages = 1,
-  updateParams
+  updateParams,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const internalUpdateParams = (updates: Record<string, string | number | null>) => {
+  const internalUpdateParams = (
+    updates: Record<string, string | number | null>
+  ) => {
     if (updateParams) return updateParams(updates);
     // fallback: update URL using router
     const params = new URLSearchParams(Array.from(searchParams.entries()));
@@ -60,7 +62,10 @@ const BookCardList: React.FC<BookCardListProps> = ({
       </div>
 
       {showPagination && (
-        <CustomizedPagination pages={pages} updateParams={internalUpdateParams} />
+        <CustomizedPagination
+          pages={pages}
+          updateParams={internalUpdateParams}
+        />
       )}
     </>
   );

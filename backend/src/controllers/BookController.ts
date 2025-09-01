@@ -330,12 +330,10 @@ const addNewBook = async (req: AuthRequest, res: Response): Promise<void> => {
     !bookData.genreIds ||
     !bookData.publisherId
   ) {
-    res
-      .status(400)
-      .json({
-        message:
-          'Book title, author IDs, genre IDs, and publisher ID are required',
-      });
+    res.status(400).json({
+      message:
+        'Book title, author IDs, genre IDs, and publisher ID are required',
+    });
     return;
   }
 
@@ -352,19 +350,15 @@ const addNewBook = async (req: AuthRequest, res: Response): Promise<void> => {
     if (error instanceof Error) {
       // Check for specific MySQL errors like foreign key constraints or duplicates
       if (error.message.includes('Duplicate entry')) {
-        res
-          .status(409)
-          .json({
-            message: 'Conflict: A book with this ID or ISBN already exists.',
-            error: error.message,
-          });
+        res.status(409).json({
+          message: 'Conflict: A book with this ID or ISBN already exists.',
+          error: error.message,
+        });
       } else if (error.message.includes('Foreign key constraint failed')) {
-        res
-          .status(400)
-          .json({
-            message: 'Bad request: Invalid author, genre, or publisher ID.',
-            error: error.message,
-          });
+        res.status(400).json({
+          message: 'Bad request: Invalid author, genre, or publisher ID.',
+          error: error.message,
+        });
       } else {
         res
           .status(500)
@@ -393,12 +387,10 @@ const updateBookInventory = async (
 
   // Basic validation
   if (typeof quantity !== 'number' || quantity < 0) {
-    res
-      .status(400)
-      .json({
-        message:
-          'Invalid quantity provided. Quantity must be a non-negative number.',
-      });
+    res.status(400).json({
+      message:
+        'Invalid quantity provided. Quantity must be a non-negative number.',
+    });
     return;
   }
 
@@ -409,11 +401,9 @@ const updateBookInventory = async (
       PLACEHOLDER_STAFF_ID
     );
     if (updated) {
-      res
-        .status(200)
-        .json({
-          message: `Book ${bookId} inventory updated successfully to ${quantity}.`,
-        });
+      res.status(200).json({
+        message: `Book ${bookId} inventory updated successfully to ${quantity}.`,
+      });
     } else {
       res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
@@ -450,11 +440,9 @@ const retireBook = async (req: AuthRequest, res: Response): Promise<void> => {
       staffId ? staffId : PLACEHOLDER_STAFF_ID
     );
     if (updated) {
-      res
-        .status(200)
-        .json({
-          message: `Book ${bookId} status updated successfully to 'unavailable'.`,
-        });
+      res.status(200).json({
+        message: `Book ${bookId} status updated successfully to 'unavailable'.`,
+      });
     } else {
       res.status(404).json({ message: `Book with ID ${bookId} not found.` });
     }
@@ -546,11 +534,9 @@ const retireCopy = async (req: AuthRequest, res: Response): Promise<void> => {
       staffId ? staffId : PLACEHOLDER_STAFF_ID
     );
     if (updated) {
-      res
-        .status(200)
-        .json({
-          message: `Book ${copyId} status updated successfully to 'unavailable'.`,
-        });
+      res.status(200).json({
+        message: `Book ${copyId} status updated successfully to 'unavailable'.`,
+      });
     } else {
       res.status(404).json({ message: `Book with ID ${copyId} not found.` });
     }

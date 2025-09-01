@@ -51,8 +51,10 @@ export const createStaffLog = async (
   }
 };
 
-
-const getStaffLogs = async (startDate?: string, endDate?: string): Promise<StaffLog[]> => {
+const getStaffLogs = async (
+  startDate?: string,
+  endDate?: string
+): Promise<StaffLog[]> => {
   try {
     let query: string;
     let params: string[] = [];
@@ -92,7 +94,10 @@ const getStaffLogs = async (startDate?: string, endDate?: string): Promise<Staff
       `;
     }
 
-    const results = await mysqlConnection.executeQuery(query, params) as StaffLog[];
+    const results = (await mysqlConnection.executeQuery(
+      query,
+      params
+    )) as StaffLog[];
     return results;
   } catch (error) {
     // AppError
@@ -103,9 +108,9 @@ const getStaffLogs = async (startDate?: string, endDate?: string): Promise<Staff
     console.error('Database error in staff log retrieval:', error);
     throw new Error('Failed to retrieve staff log due to database error');
   }
-}
+};
 
 export default {
   createStaffLog,
-  getStaffLogs
+  getStaffLogs,
 };

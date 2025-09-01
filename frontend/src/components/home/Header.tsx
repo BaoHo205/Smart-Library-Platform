@@ -23,7 +23,7 @@ const options: Option[] = [
   { id: 'publisher', name: 'Publisher' },
 ];
 
-interface HeaderProps { 
+interface HeaderProps {
   genres: Option[];
 }
 
@@ -63,7 +63,12 @@ const Header: React.FC<HeaderProps> = ({ genres }) => {
     <header className="flex items-center justify-between">
       <div className="flex h-full gap-5">
         <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
-          <Select value={searchParam} onValueChange={searchCategory => setParamAndPush('searchBy', searchCategory)}>
+          <Select
+            value={searchParam}
+            onValueChange={searchCategory =>
+              setParamAndPush('searchBy', searchCategory)
+            }
+          >
             <SelectTrigger className="m-0 h-full w-[10rem] rounded-md bg-neutral-100 font-medium">
               <SelectValue></SelectValue>
             </SelectTrigger>
@@ -86,10 +91,15 @@ const Header: React.FC<HeaderProps> = ({ genres }) => {
           />
         </div>
         <Combobox
-          options={genres.map(genre => ({ value: genre.id, label: genre.name }))}
+          options={genres.map(genre => ({
+            value: genre.id,
+            label: genre.name,
+          }))}
           optionName="genre"
           className="h-full w-[12vw] rounded-lg"
-          onValueChange={selectedGenre => setParamAndPush('genre', selectedGenre)}
+          onValueChange={selectedGenre =>
+            setParamAndPush('genre', selectedGenre)
+          }
         />
       </div>
       <UserChip user={user} loading={authLoading} />

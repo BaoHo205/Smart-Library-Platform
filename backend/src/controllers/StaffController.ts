@@ -138,23 +138,26 @@ const getStaffLogs = async (req: AuthRequest, res: Response) => {
   // #swagger.description = 'Retrieve staff activity logs. If startDate and endDate are provided, filter by date range. Otherwise, return all logs. Staff access required.'
   try {
     const { startDate, endDate } = req.query;
-    
+
     // Convert to string if provided, otherwise undefined
     const startDateStr = startDate ? startDate.toString() : undefined;
     const endDateStr = endDate ? endDate.toString() : undefined;
-    
+
     // If one date is provided but not the other, return error
     if ((startDateStr && !endDateStr) || (!startDateStr && endDateStr)) {
-      throw new ValidationError('Both startDate and endDate must be provided together');
+      throw new ValidationError(
+        'Both startDate and endDate must be provided together'
+      );
     }
-    
+
     const result = await StaffLogService.getStaffLogs(startDateStr, endDateStr);
-    
+
     res.status(200).json({
       success: true,
-      message: startDateStr && endDateStr 
-        ? 'Filtered staff logs retrieved successfully' 
-        : 'All staff logs retrieved successfully',
+      message:
+        startDateStr && endDateStr
+          ? 'Filtered staff logs retrieved successfully'
+          : 'All staff logs retrieved successfully',
       data: result,
     });
   } catch (error) {
@@ -164,8 +167,8 @@ const getStaffLogs = async (req: AuthRequest, res: Response) => {
         success: false,
         error: {
           code: error.code,
-          message: error.message
-        }
+          message: error.message,
+        },
       });
     }
 
@@ -174,15 +177,15 @@ const getStaffLogs = async (req: AuthRequest, res: Response) => {
       success: false,
       error: {
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'An unexpected error occurred'
-      }
+        message: 'An unexpected error occurred',
+      },
     });
   }
-}
+};
 
 export default {
   getMostBorrowedBooks,
   getTopActiveReaders,
   getBooksWithLowAvailability,
-  getStaffLogs
+  getStaffLogs,
 };

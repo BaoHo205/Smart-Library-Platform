@@ -51,7 +51,7 @@ export function UserChip({ user, loading }: UserChipProps) {
       : user.userName.slice(0, 2).toUpperCase();
 
   return (
-    <Card className="flex flex-row items-center gap-2 p-2 rounded-md">
+    <Card className="flex flex-row items-center gap-2 rounded-md p-2">
       <Avatar className="h-8 w-8">
         {user.avatarUrl ? (
           <Image

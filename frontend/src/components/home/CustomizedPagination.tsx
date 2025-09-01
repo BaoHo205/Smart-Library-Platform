@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import {
   Pagination,
@@ -16,9 +16,14 @@ interface CustomizedPaginationProps {
   updateParams: (updates: Record<string, string | number | null>) => void;
 }
 
-const CustomizedPagination: React.FC<CustomizedPaginationProps> = ({ pages = 1, updateParams }) => {
+const CustomizedPagination: React.FC<CustomizedPaginationProps> = ({
+  pages = 1,
+  updateParams,
+}) => {
   const searchParams = useSearchParams();
-  const [currentPageState, setCurrentPageState] = useState<number>(Number(searchParams.get('page') ?? 1));
+  const [currentPageState, setCurrentPageState] = useState<number>(
+    Number(searchParams.get('page') ?? 1)
+  );
 
   // Handle pagination logic
   const totalPages = Math.max(1, Math.floor(pages));

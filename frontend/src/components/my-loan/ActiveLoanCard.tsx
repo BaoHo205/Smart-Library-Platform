@@ -75,7 +75,7 @@ const ActiveLoanCard = ({ checkout }: { checkout: CheckoutItem }) => {
         </div>
         <Button
           onClick={() => {
-            handleReturn(checkout.copyId || "");
+            handleReturn(checkout.copyId || '');
           }}
           disabled={isReturning}
           className="w-24"

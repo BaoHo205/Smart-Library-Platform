@@ -35,15 +35,11 @@
       "description": "Reading-session endpoints"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/user/profile": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get user profile",
         "description": "Get current user profile information using JWT token.",
         "responses": {
@@ -69,9 +65,7 @@
     },
     "/user/all": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get all users for search",
         "description": "Get all users for search and filtering purposes. Staff only.",
         "responses": {
@@ -86,9 +80,7 @@
     },
     "/user/search": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Search users",
         "description": "Search users by query string. Staff only.",
         "parameters": [
@@ -113,9 +105,7 @@
     },
     "/user/reviewBook": {
       "post": {
-        "tags": [
-          "Reviews"
-        ],
+        "tags": ["Reviews"],
         "summary": "Review book",
         "description": "Add or Update a review for a book. User must have borrowed and returned the book first.",
         "parameters": [
@@ -150,9 +140,7 @@
     },
     "/staff/most-borrowed-books": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get most borrowed books in a specific period",
         "description": "Retrieve statistics of the most frequently borrowed books. Staff access required.",
         "parameters": [
@@ -192,9 +180,7 @@
     },
     "/staff/top-active-readers": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get top active readers by total checkouts",
         "description": "Retrieve statistics of the most active library users/readers. Staff access required.",
         "parameters": [
@@ -221,9 +207,7 @@
     },
     "/staff/low-availability": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get books with low availability",
         "description": "Retrieve books that have low availability/stock levels. Staff access required.",
         "parameters": [
@@ -245,9 +229,7 @@
     },
     "/staff/logs": {
       "get": {
-        "tags": [
-          "Staff"
-        ],
+        "tags": ["Staff"],
         "summary": "Get staff logs within a date range or all logs",
         "description": "Retrieve staff activity logs. If startDate and endDate are provided, filter by date range. Otherwise, return all logs. Staff access required.",
         "parameters": [
@@ -337,9 +319,7 @@
     },
     "/books/{bookId}": {
       "get": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Get book information by ID",
         "description": "Retrieve detailed information about a specific book by its ID.",
         "parameters": [
@@ -369,9 +349,7 @@
     },
     "/books/{bookId}/reviews": {
       "get": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Get all reviews for a specific book",
         "description": "Retrieve all reviews for a specific book by its ID with user information.",
         "parameters": [
@@ -422,9 +400,7 @@
     },
     "/books/borrow/{bookId}": {
       "post": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Borrow a book",
         "description": "Borrow a specific book by its ID. Requires user authentication.",
         "parameters": [
@@ -502,9 +478,7 @@
     },
     "/books/return/{bookId}": {
       "put": {
-        "tags": [
-          "Books"
-        ],
+        "tags": ["Books"],
         "summary": "Return a book",
         "description": "Return a borrowed book by its ID. Requires user authentication.",
         "parameters": [
@@ -793,9 +767,7 @@
     },
     "/checkouts/": {
       "get": {
-        "tags": [
-          "Checkouts"
-        ],
+        "tags": ["Checkouts"],
         "summary": "Get all checkouts by user ID",
         "description": "Retrieve a list of all checkouts for a specific user.",
         "responses": {
@@ -810,9 +782,7 @@
     },
     "/reading-sessions/start": {
       "post": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Start a new reading session",
         "description": "Initialize a new reading session for a user with a specific book and device",
         "responses": {
@@ -841,18 +811,10 @@
                   },
                   "device": {
                     "type": "string",
-                    "enum": [
-                      "mobile",
-                      "tablet",
-                      "desktop"
-                    ]
+                    "enum": ["mobile", "tablet", "desktop"]
                   }
                 },
-                "required": [
-                  "userId",
-                  "bookId",
-                  "device"
-                ]
+                "required": ["userId", "bookId", "device"]
               }
             }
           }
@@ -861,9 +823,7 @@
     },
     "/reading-sessions/end/{sessionId}": {
       "post": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "End a reading session",
         "description": "Complete and finalize a reading session by session ID",
         "parameters": [
@@ -893,9 +853,7 @@
     },
     "/reading-sessions/{sessionId}/pages": {
       "post": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Add pages read to session",
         "description": "Track pages read during an active reading session",
         "parameters": [
@@ -935,9 +893,7 @@
                     }
                   }
                 },
-                "required": [
-                  "pages"
-                ]
+                "required": ["pages"]
               }
             }
           }
@@ -946,9 +902,7 @@
     },
     "/reading-sessions/{sessionId}/highlights": {
       "post": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Add highlight to session",
         "description": "Add a text highlight to an active reading session",
         "parameters": [
@@ -988,10 +942,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "pageNumber",
-                  "text"
-                ]
+                "required": ["pageNumber", "text"]
               }
             }
           }
@@ -1000,9 +951,7 @@
     },
     "/reading-sessions/avg-time": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get average reading session time",
         "description": "Retrieve analytics data showing average reading session duration per user",
         "responses": {
@@ -1017,9 +966,7 @@
     },
     "/reading-sessions/most-highlighted": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get most highlighted books",
         "description": "Retrieve books with the highest number of highlights from reading sessions",
         "parameters": [
@@ -1042,9 +989,7 @@
     },
     "/reading-sessions/top-books-time": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get top books by reading time",
         "description": "Retrieve books ranked by total reading time across all users",
         "parameters": [
@@ -1067,9 +1012,7 @@
     },
     "/reading-sessions/trends": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get reading trends over time",
         "description": "Retrieve reading activity trends and patterns over a specified time period",
         "parameters": [
@@ -1113,9 +1056,7 @@
     },
     "/reading-sessions/devices": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get device usage analytics",
         "description": "Retrieve analytics data about reading session distribution across different device types",
         "responses": {
@@ -1130,9 +1071,7 @@
     },
     "/reading-sessions/most-highlighted-with-details": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get most highlighted books with complete details",
         "description": "Retrieve books with the highest number of highlights including book titles, authors, and cover images",
         "parameters": [
@@ -1155,9 +1094,7 @@
     },
     "/reading-sessions/top-books-time-with-details": {
       "get": {
-        "tags": [
-          "Reading Sessions"
-        ],
+        "tags": ["Reading Sessions"],
         "summary": "Get top books by reading time with complete details",
         "description": "Retrieve books ranked by total reading time including book titles, authors, and cover images",
         "parameters": [
@@ -1269,9 +1206,7 @@
     },
     "/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register new user",
         "description": "Create a new user account with email and password",
         "responses": {
@@ -1289,9 +1224,7 @@
     },
     "/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User login",
         "description": "Authenticate user and return access and refresh tokens",
         "responses": {
@@ -1309,9 +1242,7 @@
     },
     "/refresh": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Refresh access token",
         "description": "Generate a new access token using refresh token",
         "responses": {
@@ -1329,9 +1260,7 @@
     },
     "/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User logout",
         "description": "Logout user and invalidate tokens",
         "responses": {
