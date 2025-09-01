@@ -44,7 +44,7 @@ const HomePage = ({ initialData }: { initialData?: { data?: { data: Book[]; tota
   };
 
   const books: Book[] = initialData?.data?.data || [];
-  const pages: number = Math.ceil((initialData?.data?.total || 0) / 9) || 0;
+  const pages: number = Math.floor((initialData?.data?.total || 0) / 9) || 0;
 
   const handleNextPage = (): void => {
     if (currentPage < pages) {
