@@ -2,6 +2,7 @@ import mysqlConnection from '../database/mysql/connection';
 import { v4 as uuidv4 } from 'uuid';
 import { StaffLog } from '../models/mysql/StaffLog';
 import { ResultSetHeader } from 'mysql2/promise';
+import { AppError } from '@/types/errors';
 
 /**
  * Creates a new log entry in the Staff_Logs table.
@@ -48,4 +49,63 @@ export const createStaffLog = async (
       throw new Error(`Could not create staff log: ${String(error)}`);
     }
   }
+};
+
+
+const getStaffLogs = async (startDate?: string, endDate?: string): Promise<StaffLog[]> => {
+  try {
+    let query: string;
+    let params: string[] = [];
+
+    if (startDate && endDate) {
+      // Filter by date range if both dates are provided
+      query = `
+        SELECT 
+          l.id,
+          CONCAT(u.firstName, ' ', u.lastName) AS userName,
+          l.actionType,
+          l.actionDetails,
+          l.createdAt
+        FROM
+          staff_logs l
+              JOIN
+          users u ON u.id = l.userId
+        WHERE
+          l.createdAt BETWEEN ? AND ?
+        ORDER BY l.createdAt DESC;
+      `;
+      params = [startDate, endDate];
+    } else {
+      // Get all logs if no date range is provided
+      query = `
+        SELECT 
+          l.id,
+          CONCAT(u.firstName, ' ', u.lastName) AS userName,
+          l.actionType,
+          l.actionDetails,
+          l.createdAt
+        FROM
+          staff_logs l
+              JOIN
+          users u ON u.id = l.userId
+        ORDER BY l.createdAt DESC;
+      `;
+    }
+
+    const results = await mysqlConnection.executeQuery(query, params) as StaffLog[];
+    return results;
+  } catch (error) {
+    // AppError
+    if (error instanceof AppError) {
+      throw error;
+    }
+    // Handle database errors
+    console.error('Database error in staff log retrieval:', error);
+    throw new Error('Failed to retrieve staff log due to database error');
+  }
+}
+
+export default {
+  createStaffLog,
+  getStaffLogs
 };

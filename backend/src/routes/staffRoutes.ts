@@ -20,4 +20,10 @@ staffRouter.get(
   StaffController.getBooksWithLowAvailability
 );
 
+staffRouter.get(
+  '/logs',
+  authMiddleware.verifyStaff,
+  StaffController.getStaffLogs
+);
+
 export default staffRouter;

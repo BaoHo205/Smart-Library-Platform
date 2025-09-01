@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import StaffService from '../services/StaffService';
+import StaffLogService from '../services/StaffLogService';
 import { AuthRequest } from '@/middleware/authMiddleware';
+import { AppError, ValidationError } from '@/types/errors';
 
 const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Staff']
@@ -130,8 +132,57 @@ const getBooksWithLowAvailability = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const getStaffLogs = async (req: AuthRequest, res: Response) => {
+  // #swagger.tags = ['Staff']
+  // #swagger.summary = 'Get staff logs within a date range or all logs'
+  // #swagger.description = 'Retrieve staff activity logs. If startDate and endDate are provided, filter by date range. Otherwise, return all logs. Staff access required.'
+  try {
+    const { startDate, endDate } = req.query;
+    
+    // Convert to string if provided, otherwise undefined
+    const startDateStr = startDate ? startDate.toString() : undefined;
+    const endDateStr = endDate ? endDate.toString() : undefined;
+    
+    // If one date is provided but not the other, return error
+    if ((startDateStr && !endDateStr) || (!startDateStr && endDateStr)) {
+      throw new ValidationError('Both startDate and endDate must be provided together');
+    }
+    
+    const result = await StaffLogService.getStaffLogs(startDateStr, endDateStr);
+    
+    res.status(200).json({
+      success: true,
+      message: startDateStr && endDateStr 
+        ? 'Filtered staff logs retrieved successfully' 
+        : 'All staff logs retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    // Handle custom application errors
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message
+        }
+      });
+    }
+
+    // Handle unexpected errors
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred'
+      }
+    });
+  }
+}
+
 export default {
   getMostBorrowedBooks,
   getTopActiveReaders,
   getBooksWithLowAvailability,
+  getStaffLogs
 };
