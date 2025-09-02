@@ -4,6 +4,63 @@ import StaffLogService from '../services/StaffLogService';
 import { AuthRequest } from '@/middleware/authMiddleware';
 import { AppError, ValidationError } from '@/types/errors';
 
+const getBorrowCountInRange = async (req: AuthRequest, res: Response) => {
+  // #swagger.tags = ['Staff']
+  // #swagger.summary = 'Get total borrow count in a date range'
+  // #swagger.description = 'Returns the total number of checkout records between startDate and endDate (inclusive). Staff access required.'
+  /*  #swagger.parameters['startDate'] = {
+        in: 'query',
+        description: 'Start date (YYYY-MM-DD)',
+        required: true,
+        type: 'string'
+      }
+      #swagger.parameters['endDate'] = {
+        in: 'query',
+        description: 'End date (YYYY-MM-DD)',
+        required: true,
+        type: 'string'
+      }
+  */
+  try {
+    const startDate = String(req.query.startDate || '').trim();
+    const endDate = String(req.query.endDate || '').trim();
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'startDate and endDate are required (YYYY-MM-DD)',
+      });
+    }
+
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+    if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date format. Use YYYY-MM-DD',
+      });
+    }
+    if (startDateObj > endDateObj) {
+      return res.status(400).json({
+        success: false,
+        message: 'startDate cannot be later than endDate',
+      });
+    }
+
+    const result = await StaffService.getBorrowCountInRange(startDate, endDate);
+    return res.status(200).json({
+      success: true,
+      message: 'Borrow count retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+    });
+  }
+};
+
 const getMostBorrowedBooks = async (req: AuthRequest, res: Response) => {
   // #swagger.tags = ['Staff']
   // #swagger.summary = 'Get most borrowed books in a specific period'
@@ -188,4 +245,5 @@ export default {
   getTopActiveReaders,
   getBooksWithLowAvailability,
   getStaffLogs,
+  getBorrowCountInRange,
 };
