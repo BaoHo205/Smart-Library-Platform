@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -45,8 +45,6 @@ const Combobox: React.FC<ComboboxProps> = ({
       onValueChange(newValue);
     }
   };
-  console.log(Array.isArray(options), options);
-  console.log(options)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

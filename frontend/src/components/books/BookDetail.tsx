@@ -63,9 +63,6 @@ export default function BookDetail({
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   priority={true}
-                  onError={() => {
-                    console.log('Failed to load book cover image');
-                  }}
                 />
               ) : (
                 <div className="flex h-full min-h-[400px] w-full items-center justify-center">
@@ -124,9 +121,7 @@ export default function BookDetail({
                     Offline Available
                   </span>
                   <MapPin className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-600">
-                    Beanland Library
-                  </span>
+                  <span className="text-gray-600">Beanland Library</span>
                 </div>
                 {book.availableCopies > 0 ? (
                   <div className="inline-block rounded-lg border-2 border-black bg-white px-3 py-1 text-sm font-semibold text-black">
@@ -137,7 +132,6 @@ export default function BookDetail({
                     Out of stock
                   </div>
                 )}
-
               </div>
             </div>
           </div>

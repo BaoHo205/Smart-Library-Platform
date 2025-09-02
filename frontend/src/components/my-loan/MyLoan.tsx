@@ -1,7 +1,7 @@
 import ActiveLoanCard from './ActiveLoanCard';
 import PastLoanCard from './PastLoanCard';
 import type { CheckoutItem } from '@/types/checkout.type';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
   const activeCheckouts: CheckoutItem[] = checkouts.filter(
@@ -29,10 +29,7 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {activeCheckouts.length > 0 ? (
               activeCheckouts.map(checkout => (
-                <ActiveLoanCard
-                  key={checkout.bookId}
-                  checkout={checkout}
-                />
+                <ActiveLoanCard key={checkout.bookId} checkout={checkout} />
               ))
             ) : (
               <div className="col-span-full py-12 text-center">
@@ -45,7 +42,6 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
                   </p>
                 </div>
               </div>
-
             )}
           </div>
         </TabsContent>
@@ -76,4 +72,4 @@ export default function MyLoan({ checkouts }: { checkouts: CheckoutItem[] }) {
       </Tabs>
     </div>
   );
-};
+}

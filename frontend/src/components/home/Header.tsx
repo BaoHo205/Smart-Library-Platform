@@ -1,9 +1,9 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+
+import React, { useState, useCallback } from 'react';
 import { UserChip } from '../ui/userchip';
 import { Input } from '../ui/input';
 import Combobox from './ComboBox';
-import axiosInstance from '@/config/axiosConfig';
 import debounce from 'lodash.debounce';
 import { useAuth } from '../auth/useAuth';
 import {
@@ -13,77 +13,69 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-interface Options {
-  value: string;
-  label: string;
-}
+type Option = { id: string; name: string };
 
-interface HeaderProps {
-  onCurrentGenreChange: (genre: string) => void;
-  onSearchParamChange: (param: string) => void;
-  onSearchInputChange: (input: string) => void; // Add input change handler
-  searchParam: string;
-  searchInput: string;
-  currentGenre: string;
-}
-
-const options: Options[] = [
-  {
-    value: 'title',
-    label: 'Title',
-  },
-  {
-    value: 'author',
-    label: 'Author',
-  },
-  {
-    value: 'publisher',
-    label: 'Publisher',
-  },
+const options: Option[] = [
+  { id: 'title', name: 'Title' },
+  { id: 'author', name: 'Author' },
+  { id: 'publisher', name: 'Publisher' },
 ];
 
-const Header: React.FC<HeaderProps> = ({
-  onCurrentGenreChange,
-  onSearchParamChange,
-  onSearchInputChange,
-  searchParam,
-  searchInput,
-}) => {
+interface HeaderProps {
+  genres: Option[];
+}
+
+const Header: React.FC<HeaderProps> = ({ genres }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const searchParam = String(searchParams.get('searchBy') ?? 'title');
+  const searchInput = String(searchParams.get('q') ?? '');
   const { user, loading: authLoading } = useAuth();
-  const [genres, setGenres] = useState<Options[]>([]);
   const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
+
   const debouncedSearchInputChange = useCallback(
-    debounce(nextValue => onSearchInputChange(nextValue), 500),
-    []
+    debounce((nextValue: string) => {
+      const params = new URLSearchParams(Array.from(searchParams.entries()));
+      if (!nextValue) params.delete('q');
+      else params.set('q', nextValue);
+      params.set('page', '1');
+      const q = params.toString();
+      const url = q ? `?${q}` : '/';
+      router.push(url);
+    }, 500),
+    [searchParams, router]
   );
 
-  const fetchGenres = async (): Promise<void> => {
-    try {
-      const response = await axiosInstance.get('api/v1/genres');
-      setGenres(response.data.data as Options[]);
-    } catch (error) {
-      console.error('Failed to fetch genres:', error);
-      setGenres([]); // Set empty array on error
-    }
+  const setParamAndPush = (key: string, value: string | null) => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    if (value === null || value === '') params.delete(key);
+    else params.set(key, value);
+    params.set('page', '1');
+    const q = params.toString();
+    const url = q ? `?${q}` : '/';
+    router.push(url);
   };
-
-  useEffect(() => {
-    fetchGenres();
-  }, []);
 
   return (
     <header className="flex items-center justify-between">
       <div className="flex h-full gap-5">
         <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
-          <Select value={searchParam} onValueChange={onSearchParamChange}>
+          <Select
+            value={searchParam}
+            onValueChange={searchCategory =>
+              setParamAndPush('searchBy', searchCategory)
+            }
+          >
             <SelectTrigger className="m-0 h-full w-[10rem] rounded-md bg-neutral-100 font-medium">
-              <SelectValue />
+              <SelectValue></SelectValue>
             </SelectTrigger>
             <SelectContent>
               {options.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                <SelectItem key={option.id} value={option.id}>
+                  {option.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -91,23 +83,26 @@ const Header: React.FC<HeaderProps> = ({
           <Input
             placeholder="Search books, authors, publishers..."
             value={currSearchInput}
-            onChange={e => {
-              setCurrSearchInput(e.target.value);
-              debouncedSearchInputChange(e.target.value);
+            onChange={input => {
+              setCurrSearchInput(input.target.value);
+              debouncedSearchInputChange(input.target.value);
             }}
             className="h-full rounded-r-none border-0 shadow-none focus-visible:ring-0"
           />
         </div>
         <Combobox
-          options={genres}
+          options={genres.map(genre => ({
+            value: genre.id,
+            label: genre.name,
+          }))}
           optionName="genre"
           className="h-full w-[12vw] rounded-lg"
-          onValueChange={onCurrentGenreChange}
+          onValueChange={selectedGenre =>
+            setParamAndPush('genre', selectedGenre)
+          }
         />
       </div>
-      <div className="flex items-center gap-3 rounded-lg border px-2.5 py-1.5 shadow-sm">
-        <UserChip user={user} loading={authLoading} />
-      </div>
+      <UserChip user={user} loading={authLoading} />
     </header>
   );
 };

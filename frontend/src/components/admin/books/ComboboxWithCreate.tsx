@@ -1,11 +1,11 @@
 // components/ComboboxWithCreate.tsx
-"use client";
+'use client';
 
-import * as React from "react";
-import { Check, ChevronsUpDown, PlusCircle, X } from "lucide-react";
+import * as React from 'react';
+import { Check, ChevronsUpDown, PlusCircle, X } from 'lucide-react';
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -14,15 +14,15 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 interface Item {
   id: string;
@@ -54,19 +54,19 @@ export const ComboboxWithCreate = ({
 }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
   const [isCreating, setIsCreating] = React.useState(false);
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState('');
   const inputRef = React.useRef(null);
 
   const handleSelect = (currentValue: string) => {
     if (multiple) {
       const currentArrayValue = Array.isArray(value) ? value : [];
       if (currentArrayValue.includes(currentValue)) {
-        onValueChange(currentArrayValue.filter((v) => v !== currentValue));
+        onValueChange(currentArrayValue.filter(v => v !== currentValue));
       } else {
         onValueChange([...currentArrayValue, currentValue]);
       }
     } else {
-      onValueChange(currentValue === value ? "" : currentValue);
+      onValueChange(currentValue === value ? '' : currentValue);
       setOpen(false);
     }
   };
@@ -79,9 +79,9 @@ export const ComboboxWithCreate = ({
 
   // Handler for creating a new item
   const handleCreateNew = () => {
-    if (search.trim() !== "") {
+    if (search.trim() !== '') {
       onNewItem(search);
-      setSearch("");
+      setSearch('');
       setIsCreating(false);
     }
   };
@@ -100,10 +100,17 @@ export const ComboboxWithCreate = ({
             ref={inputRef}
             placeholder={`Enter new ${label.toLowerCase()}`}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
-          <Button type="button" onClick={handleCreateNew}>Create</Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => setIsCreating(false)}>
+          <Button type="button" onClick={handleCreateNew}>
+            Create
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCreating(false)}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -118,7 +125,7 @@ export const ComboboxWithCreate = ({
             >
               {multiple && selectedLabels.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  {selectedLabels.map((label) => (
+                  {selectedLabels.map(label => (
                     <Badge key={label} variant="secondary">
                       {label}
                     </Badge>
@@ -126,7 +133,7 @@ export const ComboboxWithCreate = ({
                 </div>
               ) : (
                 // Display the selected single item or placeholder
-                items.find((item) => item.id === value)?.label || placeholder
+                items.find(item => item.id === value)?.label || placeholder
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -141,7 +148,7 @@ export const ComboboxWithCreate = ({
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  {items.map((item) => (
+                  {items.map(item => (
                     <CommandItem
                       key={item.id}
                       value={item.label}
@@ -149,10 +156,10 @@ export const ComboboxWithCreate = ({
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          'mr-2 h-4 w-4',
                           Array.isArray(value) && value.includes(item.id)
-                            ? "opacity-100"
-                            : "opacity-0"
+                            ? 'opacity-100'
+                            : 'opacity-0'
                         )}
                       />
                       {item.label}
@@ -161,9 +168,7 @@ export const ComboboxWithCreate = ({
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
-                    onSelect={handleToggleCreate}
-                  >
+                  <CommandItem onSelect={handleToggleCreate}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Create New {label}
                   </CommandItem>

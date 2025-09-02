@@ -79,11 +79,12 @@ const getTopActiveReaders = async (
       ORDER BY total_checkouts DESC`;
 
     // Add LIMIT only if it's a numeric value, not 'max'
-    const hasNumericLimit = limit !== 'max' && !isNaN(parseInt(limit)) && parseInt(limit) > 0;
+    const hasNumericLimit =
+      limit !== 'max' && !isNaN(parseInt(limit)) && parseInt(limit) > 0;
     const query = hasNumericLimit
       ? `${baseQuery}\n      LIMIT ${parseInt(limit)};`
       : `${baseQuery};`;
-    
+
     const params = [monthsBack];
     const result = await mysql.executeQuery(query, params);
     return result;
@@ -97,7 +98,7 @@ const getTopActiveReaders = async (
 const getBooksWithLowAvailability = async (limit: number | 'max' = 5) => {
   try {
     let baseQuery: string;
-    
+
     if (limit === 'max') {
       // for categories
       baseQuery = `
@@ -133,7 +134,8 @@ const getBooksWithLowAvailability = async (limit: number | 'max' = 5) => {
     }
 
     // Apply limit if provided and valid, but not 'max'
-    const hasNumericLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
+    const hasNumericLimit =
+      typeof limit === 'number' && Number.isFinite(limit) && limit > 0;
     const query = hasNumericLimit
       ? `${baseQuery}\n      LIMIT ${Math.trunc(limit)};`
       : `${baseQuery};`;

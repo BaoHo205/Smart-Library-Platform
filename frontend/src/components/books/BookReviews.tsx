@@ -19,7 +19,7 @@ export default function BookReviews({
   onAddReview,
   onUpdateReview,
   currentUserId,
-  isBorrowed
+  isBorrowed,
 }: BookReviewsProps) {
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
@@ -88,10 +88,11 @@ export default function BookReviews({
         {[1, 2, 3, 4, 5].map(star => (
           <Star
             key={star}
-            className={`h-5 w-5 ${star <= (interactive ? hoverState || rating : rating)
-              ? 'fill-yellow-400 text-yellow-400'
-              : 'text-gray-300'
-              } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
+            className={`h-5 w-5 ${
+              star <= (interactive ? hoverState || rating : rating)
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'text-gray-300'
+            } ${interactive ? 'cursor-pointer transition-transform hover:scale-110' : ''}`}
             onClick={() => interactive && onStarClick?.(star)}
             onMouseEnter={() => interactive && setHoverState(star)}
             onMouseLeave={() => interactive && setHoverState(0)}
@@ -144,7 +145,7 @@ export default function BookReviews({
                 />
 
                 {addReviewError && (
-                  <p className="text-red-500 text-sm mt-1">{addReviewError}</p>
+                  <p className="mt-1 text-sm text-red-500">{addReviewError}</p>
                 )}
 
                 <div className="flex justify-end">
@@ -211,7 +212,9 @@ export default function BookReviews({
                       </div>
 
                       {editReviewError && (
-                        <p className="text-red-500 text-sm mt-1">{editReviewError}</p>
+                        <p className="mt-1 text-sm text-red-500">
+                          {editReviewError}
+                        </p>
                       )}
 
                       <div className="flex gap-2">

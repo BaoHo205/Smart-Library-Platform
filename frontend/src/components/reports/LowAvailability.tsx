@@ -63,7 +63,10 @@ export function LowAvailability({
     return 'text-green-500';
   };
 
-  const getAvailabilityStatus = (percentage: number, availableCopies: number) => {
+  const getAvailabilityStatus = (
+    percentage: number,
+    availableCopies: number
+  ) => {
     if (availableCopies === 0) return 'Out of Stock';
     if (percentage <= 10) return 'Critical';
     if (percentage <= 25) return 'Low';
@@ -80,7 +83,7 @@ export function LowAvailability({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Low availability books list */}
-        <div className="h-[200px] overflow-y-auto space-y-2 pr-2">
+        <div className="h-[200px] space-y-2 overflow-y-auto pr-2">
           {books.length === 0 ? (
             <div className="py-4 text-center">
               <p className="text-sm text-gray-500">
@@ -105,7 +108,11 @@ export function LowAvailability({
                       {book.availableCopies} of {book.quantity} available
                     </p>
                     <p className="text-xs text-gray-500">
-                      Status: {getAvailabilityStatus(book.availability_percentage, book.availableCopies)}
+                      Status:{' '}
+                      {getAvailabilityStatus(
+                        book.availability_percentage,
+                        book.availableCopies
+                      )}
                     </p>
                   </div>
                 </div>
@@ -114,8 +121,8 @@ export function LowAvailability({
                     book.availability_percentage === 0
                       ? 'destructive'
                       : book.availability_percentage <= 25
-                      ? 'secondary'
-                      : 'outline'
+                        ? 'secondary'
+                        : 'outline'
                   }
                   className="ml-2"
                 >
