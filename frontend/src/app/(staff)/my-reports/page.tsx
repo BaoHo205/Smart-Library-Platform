@@ -114,7 +114,9 @@ export default function StaffReportsPage() {
         getBooksWithLowAvailability(debouncedFilters.lowAvailabilityLimit),
         getAllBooksForCategories(),
         getTopActiveReaders(
-          debouncedFilters.monthsBack === 'all' ? 999 : debouncedFilters.monthsBack,
+          debouncedFilters.monthsBack === 'all'
+            ? 999
+            : debouncedFilters.monthsBack,
           debouncedFilters.topReadersLimit
         ),
       ]);
@@ -206,7 +208,7 @@ export default function StaffReportsPage() {
 
   return (
     <div className="bg-gray-50">
-      <div className="w-full max-w-none px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8">
+      <div className="flex w-full max-w-none flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
         <div className="">
           <div className="flex items-center justify-between">
             <div>
@@ -219,24 +221,25 @@ export default function StaffReportsPage() {
           </div>
         </div>
 
-        <div className='flex gap-6 '>
+        <div className="flex gap-6">
           {totalBorrowCount !== null && (
-            <div className="relative overflow-hidden rounded-2xl bg-black text-white p-8 mx-auto min-h-full">
+            <div className="relative mx-auto min-h-full overflow-hidden rounded-2xl bg-black p-8 text-white">
               {/* Background decorative circles */}
-              <div className="absolute right-0 top-0 w-64 h-64 rounded-full border border-white/30 -translate-y-16 translate-x-16" />
-              <div className="absolute right-8 top-8 w-48 h-48 rounded-full border border-white/30 -translate-y-8 translate-x-8" />
-              <div className="absolute right-16 top-16 w-32 h-32 rounded-full border border-white/30" />
-              <div className="relative z-10 flex items-center justify-center gap-6 px-8 py-2 h-full">
+              <div className="absolute top-0 right-0 h-64 w-64 translate-x-16 -translate-y-16 rounded-full border border-white/30" />
+              <div className="absolute top-8 right-8 h-48 w-48 translate-x-8 -translate-y-8 rounded-full border border-white/30" />
+              <div className="absolute top-16 right-16 h-32 w-32 rounded-full border border-white/30" />
+              <div className="relative z-10 flex h-full items-center justify-center gap-6 px-8 py-2">
                 <div className="">
-                  <h1 className="text-3xl font-bold whitespace-nowrap">BOOKS BORROWED</h1>
+                  <h1 className="text-3xl font-bold whitespace-nowrap">
+                    BOOKS BORROWED
+                  </h1>
                   {filters.startDate && filters.endDate ? (
                     <p className="text text-white/80">
                       From: {filters.startDate} to {filters.endDate}
-                      </p>
-                    ) : (
-                      <p className="text text-white/80">All Time</p>
-                    )
-                  } 
+                    </p>
+                  ) : (
+                    <p className="text text-white/80">All Time</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 whitespace-nowrap">
                   <div className="text-right">
@@ -255,7 +258,6 @@ export default function StaffReportsPage() {
         </div>
 
         <div className="space-y-8">
-
           <MostBorrowedBooks
             books={mostBorrowedBooks}
             loading={mostBorrowedLoading}

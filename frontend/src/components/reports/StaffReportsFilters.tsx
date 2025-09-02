@@ -363,8 +363,8 @@ export function StaffReportsFilters({
   }
 
   return (
-    <div className="w-full h-full">
-      <Card className="overflow-hidden border-gray-100 bg-white shadow-lg h-full">
+    <div className="h-full w-full">
+      <Card className="h-full overflow-hidden border-gray-100 bg-white shadow-lg">
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white pb-6">
             <div className="flex items-center justify-between">

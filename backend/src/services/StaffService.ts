@@ -1,9 +1,6 @@
 import mysql from '../database/mysql/connection';
 
-const getBorrowCountInRange = async (
-  startDate: string,
-  endDate: string
-) => {
+const getBorrowCountInRange = async (startDate: string, endDate: string) => {
   try {
     const query = `SELECT CountBooksBorrowedInRange(?, ?) AS totalBorrowed;`;
     const rows = (await mysql.executeQuery(query, [startDate, endDate])) as

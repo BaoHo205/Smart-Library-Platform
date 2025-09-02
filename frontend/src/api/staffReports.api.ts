@@ -107,7 +107,7 @@ export const getTopActiveReaders = async (
   return response.data.data || [];
 };
 
-export const getBooksBorrowCountInRange = async(
+export const getBooksBorrowCountInRange = async (
   startDate: string,
   endDate: string
 ): Promise<number> => {
@@ -115,4 +115,4 @@ export const getBooksBorrowCountInRange = async(
     `/api/v1/staff/borrow-count?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
   );
   return response.data.data?.totalBorrowed;
-}
+};

@@ -217,7 +217,7 @@ export function LowAvailabilityChart({
                       <Dialog key={category}>
                         <DialogTrigger asChild>
                           <button
-                            className="w-full h-20 cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
+                            className="h-20 w-full cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
                             onClick={() => setSelectedCategory(category)}
                           >
                             <div className="flex items-center justify-between">

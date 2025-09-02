@@ -11,7 +11,12 @@ export default async function Page({
 }: {
   searchParams: Record<string, string>;
 }) {
-  const { genre='', page=1, searchBy='title', q='' } = await searchParams;
+  const {
+    genre = '',
+    page = 1,
+    searchBy = 'title',
+    q = '',
+  } = await searchParams;
 
   const params = new URLSearchParams();
   if (genre) params.set('genre', genre);
