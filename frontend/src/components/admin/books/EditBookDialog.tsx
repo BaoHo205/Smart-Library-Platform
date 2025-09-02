@@ -100,6 +100,8 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
   const addPublisher = useDataStore(s => s.addPublisher);
   const addAuthor = useDataStore(s => s.addAuthor);
   const retireBook = useDataStore(s => s.retireBook);
+  const setBookCopies = useDataStore(s => s.setBookCopies);
+  const bookCopies = useDataStore(s => s.bookCopies);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -143,6 +145,20 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
       form.setValue('avgRating', parseFloat(book.avgRating) || 0);
     }
   }, [open, book, publisherList, authorList, genreList, form]);
+
+  // --- API Call for Fetching Data on Component Mount ---
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await axiosInstance.get(`/api/v1/books/${book.id}/copies`);
+        setBookCopies(result.data.result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Failed to fetch book copies.');
+      }
+    };
+    fetchData();
+  }, [book.id, setBookCopies]);
 
   const handleCreatePublisher = async (name: string) => {
     try {
@@ -248,6 +264,8 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
     id: g.id!,
     label: g.name,
   }));
+
+  const isRetireDisabled = bookCopies.some(copy => copy.isBorrowed === 1);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -489,6 +507,7 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
                   type="button"
                   variant="destructive"
                   onClick={handleRetireBook}
+                  disabled={isRetireDisabled}
                 >
                   Retire
                 </Button>

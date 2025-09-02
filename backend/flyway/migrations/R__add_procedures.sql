@@ -921,6 +921,16 @@ BEGIN
         SET MESSAGE_TEXT = 'Book ID is a required field';
     END IF;
 
+    -- Lock the row
+    SELECT id INTO @bookExists
+    FROM books
+    WHERE id = p_bookId FOR UPDATE;
+
+    IF @bookExists IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID does not exist';
+    END IF;
+
     -- Update the main book record using IFNULL for partial updates
     UPDATE books
     SET
