@@ -932,7 +932,7 @@ BEGIN
         description = IFNULL(p_description, description),
         avgRating = IFNULL(p_avgRating, avgRating),
         updatedAt = CURRENT_TIMESTAMP
-    WHERE id = p_bookId FOR UPDATE;
+    WHERE id = p_bookId;
 
     -- Update author associations only if new author IDs are provided
     IF p_authorIds IS NOT NULL AND p_authorIds <> '' THEN
