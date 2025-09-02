@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { UserChip } from '../ui/userchip';
 import { Input } from '../ui/input';
 import Combobox from './ComboBox';
@@ -31,10 +31,20 @@ const Header: React.FC<HeaderProps> = ({ genres }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const searchParam = String(searchParams.get('searchBy') ?? 'title');
-  const searchInput = String(searchParams.get('q') ?? '');
+  // const searchParam = String(searchParams.get('searchBy') ?? 'title');
+  // const searchInput = String(searchParams.get('q') ?? '');
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (params.toString() === '') {
+      params.set('searchBy', 'title');
+      params.set('q', '');
+      params.set('page', '1');
+    }
+    console.log(params.toString());
+    router.push(`?${params.toString()}`);
+  }, []);
   const { user, loading: authLoading } = useAuth();
-  const [currSearchInput, setCurrSearchInput] = useState<string>(searchInput);
+  const [currSearchInput, setCurrSearchInput] = useState<string>('');
 
   const debouncedSearchInputChange = useCallback(
     debounce((nextValue: string) => {
@@ -64,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ genres }) => {
       <div className="flex h-full gap-5">
         <div className="flex h-full w-[25vw] items-center rounded-lg border p-1.5 shadow-2xs">
           <Select
-            value={searchParam}
+            value={searchParams?.get('searchBy') ?? 'title'}
             onValueChange={searchCategory =>
               setParamAndPush('searchBy', searchCategory)
             }
