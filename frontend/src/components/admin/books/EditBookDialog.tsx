@@ -424,7 +424,7 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="avgRating"
                 render={({ field }) => (
@@ -461,7 +461,7 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
             <FormField
               control={form.control}
