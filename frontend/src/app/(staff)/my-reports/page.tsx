@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserChip } from '@/components/ui/userchip';
 import {
@@ -82,119 +82,57 @@ export default function StaffReportsPage() {
 
   const debouncedFilters = useDebounce(filters, 300);
 
-  const initialLoadComplete = useRef(false);
-
   const [error, setError] = useState<string | null>(null);
 
   const handleBookClick = (bookId: string) => {
     window.open(`/books/${bookId}`, '_blank');
   };
 
+  const fetchReports = useCallback(async () => {
+    try {
+      setError(null);
+      setMostBorrowedLoading(true);
+      setLowAvailabilityLoading(true);
+      setTopReadersLoading(true);
+
+      const [
+        mostBorrowedData,
+        lowAvailabilityData,
+        allBooksData,
+        topReadersData,
+      ] = await Promise.all([
+        getMostBorrowedBooks(
+          debouncedFilters.startDate,
+          debouncedFilters.endDate,
+          debouncedFilters.mostBorrowedLimit,
+          debouncedFilters.monthsBack === 'all'
+        ),
+        getBooksWithLowAvailability(debouncedFilters.lowAvailabilityLimit),
+        getAllBooksForCategories(),
+        getTopActiveReaders(
+          debouncedFilters.monthsBack === 'all' ? 999 : debouncedFilters.monthsBack,
+          debouncedFilters.topReadersLimit
+        ),
+      ]);
+
+      setMostBorrowedBooks(mostBorrowedData);
+      setLowAvailabilityBooks(lowAvailabilityData);
+      setAllBooksForCategories(allBooksData);
+      setTopActiveReaders(topReadersData);
+    } catch (error) {
+      console.error('Failed to load staff reports data:', error);
+      setError('Failed to load staff reports data. Please try again.');
+    } finally {
+      setMostBorrowedLoading(false);
+      setLowAvailabilityLoading(false);
+      setTopReadersLoading(false);
+    }
+  }, [debouncedFilters]);
+
   useEffect(() => {
-    if (!user || initialLoadComplete.current) return;
-
-    const loadInitialData = async () => {
-      try {
-        setError(null);
-        setMostBorrowedLoading(true);
-        setLowAvailabilityLoading(true);
-        setTopReadersLoading(true);
-
-        console.log('Fetching data with filters:', filters);
-
-        const [
-          mostBorrowedData,
-          lowAvailabilityData,
-          allBooksData,
-          topReadersData,
-        ] = await Promise.all([
-          getMostBorrowedBooks(
-            filters.startDate,
-            filters.endDate,
-            filters.mostBorrowedLimit,
-            filters.monthsBack === 'all'
-          ),
-          getBooksWithLowAvailability(filters.lowAvailabilityLimit),
-          getAllBooksForCategories(),
-          getTopActiveReaders(
-            filters.monthsBack === 'all' ? 999 : filters.monthsBack,
-            filters.topReadersLimit
-          ),
-        ]);
-
-        console.log('Data fetched:', {
-          mostBorrowedData,
-          lowAvailabilityData,
-          allBooksData,
-          topReadersData,
-        });
-
-        setMostBorrowedBooks(mostBorrowedData);
-        setLowAvailabilityBooks(lowAvailabilityData);
-        setAllBooksForCategories(allBooksData);
-        setTopActiveReaders(topReadersData);
-
-        initialLoadComplete.current = true;
-      } catch (error) {
-        console.error('Failed to load initial staff reports data:', error);
-        setError('Failed to load staff reports data. Please try again.');
-      } finally {
-        setMostBorrowedLoading(false);
-        setLowAvailabilityLoading(false);
-        setTopReadersLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, [user]);
-
-  // Handle filter changes - reload data when filters change
-  useEffect(() => {
-    if (!user || !initialLoadComplete.current) return;
-
-    const loadFilteredData = async () => {
-      try {
-        setError(null);
-        setMostBorrowedLoading(true);
-        setLowAvailabilityLoading(true);
-        setTopReadersLoading(true);
-
-        const [
-          mostBorrowedData,
-          lowAvailabilityData,
-          allBooksData,
-          topReadersData,
-        ] = await Promise.all([
-          getMostBorrowedBooks(
-            filters.startDate,
-            filters.endDate,
-            filters.mostBorrowedLimit,
-            filters.monthsBack === 'all'
-          ),
-          getBooksWithLowAvailability(filters.lowAvailabilityLimit),
-          getAllBooksForCategories(),
-          getTopActiveReaders(
-            filters.monthsBack === 'all' ? 999 : filters.monthsBack,
-            filters.topReadersLimit
-          ),
-        ]);
-
-        setMostBorrowedBooks(mostBorrowedData);
-        setLowAvailabilityBooks(lowAvailabilityData);
-        setAllBooksForCategories(allBooksData);
-        setTopActiveReaders(topReadersData);
-      } catch (error) {
-        console.error('Failed to load filtered staff reports data:', error);
-        setError('Failed to update staff reports data. Please try again.');
-      } finally {
-        setMostBorrowedLoading(false);
-        setLowAvailabilityLoading(false);
-        setTopReadersLoading(false);
-      }
-    };
-
-    loadFilteredData();
-  }, [debouncedFilters, user]);
+    if (!user) return;
+    fetchReports();
+  }, [user, fetchReports]);
 
   const handleFiltersChange = useCallback(
     (newFilters: Partial<StaffReportsFiltersState>) => {
