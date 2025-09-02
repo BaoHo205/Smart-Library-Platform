@@ -1,5 +1,21 @@
 import mysql from '../database/mysql/connection';
 
+const getBorrowCountInRange = async (startDate: string, endDate: string) => {
+  try {
+    const query = `SELECT CountBooksBorrowedInRange(?, ?) AS totalBorrowed;`;
+    const rows = (await mysql.executeQuery(query, [startDate, endDate])) as
+      | Array<{ totalBorrowed: number }>
+      | unknown[];
+    const totalBorrowed = (rows as Array<{ totalBorrowed: number }>)[0]
+      ?.totalBorrowed;
+    return { totalBorrowed: Number(totalBorrowed ?? 0) };
+  } catch (error) {
+    throw new Error(
+      `Failed to get borrow count: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
 const getMostBorrowedBooks = async (
   startDate: string,
   endDate: string,
@@ -153,4 +169,5 @@ export default {
   getMostBorrowedBooks,
   getTopActiveReaders,
   getBooksWithLowAvailability,
+  getBorrowCountInRange,
 };

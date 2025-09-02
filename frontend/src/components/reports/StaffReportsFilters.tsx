@@ -6,11 +6,9 @@ import {
   Clock,
   Target,
   X,
-  ChevronDown,
   ChevronUp,
   Settings,
   Calendar,
-  RefreshCw,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -365,8 +363,8 @@ export function StaffReportsFilters({
   }
 
   return (
-    <div className="mb-8 w-full">
-      <Card className="overflow-hidden border-gray-100 bg-white shadow-lg">
+    <div className="h-full w-full">
+      <Card className="h-full overflow-hidden border-gray-100 bg-white shadow-lg">
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white pb-6">
             <div className="flex items-center justify-between">

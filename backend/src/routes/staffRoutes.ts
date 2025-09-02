@@ -10,6 +10,11 @@ staffRouter.get(
   StaffController.getMostBorrowedBooks
 );
 staffRouter.get(
+  '/borrow-count',
+  authMiddleware.verifyStaff,
+  StaffController.getBorrowCountInRange
+);
+staffRouter.get(
   '/top-active-readers',
   authMiddleware.verifyStaff,
   StaffController.getTopActiveReaders
