@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import type { Review } from '@/types/book.type';
 import { renderStars } from '../Star';
+import useUserProfile from '@/hooks/useUserProfile';
 
 interface BookDetail {
   id: string;
@@ -33,9 +34,13 @@ export default function BookDetail({
   book,
   reviews,
   onBorrow,
-  borrowing,
-  isBorrowed,
 }: BookDetailProps) {
+  const { checkouts } = useUserProfile();
+  const isAlreadyBorrowed = checkouts.some(
+    checkout => checkout.bookId === book.id && !checkout.isReturned
+  );
+
+  const isOutOfStock = book.availableCopies === 0;
   const calculateAvgRating = () => {
     if (!reviews || reviews.length === 0) return 0;
 
@@ -137,24 +142,24 @@ export default function BookDetail({
           </div>
 
           <div className="mt-6">
-            {isBorrowed ? (
-              <Button
-                className="cursor-not-allowed bg-slate-600 hover:bg-slate-600"
-                disabled={true}
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Borrowed
-              </Button>
-            ) : (
-              <Button
-                className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50"
-                onClick={onBorrow}
-                disabled={borrowing}
-              >
-                <Book className="mr-2 h-4 w-4" />
-                {borrowing ? 'Borrowing...' : 'Borrow'}
-              </Button>
-            )}
+            <Button
+              onClick={e => {
+                e.stopPropagation();
+                onBorrow();
+              }}
+              disabled={
+                checkouts.some(
+                  checkout =>
+                    checkout.bookId === book.id && !checkout.isReturned
+                ) || book.availableCopies === 0
+              }
+            >
+              {isAlreadyBorrowed
+                ? 'Borrowed'
+                : isOutOfStock
+                  ? 'Unavailable'
+                  : 'Borrow'}
+            </Button>
           </div>
         </div>
       </div>
