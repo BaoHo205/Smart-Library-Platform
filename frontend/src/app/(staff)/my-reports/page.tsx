@@ -17,6 +17,7 @@ import {
   getBooksWithLowAvailability,
   getTopActiveReaders,
   getAllBooksForCategories,
+  getBooksBorrowCountInRange,
 } from '@/api/staffReports.api';
 import {
   MostBorrowedBook,
@@ -24,6 +25,8 @@ import {
   BookAvailability,
   StaffReportsFiltersState,
 } from '@/types/reports.type';
+import { Card } from '@/components/ui/card';
+import { Calendar } from 'lucide-react';
 
 // Helper function to calculate date range based on months back
 const calculateDateRange = (monthsBack: number | 'all') => {
@@ -64,6 +67,7 @@ export default function StaffReportsPage() {
   const [mostBorrowedLoading, setMostBorrowedLoading] = useState(true);
   const [lowAvailabilityLoading, setLowAvailabilityLoading] = useState(true);
   const [topReadersLoading, setTopReadersLoading] = useState(true);
+  const [totalBorrowCount, setTotalBorrowCount] = useState<number | null>(null);
 
   const [mostBorrowedBooks, setMostBorrowedBooks] = useState<
     MostBorrowedBook[]
@@ -107,6 +111,7 @@ export default function StaffReportsPage() {
           lowAvailabilityData,
           allBooksData,
           topReadersData,
+          borrowCountData,
         ] = await Promise.all([
           getMostBorrowedBooks(
             filters.startDate,
@@ -120,6 +125,10 @@ export default function StaffReportsPage() {
             filters.monthsBack === 'all' ? 999 : filters.monthsBack,
             filters.topReadersLimit
           ),
+          getBooksBorrowCountInRange(
+            filters.startDate,
+            filters.endDate
+          )
         ]);
 
         console.log('Data fetched:', {
@@ -133,6 +142,7 @@ export default function StaffReportsPage() {
         setLowAvailabilityBooks(lowAvailabilityData);
         setAllBooksForCategories(allBooksData);
         setTopActiveReaders(topReadersData);
+        setTotalBorrowCount(borrowCountData);
 
         initialLoadComplete.current = true;
       } catch (error) {
@@ -146,54 +156,6 @@ export default function StaffReportsPage() {
     };
 
     loadInitialData();
-  }, [user]);
-
-  // Handle filter changes - reload data when filters change
-  useEffect(() => {
-    if (!user || !initialLoadComplete.current) return;
-
-    const loadFilteredData = async () => {
-      try {
-        setError(null);
-        setMostBorrowedLoading(true);
-        setLowAvailabilityLoading(true);
-        setTopReadersLoading(true);
-
-        const [
-          mostBorrowedData,
-          lowAvailabilityData,
-          allBooksData,
-          topReadersData,
-        ] = await Promise.all([
-          getMostBorrowedBooks(
-            filters.startDate,
-            filters.endDate,
-            filters.mostBorrowedLimit,
-            filters.monthsBack === 'all'
-          ),
-          getBooksWithLowAvailability(filters.lowAvailabilityLimit),
-          getAllBooksForCategories(),
-          getTopActiveReaders(
-            filters.monthsBack === 'all' ? 999 : filters.monthsBack,
-            filters.topReadersLimit
-          ),
-        ]);
-
-        setMostBorrowedBooks(mostBorrowedData);
-        setLowAvailabilityBooks(lowAvailabilityData);
-        setAllBooksForCategories(allBooksData);
-        setTopActiveReaders(topReadersData);
-      } catch (error) {
-        console.error('Failed to load filtered staff reports data:', error);
-        setError('Failed to update staff reports data. Please try again.');
-      } finally {
-        setMostBorrowedLoading(false);
-        setLowAvailabilityLoading(false);
-        setTopReadersLoading(false);
-      }
-    };
-
-    loadFilteredData();
   }, [debouncedFilters, user]);
 
   const handleFiltersChange = useCallback(
@@ -264,8 +226,8 @@ export default function StaffReportsPage() {
 
   return (
     <div className="bg-gray-50">
-      <div className="w-full max-w-none px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
+      <div className="w-full max-w-none px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8">
+        <div className="">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">My Reports</h1>
@@ -277,13 +239,43 @@ export default function StaffReportsPage() {
           </div>
         </div>
 
-        <StaffReportsFilters
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          loading={false}
-        />
+        <div className='flex gap-6 '>
+          {totalBorrowCount !== null && (
+            <div className="relative overflow-hidden rounded-2xl bg-black text-white p-8 mx-auto min-h-full">
+              {/* Background decorative circles */}
+              <div className="absolute right-0 top-0 w-64 h-64 rounded-full border border-white/30 -translate-y-16 translate-x-16" />
+              <div className="absolute right-8 top-8 w-48 h-48 rounded-full border border-white/30 -translate-y-8 translate-x-8" />
+              <div className="absolute right-16 top-16 w-32 h-32 rounded-full border border-white/30" />
+              <div className="relative z-10 flex items-center justify-center gap-6 px-8 py-2 h-full">
+                <div className="">
+                  <h1 className="text-3xl font-bold whitespace-nowrap">BOOKS BORROWED</h1>
+                  {filters.startDate && filters.endDate ? (
+                    <p className="text text-white/80">
+                      From: {filters.startDate} to {filters.endDate}
+                      </p>
+                    ) : (
+                      <p className="text text-white/80">All Time</p>
+                    )
+                  } 
+                </div>
+                <div className="flex items-center gap-4 whitespace-nowrap">
+                  <div className="text-right">
+                    <div className="text-3xl font-bold">{totalBorrowCount}</div>
+                    <div className="text text-white/60">Total Books</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <StaffReportsFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            loading={false}
+          />
+        </div>
 
         <div className="space-y-8">
+
           <MostBorrowedBooks
             books={mostBorrowedBooks}
             loading={mostBorrowedLoading}
