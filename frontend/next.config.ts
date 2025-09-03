@@ -1,5 +1,5 @@
 import type { NextConfig } from 'next'
- 
+
 const config: NextConfig = {
   images: {
     remotePatterns: [
@@ -10,8 +10,12 @@ const config: NextConfig = {
         pathname: '/**',
         search: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      }
     ],
   },
 }
- 
+
 export default config
