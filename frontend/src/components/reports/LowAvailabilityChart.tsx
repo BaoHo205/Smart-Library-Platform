@@ -59,39 +59,26 @@ export function LowAvailabilityChart({
     );
   }
 
-  const getAvailabilityStatus = (
-    percentage: number,
-    availableCopies: number
-  ) => {
-    if (availableCopies === 0) return 'Out of Stock';
-    if (percentage <= 10) return 'Critical';
-    if (percentage <= 25) return 'Low';
-    if (percentage <= 50) return 'Moderate';
-    return 'Good';
-  };
-
   const getAvailabilityIconColor = (percentage: number) => {
-    if (percentage <= 10) return 'text-red-500';
     if (percentage <= 25) return 'text-orange-500';
     if (percentage <= 50) return 'text-yellow-500';
     if (percentage <= 75) return 'text-blue-500';
     return 'text-green-500';
   };
 
-  // Categorize books by availability
+  // Categorize books by availability - use backend data directly
   const categorizedBooks = {
     'Out of Stock': allBooksForCategories.filter(
-      book => book.availableCopies === 0
+      book => book.availability_status === 'Out of Stock'
     ),
     'Low Availability': allBooksForCategories.filter(
-      book => book.availableCopies > 0 && book.availability_percentage <= 25
+      book => book.availability_status === 'Low Availability'
     ),
-    Moderate: allBooksForCategories.filter(
-      book =>
-        book.availability_percentage > 25 && book.availability_percentage <= 50
+    'Moderate': allBooksForCategories.filter(
+      book => book.availability_status === 'Moderate'
     ),
     'High Availability': allBooksForCategories.filter(
-      book => book.availability_percentage > 50
+      book => book.availability_status === 'High Availability'
     ),
   };
 
@@ -110,7 +97,7 @@ export function LowAvailabilityChart({
       textColor: 'text-orange-700',
       borderColor: 'border-orange-200',
     },
-    Moderate: {
+    'Moderate': {
       icon: MinusIcon,
       color: 'bg-yellow-500',
       bgColor: 'bg-yellow-50',
@@ -176,10 +163,7 @@ export function LowAvailabilityChart({
                         </p>
                         <p className="text-xs text-gray-500">
                           Status:{' '}
-                          {getAvailabilityStatus(
-                            book.availability_percentage,
-                            book.availableCopies
-                          )}
+                          {book.availability_status}
                         </p>
                       </div>
                     </div>
@@ -325,10 +309,7 @@ export function LowAvailabilityChart({
                                             variant="outline"
                                             className={`ml-2 ${config.bgColor} ${config.textColor} ${config.borderColor}`}
                                           >
-                                            {getAvailabilityStatus(
-                                              book.availability_percentage,
-                                              book.availableCopies
-                                            )}
+                                            {book.availability_status}
                                           </Badge>
                                         </div>
                                         <div>
