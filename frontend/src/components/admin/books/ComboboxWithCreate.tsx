@@ -31,14 +31,14 @@ interface Item {
 
 interface ComboboxProps {
   items: Item[];
-  value: string[] | string; // Accept an array or a single string
-  onValueChange: (value: string[] | string) => void; // Accept an array or a single string
+  value: string[] | string;
+  onValueChange: (value: string[] | string) => void;
   onNewItem: (value: string) => void;
   placeholder: string;
   searchPlaceholder: string;
   emptyMessage: string;
   label: string;
-  multiple?: boolean; // New prop for multi-select
+  multiple?: boolean;
 }
 
 export const ComboboxWithCreate = ({
@@ -152,8 +152,10 @@ export const ComboboxWithCreate = ({
                     <CommandItem
                       key={item.id}
                       value={item.label}
-                      onSelect={() => handleSelect(item.id)}
-                    >
+                      onSelect={() => {
+                        handleSelect(item.id)
+                        console.log('Selected item:', item)
+                      }}>
                       <Check
                         className={cn(
                           'mr-2 h-4 w-4',
