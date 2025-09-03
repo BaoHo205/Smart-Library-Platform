@@ -73,6 +73,7 @@ export const getBooksWithLowAvailability = async (
     availableCopies: book.availableCopies || 0,
     quantity: book.quantity || 0,
     availability_percentage: book.availability_percentage || 0,
+    availability_status: book.availability_status || 'Unknown',
     recent_checkouts: book.recent_checkouts || 0,
     coverUrl: null,
   }));
@@ -91,6 +92,7 @@ export const getAllBooksForCategories = async (): Promise<
     availableCopies: book.availableCopies || 0,
     quantity: book.quantity || 0,
     availability_percentage: book.availability_percentage || 0,
+    availability_status: book.availability_status || 'Unknown',
     recent_checkouts: book.recent_checkouts || 0,
     coverUrl: null,
   }));
