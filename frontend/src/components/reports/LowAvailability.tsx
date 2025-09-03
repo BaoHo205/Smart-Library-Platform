@@ -55,23 +55,19 @@ export function LowAvailability({
     );
   }
 
-  const getAvailabilityIconColor = (percentage: number) => {
-    if (percentage <= 10) return 'text-red-500';
-    if (percentage <= 25) return 'text-orange-500';
-    if (percentage <= 50) return 'text-yellow-500';
-    if (percentage <= 75) return 'text-blue-500';
-    return 'text-green-500';
-  };
-
-  const getAvailabilityStatus = (
-    percentage: number,
-    availableCopies: number
-  ) => {
-    if (availableCopies === 0) return 'Out of Stock';
-    if (percentage <= 10) return 'Critical';
-    if (percentage <= 25) return 'Low';
-    if (percentage <= 50) return 'Moderate';
-    return 'Good';
+  const getAvailabilityIconColor = (availabilityStatus: string) => {
+    switch (availabilityStatus) {
+      case 'Out of Stock':
+        return 'text-red-500';
+      case 'Low Availability':
+        return 'text-orange-500';
+      case 'Moderate':
+        return 'text-yellow-500';
+      case 'High Availability':
+        return 'text-green-500';
+      default:
+        return 'text-gray-500';
+    }
   };
 
   return (
@@ -98,7 +94,7 @@ export function LowAvailability({
               >
                 <div className="flex items-center space-x-2">
                   <AlertTriangleIcon
-                    className={`h-4 w-4 ${getAvailabilityIconColor(book.availability_percentage)}`}
+                    className={`h-4 w-4 ${getAvailabilityIconColor(book.availability_status)}`}
                   />
                   <div className="flex-1 space-y-0.5">
                     <h4 className="line-clamp-1 text-sm font-medium text-gray-900">
@@ -109,10 +105,7 @@ export function LowAvailability({
                     </p>
                     <p className="text-xs text-gray-500">
                       Status:{' '}
-                      {getAvailabilityStatus(
-                        book.availability_percentage,
-                        book.availableCopies
-                      )}
+                      {book.availability_status}
                     </p>
                   </div>
                 </div>
