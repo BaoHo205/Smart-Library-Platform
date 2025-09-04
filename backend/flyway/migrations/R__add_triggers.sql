@@ -152,8 +152,7 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-
+    
 DELIMITER $$
 
 -- This trigger automatically increments the quantity and availableCopies
