@@ -59,12 +59,13 @@ CREATE TABLE books (
     pageCount INT NOT NULL,
     publisherId VARCHAR(36) NOT NULL,
     description TEXT,
+    avgRating DECIMAL(2, 1) NOT NULL DEFAULT 0,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Create BooksCopies table
-CREATE TABLE books_copies (
+CREATE TABLE book_copies (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     bookId VARCHAR(36) NOT NULL,
     isBorrowed BOOLEAN NOT NULL DEFAULT FALSE,

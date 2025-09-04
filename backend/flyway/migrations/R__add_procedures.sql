@@ -57,7 +57,7 @@ proc: BEGIN
     -- Check if user already has this book checked out
     SELECT COUNT(*) INTO v_active_checkout_count
     FROM checkouts c
-    JOIN books_copies bc ON c.copyId = bc.id
+    JOIN book_copies bc ON c.copyId = bc.id
     WHERE c.userId = p_userId AND bc.bookId = p_bookId AND c.isReturned = FALSE;
     
     IF v_active_checkout_count > 0 THEN
@@ -112,7 +112,7 @@ proc: BEGIN
 
     -- Find an available copy and lock it
     SELECT id INTO v_copyId
-    FROM books_copies
+    FROM book_copies
     WHERE bookId = p_bookId AND isBorrowed = FALSE
     ORDER BY createdAt ASC
     LIMIT 1
@@ -221,7 +221,7 @@ BEGIN
     SET i = 1;
     WHILE i <= p_quantity DO
         SET v_copiesId = UUID();
-        INSERT INTO books_copies (
+        INSERT INTO book_copies (
             id,
             bookId,
             isBorrowed,
@@ -394,7 +394,7 @@ BEGIN
         WHERE id = p_bookId;
 
         -- Also retire all book copies associated with this book
-        UPDATE books_copies
+        UPDATE book_copies
         SET
             isBorrowed = 0, -- Set to 0 to indicate the copies are no longer borrowed
             updatedAt = CURRENT_TIMESTAMP
@@ -440,9 +440,9 @@ BEGIN
     -- Generate a new UUID for the book copy
     SET newCopyId = UUID();
 
-    -- Insert a new record into the books_copies table.
+    -- Insert a new record into the book_copies table.
     -- The newCopyId variable is used for the ID.
-    INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt)
+    INSERT INTO book_copies (id, bookId, isBorrowed, createdAt, updatedAt)
     VALUES (newCopyId, p_bookId, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
     
@@ -485,7 +485,7 @@ BEGIN
 
     -- Step 1: Check if the book copy exists and get its details.
     SELECT bookId, isBorrowed INTO v_bookId, v_isBorrowed
-    FROM books_copies
+    FROM book_copies
     WHERE id = p_copyId;
 
     -- Step 2: Check if the book copy is currently borrowed.
@@ -498,8 +498,8 @@ BEGIN
     -- Step 3: Log the action before deletion.
     CALL AddStaffLog(p_staffId, v_bookId, 'DELETE', CONCAT('Attempted to delete book copy with ID ', p_copyId));
 
-    -- Step 4: Delete the book copy from the books_copies table.
-    DELETE FROM books_copies
+    -- Step 4: Delete the book copy from the book_copies table.
+    DELETE FROM book_copies
     WHERE id = p_copyId;
 
     -- Step 5: If the deletion is successful, commit the transaction.
@@ -537,7 +537,7 @@ BEGIN
 
     -- Check the current status of the book copy
     SELECT isBorrowed INTO currentIsBorrowed
-    FROM books_copies
+    FROM book_copies
     WHERE id = p_copyId;
 
     -- Check if the book copy exists
@@ -553,7 +553,7 @@ BEGIN
         CALL AddStaffLog(p_staffId, p_copyId, 'UPDATE', CONCAT('Attempted to retire an already retired copy: ', p_copyId));
     ELSE
         -- The book is currently borrowed (isBorrowed = 1), so we can proceed with retiring it.
-        UPDATE books_copies
+        UPDATE book_copies
         SET
             isBorrowed = 0,
             updatedAt = CURRENT_TIMESTAMP
@@ -667,7 +667,7 @@ proc: BEGIN
     -- Check user has borrowed this book before
     SELECT COUNT(*) INTO v_has_borrowed
     FROM checkouts c
-    JOIN books_copies bc
+    JOIN book_copies bc
 		ON c.copyId = bc.id
     WHERE c.userId = p_userId AND bc.bookId = p_bookId AND c.checkoutDate IS NOT NULL;
     

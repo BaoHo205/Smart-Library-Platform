@@ -21,19 +21,19 @@ WHERE description IS NULL OR TRIM(description) = '';
 update books b
 set quantity = 
 (select count(*) 
-from books_copies bc
+from book_copies bc
 where bc.bookId = b.id);
 
 update books b
 set availableCopies = 
 (select count(*) 
-from books_copies bc
+from book_copies bc
 where bc.bookId = b.id
 and bc.isBorrowed = false);
 
--- Add avgRating column
-ALTER TABLE books
-ADD avgRating DECIMAL(2, 1);
+-- -- Add avgRating column
+-- ALTER TABLE books
+-- ADD avgRating DECIMAL(2, 1);
 
 DROP PROCEDURE IF EXISTS CalculateAvgRating;
 DELIMITER //
@@ -53,3 +53,4 @@ DELIMITER ;
 
 SET SQL_SAFE_UPDATES = 0;
 call CalculateAvgRating();
+
