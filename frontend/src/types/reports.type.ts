@@ -31,6 +31,7 @@ export interface BookAvailability {
   availableCopies: number;
   quantity: number;
   availability_percentage: number;
+  availability_status: string;
   recent_checkouts: number;
   coverUrl?: string | null;
 }

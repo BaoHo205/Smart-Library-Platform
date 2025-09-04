@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import { columns } from '@/components/admin/books/columns';
 import { DataTable } from '@/components/admin/books/data-table';
@@ -8,7 +7,6 @@ import axiosInstance from '@/config/axiosConfig';
 import { useDataStore } from '@/lib/useDataStore';
 import { UserChip } from '@/components/ui/userchip';
 import { useAuth } from '@/components/auth/useAuth';
-import { Card } from '@/components/ui/card';
 
 const page = () => {
   const setBooks = useDataStore(s => s.setBooks);

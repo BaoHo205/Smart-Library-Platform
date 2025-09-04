@@ -32,7 +32,7 @@ export function UserChip({ user, loading }: UserChipProps) {
 
   if (!user) {
     return (
-      <Card className="flex items-center gap-2">
+      <Card className="flex flex-row items-center gap-2 rounded-md p-2">
         <Avatar className="h-8 w-8">
           <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-500">
             ?

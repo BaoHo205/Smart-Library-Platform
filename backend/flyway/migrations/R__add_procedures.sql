@@ -230,7 +230,7 @@ BEGIN
         ) VALUES (
             v_copiesId,
             v_bookId,
-            1,
+            0,
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
         );
@@ -374,7 +374,7 @@ BEGIN
     -- Check the current status of the book
     SELECT isRetired INTO currentIsRetired
     FROM books
-    WHERE id = p_bookId;
+    WHERE id = p_bookId FOR UPDATE;
 
     -- Check if the book was found
     IF currentIsRetired IS NULL THEN
@@ -486,7 +486,7 @@ BEGIN
     -- Step 1: Check if the book copy exists and get its details.
     SELECT bookId, isBorrowed INTO v_bookId, v_isBorrowed
     FROM books_copies
-    WHERE id = p_copyId;
+    WHERE id = p_copyId FOR UPDATE;
 
     -- Step 2: Check if the book copy is currently borrowed.
     -- We are deliberately throwing a custom error if it is.
@@ -538,7 +538,7 @@ BEGIN
     -- Check the current status of the book copy
     SELECT isBorrowed INTO currentIsBorrowed
     FROM books_copies
-    WHERE id = p_copyId;
+    WHERE id = p_copyId FOR UPDATE;
 
     -- Check if the book copy exists
     IF currentIsBorrowed IS NULL THEN
@@ -919,6 +919,16 @@ BEGIN
     IF p_bookId IS NULL OR p_bookId = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Book ID is a required field';
+    END IF;
+
+    -- Lock the row
+    SELECT id INTO @bookExists
+    FROM books
+    WHERE id = p_bookId FOR UPDATE;
+
+    IF @bookExists IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Book ID does not exist';
     END IF;
 
     -- Update the main book record using IFNULL for partial updates

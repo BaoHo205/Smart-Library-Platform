@@ -1,9 +1,6 @@
 import mysql from '../database/mysql/connection';
 
-const getBorrowCountInRange = async (
-  startDate: string,
-  endDate: string
-) => {
+const getBorrowCountInRange = async (startDate: string, endDate: string) => {
   try {
     const query = `SELECT CountBooksBorrowedInRange(?, ?) AS totalBorrowed;`;
     const rows = (await mysql.executeQuery(query, [startDate, endDate])) as
@@ -126,10 +123,9 @@ const getBooksWithLowAvailability = async (limit: number | 'max' = 5) => {
                0 as recent_checkouts,
                CASE 
                  WHEN b.availableCopies = 0 THEN 'Out of Stock'
-                 WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
-                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
+                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low Availability'
                  WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
-                 ELSE 'Good'
+                 ELSE 'High Availability'
                END as availability_status
         FROM books b
         ORDER BY availability_percentage ASC`;
@@ -141,10 +137,9 @@ const getBooksWithLowAvailability = async (limit: number | 'max' = 5) => {
                0 as recent_checkouts,
                CASE 
                  WHEN b.availableCopies = 0 THEN 'Out of Stock'
-                 WHEN (b.availableCopies / b.quantity) <= 0.1 THEN 'Critical'
-                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low'
+                 WHEN (b.availableCopies / b.quantity) <= 0.25 THEN 'Low Availability'
                  WHEN (b.availableCopies / b.quantity) <= 0.5 THEN 'Moderate'
-                 ELSE 'Good'
+                 ELSE 'High Availability'
                END as availability_status
         FROM books b
         WHERE (b.availableCopies / b.quantity) < 0.5   -- Less than 50% available (more inclusive)

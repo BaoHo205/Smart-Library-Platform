@@ -73,6 +73,7 @@ export const getBooksWithLowAvailability = async (
     availableCopies: book.availableCopies || 0,
     quantity: book.quantity || 0,
     availability_percentage: book.availability_percentage || 0,
+    availability_status: book.availability_status || 'Unknown',
     recent_checkouts: book.recent_checkouts || 0,
     coverUrl: null,
   }));
@@ -91,6 +92,7 @@ export const getAllBooksForCategories = async (): Promise<
     availableCopies: book.availableCopies || 0,
     quantity: book.quantity || 0,
     availability_percentage: book.availability_percentage || 0,
+    availability_status: book.availability_status || 'Unknown',
     recent_checkouts: book.recent_checkouts || 0,
     coverUrl: null,
   }));
@@ -105,4 +107,14 @@ export const getTopActiveReaders = async (
     `/api/v1/staff/top-active-readers?monthsBack=${monthsBack}&limit=${limitParam}`
   );
   return response.data.data || [];
+};
+
+export const getBooksBorrowCountInRange = async (
+  startDate: string,
+  endDate: string
+): Promise<number> => {
+  const response = await axiosInstance.get(
+    `/api/v1/staff/borrow-count?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
+  );
+  return response.data.data?.totalBorrowed;
 };

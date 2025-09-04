@@ -140,7 +140,7 @@ export function ActivityLogTable({ logs: initialLogs }: ActivityLogTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="max-w-md">
-                    <div className="text-sm leading-relaxed break-words">
+                    <div className="text-sm leading-relaxed break-words truncate">
                       {log.actionDetails}
                     </div>
                   </TableCell>
