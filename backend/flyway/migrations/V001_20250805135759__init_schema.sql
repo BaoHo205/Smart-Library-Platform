@@ -65,7 +65,7 @@ CREATE TABLE books (
 );
 
 -- Create BooksCopies table
-CREATE TABLE book_copies (
+CREATE TABLE books_copies (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     bookId VARCHAR(36) NOT NULL,
     isBorrowed BOOLEAN NOT NULL DEFAULT FALSE,

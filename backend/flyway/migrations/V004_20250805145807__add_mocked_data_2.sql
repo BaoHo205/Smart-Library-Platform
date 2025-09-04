@@ -44,7 +44,7 @@ INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, isR
 ('edd3c35b-527e-4e67-bfcb-b546ce48ca85', 'Flex 4 in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ahmed2.jpg', '1935182420', 3, 0, 0, 600, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Using Flex, you can create high-quality, effective, and interactive Rich Internet Applications (RIAs) quickly and easily. Flex removes the complexity barrier from RIA development by offering sophisticated tools and a straightforward programming language so you can focus on what you want to do instead of how to do it. And the new features added in Flex 4 give you an even wider range of options!', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
 ('f2f2d5ff-8f35-4be7-9259-505a3d6bd274', 'Hello! Flex 4', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/armstrong3.jpg', '1933988762', 3, 3, 0, 258, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'Hello! Flex 4 progresses through 26 self-contained examples selected so you can progressively master Flex. They vary from small one-page apps, to a 3D rotating haiku, to a Connect Four-like game. And in the last chapter you''ll learn to build a full Flex application called SocialStalkr   a mashup that lets you follow your friends by showing their tweets on a Yahoo map.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0);
 
-INSERT INTO book_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES
+INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES
 ('a3d06044-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
 ('a3d061c1-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
 ('a3d062ad-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
@@ -332,3 +332,153 @@ INSERT INTO book_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES
 ('a3d2d87f-8903-11f0-a2c7-7604c7108b13', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
 ('a3d2d8da-8903-11f0-a2c7-7604c7108b13', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57');
 
+-- DELIMITER $$
+
+-- CREATE PROCEDURE insert_ten_copies_first22_v004()
+-- BEGIN
+--   DECLARE done INT DEFAULT 0;
+--   DECLARE book_id VARCHAR(36);
+--   DECLARE existing_count INT DEFAULT 0;
+--   DECLARE to_insert INT DEFAULT 0;
+--   DECLARE i INT DEFAULT 0;
+
+--   -- Cursor over the explicit first-22 V004 book ids (preserves list)
+--   DECLARE cur CURSOR FOR
+--     SELECT id FROM (
+--       SELECT '0418ba35-d180-4c9c-8cca-b9b41a46e65e' AS id UNION ALL
+--       SELECT '09d86af8-796d-4fb8-b93f-28f3b0a5745a' UNION ALL
+--       SELECT '0fe7225f-c962-4d6c-8d26-f3c6babcf865' UNION ALL
+--       SELECT '1394174b-5a6e-458a-88c8-4d6656484ff7' UNION ALL
+--       SELECT '1e97f78b-6cc3-4eee-86a3-e79280f64d47' UNION ALL
+--       SELECT '2013d438-5bd7-4bf5-9cc5-735a7495063c' UNION ALL
+--       SELECT '26c0c82d-0730-4b62-bc8f-36e99c5c68e4' UNION ALL
+--       SELECT '2772b67c-5593-414f-9c3f-ff70668d3f18' UNION ALL
+--       SELECT '2e55112a-4c74-4054-8a36-ad970b790092' UNION ALL
+--       SELECT '2f8b83c5-991d-4790-98a4-c9f817294c0b' UNION ALL
+--       SELECT '40671057-2871-4843-b1a3-eb4919d6fb05' UNION ALL
+--       SELECT '4c6887cd-e5c5-4470-8313-9fb48a3ce662' UNION ALL
+--       SELECT '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53' UNION ALL
+--       SELECT '4fce7bc0-36b5-4474-a37a-79e2e9e10acf' UNION ALL
+--       SELECT '52a8e46f-1965-4caa-b4e2-b6db5e9a7174' UNION ALL
+--       SELECT '5a3531d5-8e08-4066-a92d-e8d80b3d5546' UNION ALL
+--       SELECT '5b857ba9-3b52-46d4-a4bb-b2640a39db2b' UNION ALL
+--       SELECT '61d2f03f-55a6-4768-9ca0-fd717629eaff' UNION ALL
+--       SELECT '679d7f9b-86c8-4675-9cef-e745d6ce3bd7' UNION ALL
+--       SELECT '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1' UNION ALL
+--       SELECT '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9' UNION ALL
+--       SELECT '796c3bde-2a06-4290-aa9f-33d478bc61c8'
+--     ) AS ids;
+
+--   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+--   OPEN cur;
+
+--   read_loop: LOOP
+--     FETCH cur INTO book_id;
+--     IF done THEN
+--       LEAVE read_loop;
+--     END IF;
+
+--     -- ensure the book exists (skip if not present)
+--     SELECT COUNT(*) INTO existing_count FROM books WHERE id = book_id;
+--     IF existing_count = 0 THEN
+--       ITERATE read_loop;
+--     END IF;
+
+--     -- count existing copies and calculate how many to insert to reach 10 total
+--     SELECT COUNT(*) INTO existing_count FROM books_copies WHERE bookId = book_id;
+--     SET to_insert = 10 - existing_count;
+
+--     IF to_insert > 0 THEN
+--       SET i = 1;
+--       WHILE i <= to_insert DO
+--         INSERT INTO books_copies (id, bookId, isBorrowed)
+--         VALUES (UUID(), book_id, FALSE);
+--         SET i = i + 1;
+--       END WHILE;
+--     END IF;
+--   END LOOP;
+
+--   CLOSE cur;
+-- END$$
+
+-- DELIMITER ;
+
+-- CALL insert_ten_copies_first22_v004();
+
+-- DELIMITER $$
+
+-- CREATE PROCEDURE insert_three_copies_remaining22_v004()
+-- BEGIN
+--   DECLARE done INT DEFAULT 0;
+--   DECLARE book_id VARCHAR(36);
+--   DECLARE existing_count INT DEFAULT 0;
+--   DECLARE to_insert INT DEFAULT 0;
+--   DECLARE i INT DEFAULT 0;
+
+--   -- Cursor: select up to 22 books that are NOT in the "first 22" list from V004
+--   DECLARE cur CURSOR FOR
+--     SELECT id FROM books
+--     WHERE id NOT IN (
+--       '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
+--       '09d86af8-796d-4fb8-b93f-28f3b0a5745a',
+--       '0fe7225f-c962-4d6c-8d26-f3c6babcf865',
+--       '1394174b-5a6e-458a-88c8-4d6656484ff7',
+--       '1e97f78b-6cc3-4eee-86a3-e79280f64d47',
+--       '2013d438-5bd7-4bf5-9cc5-735a7495063c',
+--       '26c0c82d-0730-4b62-bc8f-36e99c5c68e4',
+--       '2772b67c-5593-414f-9c3f-ff70668d3f18',
+--       '2e55112a-4c74-4054-8a36-ad970b790092',
+--       '2f8b83c5-991d-4790-98a4-c9f817294c0b',
+--       '40671057-2871-4843-b1a3-eb4919d6fb05',
+--       '4c6887cd-e5c5-4470-8313-9fb48a3ce662',
+--       '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53',
+--       '4fce7bc0-36b5-4474-a37a-79e2e9e10acf',
+--       '52a8e46f-1965-4caa-b4e2-b6db5e9a7174',
+--       '5a3531d5-8e08-4066-a92d-e8d80b3d5546',
+--       '5b857ba9-3b52-46d4-a4bb-b2640a39db2b',
+--       '61d2f03f-55a6-4768-9ca0-fd717629eaff',
+--       '679d7f9b-86c8-4675-9cef-e745d6ce3bd7',
+--       '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1',
+--       '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9',
+--       '796c3bde-2a06-4290-aa9f-33d478bc61c8'
+--     )
+--     LIMIT 22;
+
+--   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+--   OPEN cur;
+
+--   read_loop: LOOP
+--     FETCH cur INTO book_id;
+--     IF done THEN
+--       LEAVE read_loop;
+--     END IF;
+
+--     -- ensure the book exists (extra safety)
+--     SELECT COUNT(*) INTO existing_count FROM books WHERE id = book_id;
+--     IF existing_count = 0 THEN
+--       ITERATE read_loop;
+--     END IF;
+
+--     -- how many copies already exist for this book
+--     SELECT COUNT(*) INTO existing_count FROM books_copies WHERE bookId = book_id;
+--     SET to_insert = 3 - existing_count;
+
+--     -- insert the delta (so total becomes at least 3; won't exceed 3)
+--     IF to_insert > 0 THEN
+--       SET i = 1;
+--       WHILE i <= to_insert DO
+--         INSERT INTO books_copies (id, bookId, isBorrowed)
+--         VALUES (UUID(), book_id, FALSE);
+--         SET i = i + 1;
+--       END WHILE;
+--     END IF;
+--   END LOOP;
+
+--   CLOSE cur;
+-- END$$
+
+-- DELIMITER ;
+
+-- CALL insert_three_copies_remaining22_v004();
