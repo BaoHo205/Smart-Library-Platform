@@ -6,7 +6,7 @@ WHERE pageCount = 0;
 -- Fill empty ISBNs with unique 13-digit numbers derived from the book UUID
 -- Format: 979 + 10 digits (numeric) derived from the UUID to ensure uniqueness
 UPDATE books
-SET isbn = CONCAT(
+SET isbn = CONCAT( 
   '979',
   RIGHT(LPAD(CONV(SUBSTRING(REPLACE(id, '-', ''), 1, 16), 16, 10), 10, '0'), 10)
 )
@@ -18,6 +18,10 @@ SET description = CONCAT('An engaging read: ', title, '. Placeholder description
 WHERE description IS NULL OR TRIM(description) = '';
 
 -- Update book quantity and available copies
+update books_copies bc
+set isBorrowed = true
+where bc.id in (select c.copyId from checkouts c where c.isReturned = false);
+
 update books b
 set quantity = 
 (select count(*) 
@@ -31,9 +35,9 @@ from books_copies bc
 where bc.bookId = b.id
 and bc.isBorrowed = false);
 
--- Add avgRating column
-ALTER TABLE books
-ADD avgRating DECIMAL(2, 1);
+-- -- Add avgRating column
+-- ALTER TABLE books
+-- ADD avgRating DECIMAL(2, 1);
 
 DROP PROCEDURE IF EXISTS CalculateAvgRating;
 DELIMITER //
@@ -53,3 +57,4 @@ DELIMITER ;
 
 SET SQL_SAFE_UPDATES = 0;
 call CalculateAvgRating();
+

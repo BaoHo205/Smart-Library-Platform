@@ -1,295 +1,484 @@
--- Add users mocked data
-INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (
-        '70875304-d60a-467f-8cf8-eb446aad7f5f', "jdoe", "password123",
-        "John", "Doe", "jdoe@example.com", "user",
-        '2025-08-05 08:03:11', '2025-08-05 08:03:11'
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (
-        'f7d180d9-dbbe-4bf4-8450-c9141f320826', "asmith", "password123",
-        "Alice", "Smith", "asmith@example.com", "user",
-        '2025-08-05 08:03:11', '2025-08-05 08:03:11'
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (
-        '9cbf94dd-10df-47c8-abc4-c124791dae74', "bwayne", "password123",
-        "Bruce", "Wayne", "bwayne@example.com", "user",
-        '2025-08-05 08:03:11', '2025-08-05 08:03:11'
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (
-        '6b8fe1ec-095b-43e5-8bd6-6760694caccc', "ckent", "password123",
-        "Clark", "Kent", "ckent@example.com", "user",
-        '2025-08-05 08:03:11', '2025-08-05 08:03:11'
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (
-        'e5ed73c9-9e35-4a27-8d8b-cdd00019657b', "dprince", "password123",
-        "Diana", "Prince", "dprince@example.com", "user",
-        '2025-08-05 08:03:11', '2025-08-05 08:03:11'
-    );
+INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, isRetired, pageCount, publisherId, description, createdAt, updatedAt, avgRating) VALUES
+('0418ba35-d180-4c9c-8cca-b9b41a46e65e', '3D User Interfaces with Java 3D', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barrilleaux.jpg', '1884777902', 3, 2, 0, 520, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', '3D User Interfaces with Java 3D is a practical guide for providing next-generation applications with 3D user interfaces for manipulation of in-scene objects. Emphasis is on standalone and web-based business applications, such as for online sales and mass customization, but much of what this book offers broad applicability to 3D user interfaces in other pursuits such as scientific visualization and gaming.  This book provides an extensive conceptual framework for 3D user interface techniques, and an in-depth introduction to user interface support in the Java 3D API, including such topics as picking, collision, and drag-and-drop. Many of the techniques are demonstrated in a Java 3D software framework included with the book, which also provides developers with many general-purpose building blocks for constructing their own user interfaces.    Applications and their use of 3D are approached realistically. The book is geared towards sophisticated user interfaces for the ''everyday user'' who doesn''t have a lot of time to learn another application--much less a complicated one--and an everyday computer system without exotic devices like head mounted displays and data gloves. Perhaps the best description of this book is: ''A roadmap from Java 3D to ''Swing 3D''.''', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.5),
+('09d86af8-796d-4fb8-b93f-28f3b0a5745a', 'Website Owner''s Manual', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/boag.jpg', '1933988452', 3, 3, 0, 296, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Website Owner''s Manual helps you form a vision for your site, guides you through the process of selecting a web design agency, and gives you enough background information to make intelligent decisions throughout the development process. This book provides a jargon-free overview of web design, including accessibility, usability, online marketing, and web development techniques. You''ll gain a practical understanding of the technologies, processes, and ideas that drive a successful website.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('0fe7225f-c962-4d6c-8d26-f3c6babcf865', 'jQuery in Action, Second Edition', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bibeault2.jpg', '3', 3, 3, 0, 488, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'jQuery in Action, Second Edition is a fast-paced introduction to jQuery that will take your JavaScript programming to the next level. An in-depth rewrite of the bestselling first edition, this edition provides deep and practical coverage of the latest jQuery and jQuery UI releases. The book''s unique ''lab pages'' anchor the explanation of each new concept in a practical example. You''ll learn how to traverse HTML documents, handle events, perform animations, and add Ajax to your web pages. This comprehensive guide also teaches you how jQuery interacts with other tools and frameworks and how to build jQuery plugins.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.3),
+('1394174b-5a6e-458a-88c8-4d6656484ff7', 'MongoDB in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/banker.jpg', '1935182870', 3, 2, 0, 150, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'MongoDB In Action is a comprehensive guide to MongoDB for application developers. The book begins by explaining what makes MongoDB unique and describing its ideal use cases. A series of tutorials designed for MongoDB mastery then leads into detailed examples for leveraging MongoDB in e-commerce, social networking, analytics, and other common applications.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('1e97f78b-6cc3-4eee-86a3-e79280f64d47', 'Visual Object Oriented Programming', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/burnett.jpg', '131723979', 3, 3, 0, 280, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'This first book on the union of two rapidly growing approaches to programming--visual programming and object technology--provides a window on a subject of increasing commercial importance. It is an introduction and reference for cutting-edge developers, and for researchers, students, and enthusiasts interested in the design of visual OOP languages and environments.  Visual Object-Oriented Programming includes chapters on both emerging research and on a few classic systems, that together can help those who design visual object-oriented programming systems avoid some known pitfalls. The book contains an experience report on the use of available visual programming languages in a commercial setting, and chapters, by some of the leaders of this cutting-edge subject, covering systems such as Prograph, VIPR, PURSUIT, ThingLab II, Vampire, Forms/3, Self''s environment, Vista, SPE, and Cerno.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('2013d438-5bd7-4bf5-9cc5-735a7495063c', 'Java Persistence with Hibernate', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer2.jpg', '1932394885', 3, 3, 0, 880, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', '''...this book is the ultimate solution. If you are going to use Hibernate in your application, you have no other choice, go rush to the store and get this book.'' --JavaLobby', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 1.5),
+('26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 'Designing Hard Software', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/begin.jpg', '133046192', 3, 3, 0, 350, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', '''This book is well written ... The author does not fear to be controversial. In doing so, he writes a coherent book.'' --Dr. Frank J. van der Linden, Phillips Research Laboratories', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.3),
+('2772b67c-5593-414f-9c3f-ff70668d3f18', 'Practical Methods for Your Year 2000 Problem', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cervenka.jpg', '188477752X', 3, 2, 0, 236, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'Practical Methods for Your Year 2000 Problem gives the Year 2000 project team a step-by-step methodology for addressing the Year 2000 problem.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('2e55112a-4c74-4054-8a36-ad970b790092', 'Taming Jaguar', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlotta3.jpg', '1884777699', 3, 3, 0, 362, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'Taming Jaguar is part of the PowerBuilder Developer''s series, which includes Distributed Application Development with PowerBuilder 6 and Jaguar Development with PowerBuilder 7.    An application server is the heart of your enterprise computing architecture, centralizing your web content, business logic, and access to your data and legacy applications. Sybase''s application server, Jaguar CTS, delivers performance, scalability, and flexibility running CORBA, COM, Java/EJB, C++, and PowerBuilder components.    If you are looking to adopt Jaguar in your enterprise, look no further. Taming Jaguar shows you how to solve the real-world problems of installing, trouble-shooting, designing, developing, and maintaining a Jaguar application. Topical chapters are organized in a Q & A format making it easy for you to quickly find the solution to your problem. They also provide foundational and background information as well as detailed technical how-tos.    Although designed so you can find your problems easily, this book is meant to be read cover-to-cover with each chapter discussing its topic exhaustively.    What''s inside:    J2EE development  Java Servlets  Jaguar administration & code balancing  EJBs  Web development with PowerDynamo  Advanced component design', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.0),
+('2f8b83c5-991d-4790-98a4-c9f817294c0b', 'Building Secure and Reliable Network Applications', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/birman.jpg', '1884777295', 3, 3, 0, 591, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', '''... tackles the difficult problem of building reliable distributed computing systems in a way that not only presents the principles but also describes proven practical solutions.'' --John Warne, BNR Europe', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.7),
+('40671057-2871-4843-b1a3-eb4919d6fb05', 'Jaguar Development with PowerBuilder 7', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlotta2.jpg', '1884777864', 3, 3, 0, 550, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', 'Jaguar Development with PowerBuilder 7 is the definitive guide to distributed application development with PowerBuilder. It is the only book dedicated to preparing PowerBuilder developers for Jaguar applications and has been approved by Sybase engineers and product specialists who build the tools described in the book.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 2.7),
+('4c6887cd-e5c5-4470-8313-9fb48a3ce662', 'Pro Android 3', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlow.jpg', '1430230358', 6, 5, 0, 672, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', 'Pro Android 3 is the definitive guide for experienced Android developers who want to take their applications to the next level. Fully updated for Android 3.0 (Honeycomb), this book focuses on advanced Android topics including custom views and layouts, animations, graphics and multimedia, location awareness and mapping, data storage and retrieval with SQLite and content providers, and much more. You''ll also learn how to take advantage of the new features in Android 3.0 including fragments, action bars, and the redesigned UI framework.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 2.0),
+('4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 'PFC Programmer''s Reference Manual', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/brooks.jpg', '1884777554', 6, 5, 0, 368, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'PFC Programmers'' Reference Manual provides information that should prove indispensible for the PowerBuilder programmer trying to learn the PowerBuilder Foundation Classes. It lists all of the objects and functions that they might use for a project with notes from the author on each function. Service-based architecture and appropriate object-oriented techniques are stressed throughout.    The more difficult objects and services are given special attention; these are the ones that are sure to enhance your image as an expert in this emerging technology. The text is written with the same easy-to-understand prose that has marked the PowerBuilder Dojo as one of the premier PowerBuilder sites worldwide.    At first, the programmer will find this book a comprehensive guide to the wide scope of these libraries. Later it will serve as a handy memory tool for finding exactly what is needed at implementation time.    The manager will find this book an invaluable source for understanding which tools are available for immediate implementation.    PFC Programmers'' Reference Manual covers PowerBuilder version 6 as well as version 5', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.7),
+('4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 'Collective Intelligence in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/alag.jpg', '1933988312', 3, 2, 0, 425, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'There''s a great deal of wisdom in a crowd, but how do you listen to a thousand people talking at once  Identifying the wants, needs, and knowledge of internet users can be like listening to a mob.    In the Web 2.0 era, leveraging the collective power of user contributions, interactions, and feedback is the key to market dominance. A new category of powerful programming techniques lets you discover the patterns, inter-relationships, and individual profiles   the collective intelligence   locked in the data people leave behind as they surf websites, post blogs, and interact with other users.    Collective Intelligence in Action is a hands-on guidebook for implementing collective-intelligence concepts using Java. It is the first Java-based book to emphasize the underlying algorithms and technical implementation of vital data gathering and mining techniques like analyzing trends, discovering relationships, and making predictions. It provides a pragmatic approach to personalization by combining content-based analysis with collaborative approaches.    This book is for Java developers implementing collective intelligence in real, high-use applications. Following a running example in which you harvest and use information from blogs, you learn to develop software that you can embed in your own applications. The code examples are immediately reusable and give the Java developer a working collective intelligence toolkit.    Along the way, you work with, a number of APIs and open-source toolkits including text analysis and search using Lucene, web-crawling using Nutch, and applying machine learning algorithms using WEKA and the Java Data Mining (JDM) standard.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 5.0),
+('52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 'jQuery in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bibeault.jpg', '1933988355', 3, 2, 0, 376, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', '''The best-thought-out and researched piece of literature on the jQuery library.'' --From the forward by John Resig, Creator of jQuery', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('5a3531d5-8e08-4066-a92d-e8d80b3d5546', 'JSTL in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bayern.jpg', '1930110529', 3, 3, 0, 480, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'JSTL is an important simplification of the Java web platform. With JSTL, page authors can now write dynamic pages using standard HTML-like tags and an easy-to-learn expression language. JSTL is a standard from the Java Community Process, and its expression language will become part of JSP 2.0.    JSTL in Action shows you how to write rich, dynamic web pages without programming. From simple loops to tricky XML processing, every feature of JSTL is covered and exercised in numerous useful examples. Whether you are a novice page author or an experienced Java programmer, this book shows you easy ways to create powerful web sites.    To help readers who don''t already have a JSP container run the examples in the book, there''s a free companion download here. This bundle contains a ready-to-run JSP container, a JSTL implementation, and all the book''s examples.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 'Unlocking Android', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ableson.jpg', '1933988673', 3, 3, 0, 416, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Unlocking Android: A Developer''s Guide provides concise, hands-on instruction for the Android operating system and development tools. This book teaches important architectural concepts in a straightforward writing style and builds on this with practical and useful examples throughout.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('5bb6d3ba-537c-494a-9085-bcfe47f2c245', 'Brownfield Application Development in .NET', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/baley.jpg', '1933988711', 3, 2, 0, 550, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'Brownfield Application Development in .Net shows you how to approach legacy applications with the state-of-the-art concepts, patterns, and tools you''ve learned to apply to new projects. Using an existing application as an example, this book guides you in applying the techniques and best practices you need to make it more maintainable and receptive to change.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 5.0),
+('61d2f03f-55a6-4768-9ca0-fd717629eaff', 'Hibernate in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer.jpg', '193239415X', 3, 2, 0, 400, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', '''2005 Best Java Book!'' -- Java Developer''s Journal', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 'Zend Framework in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/allen.jpg', '1933988320', 3, 3, 0, 432, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'Zend Framework in Action is a comprehensive tutorial that shows how to use the Zend Framework to create web-based applications and web services. This book takes you on an over-the-shoulder tour of the components of the Zend Framework as you build a high quality, real-world web application.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 'Coffeehouse', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/asher.jpg', '1884777384', 3, 2, 0, 316, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'Coffeehouse is an anthology of stories, poems and essays originally published on the World Wide Web.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 2.7),
+('6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 'ASP.NET 4.0 in Practice', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bochicchio.jpg', '1935182463', 3, 2, 0, 504, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'ASP.NET 4.0 in Practice contains real world techniques from well-known professionals who have been using ASP.NET since the first previews.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('796c3bde-2a06-4290-aa9f-33d478bc61c8', 'OSGi in Depth', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/alves.jpg', '193518217X', 3, 3, 0, 325, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'Enterprise OSGi shows a Java developer how to develop to the OSGi Service Platform Enterprise specification, an emerging Java-based technology for developing modular enterprise applications. Enterprise OSGi addresses several shortcomings of existing enterprise platforms, such as allowing the creation of better maintainable and extensible applications, and provide a simpler, easier-to-use, light-weight solution to enterprise software development.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('825c0ff5-0599-4127-af19-9a63bfe3c1d5', 'Android in Action, Second Edition', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ableson2.jpg', '1933988611', 3, 2, 0, 592, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Android in Action, Second Edition is a comprehensive tutorial for Android developers. Taking you far beyond ''Hello Android, '' this fast-paced book puts you in the driver'', s seat as you learn important architectural concepts and implementation strategies. You''ll master the SDK, build WebKit apps using HTML 5, and even learn to extend or replace Android''s built-in features by building useful and intriguing examples.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 1.0),
+('841ed039-dc35-4faf-9b57-44709c2b2281', 'The Quick Python Book, Second Edition', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ceder.jpg', '3', 3, 3, 0, 360, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'This revision of Manning''s popular The Quick Python Book offers a clear, crisp introduction to the elegant Python programming language and its famously easy-to-read syntax. Written for programmers new to Python, this updated edition covers features common to other languages concisely, while introducing Python''s comprehensive standard functions library and unique features in detail.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.5),
+('8ebf4566-4743-455e-bbbe-a3f45bc2f268', 'Graphics File Formats', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/brown.jpg', '133034054', 6, 6, 0, 484, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'Graphics File Formats is a comprehensive guide to the file formats used in computer graphics and related areas. It discusses implementation and design of file formats in a readable style focusing on the basic issues important for the evaluation or development of file formats, including  data types  design goals  color  data organization  data encoding  data compression  classification  and conversion  The second part of the book provides summaries of over 50 graphics file formats in commercial use, such as CGM, DDES, FITS, MPEG, PICT, PostScript, TIFF, QuickTime, RIB, SunRaster, and X bitmap. Following a uniform organization, these summaries are handy reference sources for those needing basic information on these formats.    Written by two computer experts, this book is intended for graphics professionals, programmers and all those in commercial, engineering and scientific applications areas who need to make decisions related to file formats from graphical data.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('8f4d6aec-f46e-4db8-92e8-2f6d564801f9', 'Ruby for Rails', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/black.jpg', '1932394699', 3, 2, 0, 532, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'The word is out: with Ruby on Rails you can build powerful Web applications easily and quickly! And just like the Rails framework itself, Rails applications are Ruby programs. That means you can   t tap into the full power of Rails unless you master the Ruby language.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 4.0),
+('99321abd-7d13-4c88-a0ae-9de45a7e42d8', 'iOS in Practice', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cahill.jpg', '1617291269', 3, 2, 0, 325, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'An engaging read: iOS in Practice. Placeholder description for development data.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 3.5),
+('9a0baa55-03ce-4cce-adf3-4784e4797a06', 'Team Foundation Server 2008 in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/azher.jpg', '1933988592', 3, 2, 0, 344, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'In complex software projects, managing the development process can be as critical to success as writing the code itself. A project may involve dozens of developers, managers, architects, testers, and customers, hundreds of builds, and thousands of opportunities to get off-track. To keep tabs on the people, tasks, and components of a medium- to large-scale project, most teams use a development system that allows for easy monitoring, follow-up, and accountability.    Microsoft Team Foundation Server 2008 (TFS), the server component of Microsoft''s Visual Studio Team System (VSTS), provides a powerful collaborative platform for software-development teams. The product offers an integrated toolset for tracking work items, creating test cases, managing source code, generating builds, constructing database schemas, and so on. Because in software development one size does not fit all, TFS provides process customization, project management, and reporting capabilities to build solutions around your requirements.    Team Foundation Server 2008 in Action is a hands-on guide to Team Foundation Server 2008. Written for developers with a good handle on TFS basics, this book shows you how to solve real-life problems. It''s not a repetition of Microsoft''s product documentation. Team Foundation Server 2008 in Action is a practitioner''s handbook for how to work with TFS under common constraints. This book walks you through real-life software engineering problems based on hundreds of hours of TFS experience.    You''ll benefit from expert author Jamil Azher''s extensive interactions with members of Microsoft''s TFS team and MVPs, survey feedback from the author''s blog, and interviews with organizations and user groups using TFS. Instead of just offering a high-level overview, the book provides detailed solutions for solving common   and not-so-common   problems using TFS. It discusses the strengths as well as weaknesses of TFS, and suggests appropriate problem resolution steps, workarounds, or custom solutions.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('a24bfe92-349e-4089-96e0-75989f930d28', 'Internet and Intranet Applications with PowerBuilder 6', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cervenka.jpg', '1884777600', 3, 3, 0, 390, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'If you''re a PowerBuilder programmer, Internet and Intranet Applications with PowerBuilder 6 is your ticket to learning Web.PB and related technologies. The book covers everything you need to know to build web browser and server programs with the PowerBuilder 6 Internet Toolkit. Also covered is how to write winsock programs with PB, and Distributed PB is covered to the extent necessary to learn Web.PB.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('a5b45d98-5439-4450-891a-269fd7dada03', 'Hibernate in Action (Chinese Edition)', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer-cn.jpg', '9791194027142', 3, 2, 0, 400, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'An engaging read: Hibernate in Action (Chinese Edition). Placeholder description for development data.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', 'Specification by Example', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/adzic.jpg', '1617290084', 3, 2, 0, 120, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'An engaging read: Specification by Example. Placeholder description for development data.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('b1a5e783-cee6-49a6-8939-cc6e017843f6', 'Hibernate Search in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bernard.jpg', '1933988649', 3, 2, 0, 488, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', '''A great resource for true database independent full text search.'' --Aaron Walker, base2Services', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('b42078f9-01d8-4864-888d-dee2d2ae1953', 'Hello! Python', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/briggs.jpg', '1935182080', 3, 2, 0, 350, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'Hello! Python fully covers the building blocks of Python programming and gives you a gentle introduction to more advanced topics such as object oriented programming, functional programming, network programming, and program design. New (or nearly new) programmers will learn most of what they need to know to start using Python immediately.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 5.0),
+('bd76fa55-2232-455f-b2ae-b03ba20afc6c', 'Silverlight 2 in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/campbell.jpg', '1933988428', 3, 3, 0, 400, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'Silverlight 2 in Action gives you a solid, well-thought out and coherent foundation for building RIA web applications, and provides you with lots of technical details without ever becoming cloudy.       Golo Roden, author, trainer and speaker for .NET technologies', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 1.0),
+('c5304b68-66c0-42c8-a594-431bd2ff252f', 'Flex 3 in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ahmed.jpg', '1933988746', 3, 2, 0, 576, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'New web applications require engaging user-friendly interfaces and the cooler, the better. With Flex 3, web developers at any skill level can create high-quality, effective, and interactive Rich Internet Applications (RIAs) quickly and easily. Flex removes the complexity barrier from RIA development by offering sophisticated tools and a straightforward programming language so you can focus on what you want to do instead of how to do it. And now that the major components of Flex are free and open-source, the cost barrier is gone, as well! Flex 3 in Action is an easy-to-follow, hands-on Flex tutorial. Chock-full of examples, this book goes beyond feature coverage and helps you put Flex to work in real day-to-day tasks. You''ll quickly master the Flex API and learn to apply the techniques that make your Flex applications stand out from the crowd.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('c8e3c6d6-d532-4799-94af-8f5fa444ee23', 'Griffon in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/almiray.jpg', '1935182234', 3, 3, 0, 375, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Griffon in Action is a comprehensive tutorial written for Java developers who want a more productive approach to UI development. In this book, you''ll immediately dive into Griffon. After a Griffon orientation and a quick Groovy tutorial, you''ll start building examples that explore Griffon''s high productivity approach to Swing development. One of the troublesome parts of Swing development is the amount of Java code that is required to get a simple application off the ground.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('c9ff1b35-552e-4959-9359-dd3b69472c88', 'Flex on Java', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/allmon.jpg', '1933988797', 3, 3, 0, 265, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'A beautifully written book that is a must have for every Java Developer.       Ashish Kulkarni, Technical Director, E-Business Software Solutions Ltd.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('cd695773-5ffd-4fc0-8a80-e4d384f0d564', 'iBATIS in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/begin.jpg', '1932394826', 3, 3, 0, 384, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', 'Gets new users going and gives experienced users in-depth coverage of advanced features.       Jeff Cunningham, The Weather Channel Interactive', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('d78ae155-0af9-49f8-a2df-d9c67d3df2f3', 'Flexible Rails', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/armstrong.jpg', '1933988509', 3, 3, 0, 592, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', '''Flexible Rails created a standard to which I hold other technical books. You definitely get your money''s worth.''', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('db1e1830-7298-4c16-bbe4-1a63a7d094d3', 'iPhone in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/callen.jpg', '193398886X', 3, 3, 0, 472, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'There is not another iPhone title that does such a great coverage of both Web and SDK topics under one roof, thus providing a well-rounded developer education.       Vladimir Pasman, Cocoacast.com', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('dc8abb43-e500-4969-8b7c-595af1b413e3', 'The Well-Grounded Rubyist', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/black2.jpg', '1933988657', 3, 3, 0, 520, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', 'What would appear to be the most complex topic of the book is in fact surprisingly easy to assimilate, and one realizes that the efforts of the author to gradually lead us to a sufficient knowledge of Ruby in order to tackle without pain the most difficult subjects, bears its fruit.       Eric Grimois, Developpez.com', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('edd3c35b-527e-4e67-bfcb-b546ce48ca85', 'Flex 4 in Action', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ahmed2.jpg', '1935182420', 3, 0, 0, 600, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', 'Using Flex, you can create high-quality, effective, and interactive Rich Internet Applications (RIAs) quickly and easily. Flex removes the complexity barrier from RIA development by offering sophisticated tools and a straightforward programming language so you can focus on what you want to do instead of how to do it. And the new features added in Flex 4 give you an even wider range of options!', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0),
+('f2f2d5ff-8f35-4be7-9259-505a3d6bd274', 'Hello! Flex 4', 'https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/armstrong3.jpg', '1933988762', 3, 3, 0, 258, '3ec974de-8363-43c7-a528-298d9ca7ff37', 'Hello! Flex 4 progresses through 26 self-contained examples selected so you can progressively master Flex. They vary from small one-page apps, to a 3D rotating haiku, to a Connect Four-like game. And in the last chapter you''ll learn to build a full Flex application called SocialStalkr   a mashup that lets you follow your friends by showing their tweets on a Yahoo map.', '2025-08-05 08:01:08', '2025-09-03 20:02:17', 0.0);
 
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-        '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', "Unlocking Android", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ableson.jpg", "1933988673", 3, 2, 416, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "Unlocking Android: A Developer's Guide provides concise, hands-on instruction for the Android operating system and development tools. This book teaches important architectural concepts in a straightforward writing style and builds on this with practical and useful examples throughout.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08'
-    );
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('cc1e8eb9-d214-4d67-85b4-15889d025873', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('0e05171a-891a-4a1c-a165-23ef65d64b40', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('7baa0eb8-3997-4676-a978-b1224dfa2b33', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-        '09d86af8-796d-4fb8-b93f-28f3b0a5745a', "Website Owner's Manual", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/boag.jpg", "1933988452", 3, 3, 296, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "Website Owner's Manual helps you form a vision for your site, guides you through the process of selecting a web design agency, and gives you enough background information to make intelligent decisions throughout the development process. This book provides a jargon-free overview of web design, including accessibility, usability, online marketing, and web development techniques. You'll gain a practical understanding of the technologies, processes, and ideas that drive a successful website.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08'
-    );
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('6aa007f5-1a76-4e51-bd31-a39f6f276858', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('76fe5c6d-b618-4fdd-878c-ec1bf0c85931', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES ('d0242338-9aa3-4de7-a380-99911475ad3e', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('825c0ff5-0599-4127-af19-9a63bfe3c1d5', "Android in Action, Second Edition", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ableson2.jpg", "1933988611", 3, 1, 592, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "Android in Action, Second Edition is a comprehensive tutorial for Android developers. Taking you far beyond 'Hello Android, ' this fast-paced book puts you in the driver', s seat as you learn important architectural concepts and implementation strategies. You'll master the SDK, build WebKit apps using HTML 5, and even learn to extend or replace Android's built-in features by building useful and intriguing examples.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('bd721fc2-2e9e-4c57-bba0-5033a6a77b3a', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('65417324-3787-4b56-a9e9-7007e8879a05', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b43b7020-824e-4808-a291-ac53c17e252b', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
+INSERT INTO books_copies (id, bookId, isBorrowed, createdAt, updatedAt) VALUES
+('a3d06044-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d061c1-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d062ad-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0632a-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06396-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06404-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06468-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d064c8-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0652f-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0658d-8903-11f0-a2c7-7604c7108b13', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0678e-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d067ff-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06864-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d068c4-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0691f-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0697a-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d069d3-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06a2d-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06a86-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06ae5-8903-11f0-a2c7-7604c7108b13', '09d86af8-796d-4fb8-b93f-28f3b0a5745a', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06cdb-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06d40-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06d9b-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06df4-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06e4e-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06ea4-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06f06-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06f5c-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d06fb4-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07008-8903-11f0-a2c7-7604c7108b13', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0723d-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d073a0-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07431-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d074c6-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0753a-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0759d-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d075ff-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0765d-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d077a8-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0780d-8903-11f0-a2c7-7604c7108b13', '1394174b-5a6e-458a-88c8-4d6656484ff7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07b9d-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07c0a-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07c6a-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07cc7-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07d3f-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07d99-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07df2-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07e54-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07ead-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d07f07-8903-11f0-a2c7-7604c7108b13', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08224-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0828a-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d082e6-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0833f-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0839a-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d083f4-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0844c-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d084a6-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08502-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0855c-8903-11f0-a2c7-7604c7108b13', '2013d438-5bd7-4bf5-9cc5-735a7495063c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d088b3-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08918-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08973-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d089cc-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08a25-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08a7d-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08ad6-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08b2e-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08bd9-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d08c73-8903-11f0-a2c7-7604c7108b13', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09041-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d090a6-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09104-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0915e-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d091b6-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0925f-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d092c4-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0931a-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09371-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d093c8-8903-11f0-a2c7-7604c7108b13', '2772b67c-5593-414f-9c3f-ff70668d3f18', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09828-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0988e-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d098ea-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09943-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0999b-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d099f3-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09ad2-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09b2b-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09b82-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d09bda-8903-11f0-a2c7-7604c7108b13', '2e55112a-4c74-4054-8a36-ad970b790092', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a096-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a0f8-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a152-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a1a9-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a201-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a257-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a2b0-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a30c-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a3e6-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a440-8903-11f0-a2c7-7604c7108b13', '2f8b83c5-991d-4790-98a4-c9f817294c0b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0a99e-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0aa0d-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0aa66-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0aabb-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ab16-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ab6c-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0abc2-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ac17-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ac6d-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0acc4-8903-11f0-a2c7-7604c7108b13', '40671057-2871-4843-b1a3-eb4919d6fb05', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b1f8-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b256-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b2af-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b306-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b35b-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b3af-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b404-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b459-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b4af-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0b509-8903-11f0-a2c7-7604c7108b13', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ba59-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bab5-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bb0a-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bb5d-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bbb2-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bc05-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bc58-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bcac-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bd01-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0bd54-8903-11f0-a2c7-7604c7108b13', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c3a7-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c415-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c46f-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c513-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c56f-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c5c6-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c61d-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c673-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c6cb-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0c722-8903-11f0-a2c7-7604c7108b13', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cbc0-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cc21-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cc7c-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cce7-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cd8c-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cde7-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ce44-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0ce9c-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0cefb-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d0fe40-8903-11f0-a2c7-7604c7108b13', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1071b-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d107a5-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d10813-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1087c-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d108de-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1093f-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d10998-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d109f3-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d10a50-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d10aad-8903-11f0-a2c7-7604c7108b13', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d110d2-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1113a-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11196-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d111ed-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11247-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1129d-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1138d-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d115f8-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11658-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d116b0-8903-11f0-a2c7-7604c7108b13', '5b857ba9-3b52-46d4-a4bb-b2640a39db2b', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11ce0-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11d65-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11dc3-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11e1f-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11ed4-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11f33-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11f8f-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d11fec-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d12046-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d120a9-8903-11f0-a2c7-7604c7108b13', '61d2f03f-55a6-4768-9ca0-fd717629eaff', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d12735-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1279d-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d127f8-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1284f-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d128a8-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d128fe-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d12956-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d129ae-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d12a05-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d12a5f-8903-11f0-a2c7-7604c7108b13', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d130f0-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13152-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d131af-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13210-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13269-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d132c0-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13319-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1336f-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d133cc-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13424-8903-11f0-a2c7-7604c7108b13', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13bb8-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13c20-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13c7f-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13cd9-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d13d34-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d185bc-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1862e-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d18690-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d186f0-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d18750-8903-11f0-a2c7-7604c7108b13', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d18ef5-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d18f57-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d18fae-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d19003-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1905a-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d190b4-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d19107-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d1915c-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d191b2-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d19207-8903-11f0-a2c7-7604c7108b13', '796c3bde-2a06-4290-aa9f-33d478bc61c8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2342b-8903-11f0-a2c7-7604c7108b13', '841ed039-dc35-4faf-9b57-44709c2b2281', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d23589-8903-11f0-a2c7-7604c7108b13', '841ed039-dc35-4faf-9b57-44709c2b2281', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d23618-8903-11f0-a2c7-7604c7108b13', '841ed039-dc35-4faf-9b57-44709c2b2281', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d254ef-8903-11f0-a2c7-7604c7108b13', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2557d-8903-11f0-a2c7-7604c7108b13', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d255ef-8903-11f0-a2c7-7604c7108b13', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d25b07-8903-11f0-a2c7-7604c7108b13', 'a24bfe92-349e-4089-96e0-75989f930d28', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d25b75-8903-11f0-a2c7-7604c7108b13', 'a24bfe92-349e-4089-96e0-75989f930d28', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d25bd9-8903-11f0-a2c7-7604c7108b13', 'a24bfe92-349e-4089-96e0-75989f930d28', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d260a7-8903-11f0-a2c7-7604c7108b13', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26112-8903-11f0-a2c7-7604c7108b13', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26170-8903-11f0-a2c7-7604c7108b13', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26697-8903-11f0-a2c7-7604c7108b13', 'b42078f9-01d8-4864-888d-dee2d2ae1953', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26701-8903-11f0-a2c7-7604c7108b13', 'b42078f9-01d8-4864-888d-dee2d2ae1953', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26764-8903-11f0-a2c7-7604c7108b13', 'b42078f9-01d8-4864-888d-dee2d2ae1953', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26c26-8903-11f0-a2c7-7604c7108b13', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26c8f-8903-11f0-a2c7-7604c7108b13', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d26cec-8903-11f0-a2c7-7604c7108b13', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2739f-8903-11f0-a2c7-7604c7108b13', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d27426-8903-11f0-a2c7-7604c7108b13', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d27498-8903-11f0-a2c7-7604c7108b13', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d27a06-8903-11f0-a2c7-7604c7108b13', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d27a6f-8903-11f0-a2c7-7604c7108b13', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d27acc-8903-11f0-a2c7-7604c7108b13', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2804b-8903-11f0-a2c7-7604c7108b13', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d280b2-8903-11f0-a2c7-7604c7108b13', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28119-8903-11f0-a2c7-7604c7108b13', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d286d5-8903-11f0-a2c7-7604c7108b13', 'a5b45d98-5439-4450-891a-269fd7dada03', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28739-8903-11f0-a2c7-7604c7108b13', 'a5b45d98-5439-4450-891a-269fd7dada03', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28793-8903-11f0-a2c7-7604c7108b13', 'a5b45d98-5439-4450-891a-269fd7dada03', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28cfc-8903-11f0-a2c7-7604c7108b13', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28d73-8903-11f0-a2c7-7604c7108b13', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d28dd2-8903-11f0-a2c7-7604c7108b13', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2931c-8903-11f0-a2c7-7604c7108b13', 'dc8abb43-e500-4969-8b7c-595af1b413e3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2937d-8903-11f0-a2c7-7604c7108b13', 'dc8abb43-e500-4969-8b7c-595af1b413e3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d293d3-8903-11f0-a2c7-7604c7108b13', 'dc8abb43-e500-4969-8b7c-595af1b413e3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d29939-8903-11f0-a2c7-7604c7108b13', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d29a4d-8903-11f0-a2c7-7604c7108b13', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d29abe-8903-11f0-a2c7-7604c7108b13', '825c0ff5-0599-4127-af19-9a63bfe3c1d5', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a05e-8903-11f0-a2c7-7604c7108b13', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a0f6-8903-11f0-a2c7-7604c7108b13', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a16b-8903-11f0-a2c7-7604c7108b13', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a744-8903-11f0-a2c7-7604c7108b13', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a7aa-8903-11f0-a2c7-7604c7108b13', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2a807-8903-11f0-a2c7-7604c7108b13', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2adf7-8903-11f0-a2c7-7604c7108b13', 'c9ff1b35-552e-4959-9359-dd3b69472c88', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2ae5f-8903-11f0-a2c7-7604c7108b13', 'c9ff1b35-552e-4959-9359-dd3b69472c88', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2aec1-8903-11f0-a2c7-7604c7108b13', 'c9ff1b35-552e-4959-9359-dd3b69472c88', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2b4c1-8903-11f0-a2c7-7604c7108b13', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2b528-8903-11f0-a2c7-7604c7108b13', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2b587-8903-11f0-a2c7-7604c7108b13', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2bb99-8903-11f0-a2c7-7604c7108b13', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2bc03-8903-11f0-a2c7-7604c7108b13', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2bc60-8903-11f0-a2c7-7604c7108b13', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2c2e7-8903-11f0-a2c7-7604c7108b13', '9a0baa55-03ce-4cce-adf3-4784e4797a06', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2c34d-8903-11f0-a2c7-7604c7108b13', '9a0baa55-03ce-4cce-adf3-4784e4797a06', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2c3a8-8903-11f0-a2c7-7604c7108b13', '9a0baa55-03ce-4cce-adf3-4784e4797a06', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2c9f7-8903-11f0-a2c7-7604c7108b13', 'c5304b68-66c0-42c8-a594-431bd2ff252f', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2ca5e-8903-11f0-a2c7-7604c7108b13', 'c5304b68-66c0-42c8-a594-431bd2ff252f', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2caba-8903-11f0-a2c7-7604c7108b13', 'c5304b68-66c0-42c8-a594-431bd2ff252f', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d0fe-8903-11f0-a2c7-7604c7108b13', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d16c-8903-11f0-a2c7-7604c7108b13', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d1ca-8903-11f0-a2c7-7604c7108b13', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d818-8903-11f0-a2c7-7604c7108b13', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d87f-8903-11f0-a2c7-7604c7108b13', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3d2d8da-8903-11f0-a2c7-7604c7108b13', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', 0, '2025-09-03 20:21:57', '2025-09-03 20:21:57');
 
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', "Specification by Example", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/adzic.jpg", "1617290084", 3, 3, 0, '3ec974de-8363-43c7-a528-298d9ca7ff37', "", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('68c8374e-46df-4028-acf4-4ab82bfb6eb8', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8a6492a4-5783-491c-b416-548d4a861cf3', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('d6efd171-e9d5-424a-b5bc-37b2aa07fa9f', 'aa6dddbf-d03f-4d6c-be25-dafdd8feacc5', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    'c5304b68-66c0-42c8-a594-431bd2ff252f',
-    "Flex 3 in Action",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ahmed.jpg",
-    "1933988746",
-    3,
-    1,
-    576,
-    'db294c60-9c7b-41f4-a894-d5debf81d8c3',
-    "New web applications require engaging user-friendly interfaces and the cooler, the better. With Flex 3, web developers at any skill level can create high-quality, effective, and interactive Rich Internet Applications (RIAs) quickly and easily. Flex removes the complexity barrier from RIA development by offering sophisticated tools and a straightforward programming language so you can focus on what you want to do instead of how to do it. And now that the major components of Flex are free and open-source, the cost barrier is gone, as well! Flex 3 in Action is an easy-to-follow, hands-on Flex tutorial. Chock-full of examples, this book goes beyond feature coverage and helps you put Flex to work in real day-to-day tasks. You'll quickly master the Flex API and learn to apply the techniques that make your Flex applications stand out from the crowd.",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('45c612fb-df7d-47bb-9bbf-1a282feca4a2', 'c5304b68-66c0-42c8-a594-431bd2ff252f', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b1f9ba19-ffd5-4df1-9cd3-134ddc9bb94c', 'c5304b68-66c0-42c8-a594-431bd2ff252f', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('43198f80-e2d1-45a7-9f72-bb87e830a526', 'c5304b68-66c0-42c8-a594-431bd2ff252f', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    'edd3c35b-527e-4e67-bfcb-b546ce48ca85',
-    "Flex 4 in Action",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ahmed2.jpg",
-    "1935182420",
-    3,
-    3,
-    600,
-    '65ba33b8-0f10-47c2-bbf0-2c8086ad588d',
-    "Using Flex, you can create high-quality, effective, and interactive Rich Internet Applications (RIAs) quickly and easily. Flex removes the complexity barrier from RIA development by offering sophisticated tools and a straightforward programming language so you can focus on what you want to do instead of how to do it. And the new features added in Flex 4 give you an even wider range of options!",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('3e41daeb-2028-41f9-822d-844d1a25d087', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('6d259919-f294-4e7f-8d0b-b06234f5e140', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('db0d7d53-bd4c-4255-92a6-6e4b56728f38', 'edd3c35b-527e-4e67-bfcb-b546ce48ca85', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    '4fce7bc0-36b5-4474-a37a-79e2e9e10acf',
-    "Collective Intelligence in Action",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/alag.jpg",
-    "1933988312",
-    3,
-    1,
-    425,
-    '607fd6b2-32a0-4572-bd38-b64ee0a61b3b',
-    "There's a great deal of wisdom in a crowd, but how do you listen to a thousand people talking at once  Identifying the wants, needs, and knowledge of internet users can be like listening to a mob.    In the Web 2.0 era, leveraging the collective power of user contributions, interactions, and feedback is the key to market dominance. A new category of powerful programming techniques lets you discover the patterns, inter-relationships, and individual profiles   the collective intelligence   locked in the data people leave behind as they surf websites, post blogs, and interact with other users.    Collective Intelligence in Action is a hands-on guidebook for implementing collective-intelligence concepts using Java. It is the first Java-based book to emphasize the underlying algorithms and technical implementation of vital data gathering and mining techniques like analyzing trends, discovering relationships, and making predictions. It provides a pragmatic approach to personalization by combining content-based analysis with collaborative approaches.    This book is for Java developers implementing collective intelligence in real, high-use applications. Following a running example in which you harvest and use information from blogs, you learn to develop software that you can embed in your own applications. The code examples are immediately reusable and give the Java developer a working collective intelligence toolkit.    Along the way, you work with, a number of APIs and open-source toolkits including text analysis and search using Lucene, web-crawling using Nutch, and applying machine learning algorithms using WEKA and the Java Data Mining (JDM) standard.",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('97d9a4f2-5c49-4e95-8908-93ba9c938775', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('4abd7368-8d5f-43a7-8fcc-483ba8419f78', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('1a87fd39-9bb9-437f-9987-d1ee11a240f1', '4fce7bc0-36b5-4474-a37a-79e2e9e10acf', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('679d7f9b-86c8-4675-9cef-e745d6ce3bd7', "Zend Framework in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/allen.jpg", "1933988320", 3, 3, 432, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "Zend Framework in Action is a comprehensive tutorial that shows how to use the Zend Framework to create web-based applications and web services. This book takes you on an over-the-shoulder tour of the components of the Zend Framework as you build a high quality, real-world web application.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('d06bb92c-8e28-4f40-8ff5-5d4b02a0a327', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('4a199d75-f5f1-4941-bd68-eae28318a509', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('ef072112-9ba7-44fe-85a9-2adfa1e962b6', '679d7f9b-86c8-4675-9cef-e745d6ce3bd7', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('c9ff1b35-552e-4959-9359-dd3b69472c88', "Flex on Java", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/allmon.jpg", "1933988797", 3, 3, 265, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "A beautifully written book that is a must have for every Java Developer.       Ashish Kulkarni, Technical Director, E-Business Software Solutions Ltd.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('4c1c2cd4-8391-473f-8f3f-9f1392b1647a', 'c9ff1b35-552e-4959-9359-dd3b69472c88', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('7ec1bcd0-0a87-44c0-bc4d-945aaa3c1069', 'c9ff1b35-552e-4959-9359-dd3b69472c88', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('f78655a4-cea8-48b2-824b-31ff33ac43ae', 'c9ff1b35-552e-4959-9359-dd3b69472c88', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('c8e3c6d6-d532-4799-94af-8f5fa444ee23', "Griffon in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/almiray.jpg", "1935182234", 3, 3, 375, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "Griffon in Action is a comprehensive tutorial written for Java developers who want a more productive approach to UI development. In this book, you'll immediately dive into Griffon. After a Griffon orientation and a quick Groovy tutorial, you'll start building examples that explore Griffon's high productivity approach to Swing development. One of the troublesome parts of Swing development is the amount of Java code that is required to get a simple application off the ground.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('3537847b-7331-4070-8a45-a99310e0f02a', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('97d8b50f-f4ec-4454-b138-61a72fd96e63', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('29c74ffd-2b82-42c0-b3af-055ee34eeb82', 'c8e3c6d6-d532-4799-94af-8f5fa444ee23', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('796c3bde-2a06-4290-aa9f-33d478bc61c8', "OSGi in Depth", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/alves.jpg", "193518217X", 3, 3, 325, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "Enterprise OSGi shows a Java developer how to develop to the OSGi Service Platform Enterprise specification, an emerging Java-based technology for developing modular enterprise applications. Enterprise OSGi addresses several shortcomings of existing enterprise platforms, such as allowing the creation of better maintainable and extensible applications, and provide a simpler, easier-to-use, light-weight solution to enterprise software development.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9d75987d-6e88-4223-8cb6-9c827a9660c7', '796c3bde-2a06-4290-aa9f-33d478bc61c8', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8b31a6e6-e3f9-4e0e-85e5-cf78eded66a1', '796c3bde-2a06-4290-aa9f-33d478bc61c8', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('84262ccb-9185-45ec-a53e-19b20d470753', '796c3bde-2a06-4290-aa9f-33d478bc61c8', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('d78ae155-0af9-49f8-a2df-d9c67d3df2f3', "Flexible Rails", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/armstrong.jpg", "1933988509", 3, 3, 592, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', "'Flexible Rails created a standard to which I hold other technical books. You definitely get your money's worth.'", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('88517741-bace-42ae-8a93-c4cc0e6fefd7', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('29227986-9c44-472f-92ea-35984022cba5', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c6b077f1-6e50-4359-9425-d852e38e8e32', 'd78ae155-0af9-49f8-a2df-d9c67d3df2f3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('f2f2d5ff-8f35-4be7-9259-505a3d6bd274', "Hello! Flex 4", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/armstrong3.jpg", "1933988762", 3, 3, 258, '3ec974de-8363-43c7-a528-298d9ca7ff37', "Hello! Flex 4 progresses through 26 self-contained examples selected so you can progressively master Flex. They vary from small one-page apps, to a 3D rotating haiku, to a Connect Four-like game. And in the last chapter you'll learn to build a full Flex application called SocialStalkr   a mashup that lets you follow your friends by showing their tweets on a Yahoo map.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('fcb8db91-ade8-4e0b-8e4e-2e745638af6b', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('20e70b47-d666-4873-ae2c-5b47752a3a0e', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('5bc6421f-654e-472e-a693-7d1be033806f', 'f2f2d5ff-8f35-4be7-9259-505a3d6bd274', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', "Coffeehouse", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/asher.jpg", "1884777384", 3, 2, 316, '3ec974de-8363-43c7-a528-298d9ca7ff37', "Coffeehouse is an anthology of stories, poems and essays originally published on the World Wide Web.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('7a51bac2-45d1-4e7b-8c2e-09e2494d73a5', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('91c8f19a-6d3b-4759-860f-ada05b56d8b1', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('f0c04d34-e125-4bcb-ad7e-e2b7b7f519c0', '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    '9a0baa55-03ce-4cce-adf3-4784e4797a06',
-    "Team Foundation Server 2008 in Action",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/azher.jpg",
-    "1933988592",
-    3,
-    1,
-    344,
-    'db294c60-9c7b-41f4-a894-d5debf81d8c3',
-    "In complex software projects, managing the development process can be as critical to success as writing the code itself. A project may involve dozens of developers, managers, architects, testers, and customers, hundreds of builds, and thousands of opportunities to get off-track. To keep tabs on the people, tasks, and components of a medium- to large-scale project, most teams use a development system that allows for easy monitoring, follow-up, and accountability.    Microsoft Team Foundation Server 2008 (TFS), the server component of Microsoft's Visual Studio Team System (VSTS), provides a powerful collaborative platform for software-development teams. The product offers an integrated toolset for tracking work items, creating test cases, managing source code, generating builds, constructing database schemas, and so on. Because in software development one size does not fit all, TFS provides process customization, project management, and reporting capabilities to build solutions around your requirements.    Team Foundation Server 2008 in Action is a hands-on guide to Team Foundation Server 2008. Written for developers with a good handle on TFS basics, this book shows you how to solve real-life problems. It's not a repetition of Microsoft's product documentation. Team Foundation Server 2008 in Action is a practitioner's handbook for how to work with TFS under common constraints. This book walks you through real-life software engineering problems based on hundreds of hours of TFS experience.    You'll benefit from expert author Jamil Azher's extensive interactions with members of Microsoft's TFS team and MVPs, survey feedback from the author's blog, and interviews with organizations and user groups using TFS. Instead of just offering a high-level overview, the book provides detailed solutions for solving common   and not-so-common   problems using TFS. It discusses the strengths as well as weaknesses of TFS, and suggests appropriate problem resolution steps, workarounds, or custom solutions.",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('33b5121c-aa2d-47ec-9fb0-fb9974206e2b', '9a0baa55-03ce-4cce-adf3-4784e4797a06', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c4f2a2bd-fde2-492d-81f3-407e792d3cfc', '9a0baa55-03ce-4cce-adf3-4784e4797a06', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a6333056-6b02-4efe-87f9-7072647fd8bb', '9a0baa55-03ce-4cce-adf3-4784e4797a06', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('5bb6d3ba-537c-494a-9085-bcfe47f2c245', "Brownfield Application Development in .NET", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/baley.jpg", "1933988711", 3, 2, 550, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "Brownfield Application Development in .Net shows you how to approach legacy applications with the state-of-the-art concepts, patterns, and tools you've learned to apply to new projects. Using an existing application as an example, this book guides you in applying the techniques and best practices you need to make it more maintainable and receptive to change.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('1741b0be-ae1e-4465-85b4-0c892297be20', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a3e52a34-16f2-4a5c-a2ae-a1286a1d318c', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('e2b90dce-13b4-4d25-b07b-7d4d732ecf54', '5bb6d3ba-537c-494a-9085-bcfe47f2c245', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('1394174b-5a6e-458a-88c8-4d6656484ff7', "MongoDB in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/banker.jpg", "1935182870", 3, 2, 150, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "MongoDB In Action is a comprehensive guide to MongoDB for application developers. The book begins by explaining what makes MongoDB unique and describing its ideal use cases. A series of tutorials designed for MongoDB mastery then leads into detailed examples for leveraging MongoDB in e-commerce, social networking, analytics, and other common applications.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('163efc6f-29e7-49f1-91cb-7bcc6c26a735', '1394174b-5a6e-458a-88c8-4d6656484ff7', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8ec7d200-ae64-44a7-bee6-b1f5e0ba889e', '1394174b-5a6e-458a-88c8-4d6656484ff7', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('6875da5d-8219-49c5-95e1-2f452df31822', '1394174b-5a6e-458a-88c8-4d6656484ff7', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('4c6887cd-e5c5-4470-8313-9fb48a3ce662', "Pro Android 3", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlow.jpg", "1430230358", 6, 5, 672, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', "Pro Android 3 is the definitive guide for experienced Android developers who want to take their applications to the next level. Fully updated for Android 3.0 (Honeycomb), this book focuses on advanced Android topics including custom views and layouts, animations, graphics and multimedia, location awareness and mapping, data storage and retrieval with SQLite and content providers, and much more. You'll also learn how to take advantage of the new features in Android 3.0 including fragments, action bars, and the redesigned UI framework.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b88506b6-8e8d-4ef7-96f8-2f32b5c6aa86', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('2ff6d2fd-6b8d-4705-8dcf-d2e7ea700ce9', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('acec355c-0e53-48aa-8936-c350a7e94be7', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('74660a94-3fb0-4f3c-ae53-7ee7f11397c5', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('5284b99d-f2b7-4428-8d79-2049b268d38b', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('2effb545-b8e0-4457-a14f-55eeb1ec2d2f', '4c6887cd-e5c5-4470-8313-9fb48a3ce662', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('40671057-2871-4843-b1a3-eb4919d6fb05', "Jaguar Development with PowerBuilder 7", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlotta2.jpg", "1884777864", 3, 3, 550, 'ee948f5e-b92b-4e7e-b786-30cc0b27048c', "Jaguar Development with PowerBuilder 7 is the definitive guide to distributed application development with PowerBuilder. It is the only book dedicated to preparing PowerBuilder developers for Jaguar applications and has been approved by Sybase engineers and product specialists who build the tools described in the book.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9e3f7d19-b70e-483b-b00f-9e38b898d72f', '40671057-2871-4843-b1a3-eb4919d6fb05', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8f5dd451-c27d-4494-b49c-bfaf53073274', '40671057-2871-4843-b1a3-eb4919d6fb05', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8f1f0f12-7d23-4040-9935-9749da6bee16', '40671057-2871-4843-b1a3-eb4919d6fb05', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('2e55112a-4c74-4054-8a36-ad970b790092', "Taming Jaguar", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlotta3.jpg", "1884777699", 3, 3, 362, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "Taming Jaguar is part of the PowerBuilder Developer's series, which includes Distributed Application Development with PowerBuilder 6 and Jaguar Development with PowerBuilder 7.    An application server is the heart of your enterprise computing architecture, centralizing your web content, business logic, and access to your data and legacy applications. Sybase's application server, Jaguar CTS, delivers performance, scalability, and flexibility running CORBA, COM, Java/EJB, C++, and PowerBuilder components.    If you are looking to adopt Jaguar in your enterprise, look no further. Taming Jaguar shows you how to solve the real-world problems of installing, trouble-shooting, designing, developing, and maintaining a Jaguar application. Topical chapters are organized in a Q & A format making it easy for you to quickly find the solution to your problem. They also provide foundational and background information as well as detailed technical how-tos.    Although designed so you can find your problems easily, this book is meant to be read cover-to-cover with each chapter discussing its topic exhaustively.    What's inside:    J2EE development  Java Servlets  Jaguar administration & code balancing  EJBs  Web development with PowerDynamo  Advanced component design", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('21645250-5763-4443-bf86-489d359cb772', '2e55112a-4c74-4054-8a36-ad970b790092', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('11955456-6ce7-46ea-b67e-3f5098299a05', '2e55112a-4c74-4054-8a36-ad970b790092', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c7edd2eb-a9f2-4903-a2e7-b0eb8f9f16af', '2e55112a-4c74-4054-8a36-ad970b790092', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('0418ba35-d180-4c9c-8cca-b9b41a46e65e', "3D User Interfaces with Java 3D", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barrilleaux.jpg", "1884777902", 3, 2, 520, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "3D User Interfaces with Java 3D is a practical guide for providing next-generation applications with 3D user interfaces for manipulation of in-scene objects. Emphasis is on standalone and web-based business applications, such as for online sales and mass customization, but much of what this book offers broad applicability to 3D user interfaces in other pursuits such as scientific visualization and gaming.  This book provides an extensive conceptual framework for 3D user interface techniques, and an in-depth introduction to user interface support in the Java 3D API, including such topics as picking, collision, and drag-and-drop. Many of the techniques are demonstrated in a Java 3D software framework included with the book, which also provides developers with many general-purpose building blocks for constructing their own user interfaces.    Applications and their use of 3D are approached realistically. The book is geared towards sophisticated user interfaces for the 'everyday user' who doesn't have a lot of time to learn another application--much less a complicated one--and an everyday computer system without exotic devices like head mounted displays and data gloves. Perhaps the best description of this book is: 'A roadmap from Java 3D to 'Swing 3D'.'", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('20611af5-87d8-4619-9f48-ecf1e7ccec4f', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('46a4735c-e717-404a-9e55-276df182b2eb', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('1748fd34-3a8e-4c1f-976d-f7c5ae61489d', '0418ba35-d180-4c9c-8cca-b9b41a46e65e', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('61d2f03f-55a6-4768-9ca0-fd717629eaff', "Hibernate in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer.jpg", "193239415X", 3, 2, 400, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "'2005 Best Java Book!' -- Java Developer's Journal", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('195094c9-6f80-4f76-bcf2-06c7ebcdaca7', '61d2f03f-55a6-4768-9ca0-fd717629eaff', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('adae4052-d11e-4b64-829f-f447a50d82e6', '61d2f03f-55a6-4768-9ca0-fd717629eaff', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('72bb405c-7db9-4d5c-a55b-59bac8cfd8b8', '61d2f03f-55a6-4768-9ca0-fd717629eaff', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    'a5b45d98-5439-4450-891a-269fd7dada03',
-    "Hibernate in Action (Chinese Edition)",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer-cn.jpg",
-    "",
-    3,
-    1,
-    400,
-    '607fd6b2-32a0-4572-bd38-b64ee0a61b3b',
-    "",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('559f16df-b651-4e2e-afb1-e213ba817309', 'a5b45d98-5439-4450-891a-269fd7dada03', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('743a374d-b507-4207-887a-412f025938c4', 'a5b45d98-5439-4450-891a-269fd7dada03', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('dc5fc2d5-bca5-43ad-b901-4919ca86625d', 'a5b45d98-5439-4450-891a-269fd7dada03', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('2013d438-5bd7-4bf5-9cc5-735a7495063c', "Java Persistence with Hibernate", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bauer2.jpg", "1932394885", 3, 3, 880, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "'...this book is the ultimate solution. If you are going to use Hibernate in your application, you have no other choice, go rush to the store and get this book.' --JavaLobby", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('76fe2cfa-48e0-4c39-b114-af9d0edef032', '2013d438-5bd7-4bf5-9cc5-735a7495063c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('277548f7-d546-47e0-b692-deff8bb18952', '2013d438-5bd7-4bf5-9cc5-735a7495063c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('0e28df07-ebde-4751-9457-d0b7ab83beef', '2013d438-5bd7-4bf5-9cc5-735a7495063c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('5a3531d5-8e08-4066-a92d-e8d80b3d5546', "JSTL in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bayern.jpg", "1930110529", 3, 3, 480, '3ec974de-8363-43c7-a528-298d9ca7ff37', "JSTL is an important simplification of the Java web platform. With JSTL, page authors can now write dynamic pages using standard HTML-like tags and an easy-to-learn expression language. JSTL is a standard from the Java Community Process, and its expression language will become part of JSP 2.0.    JSTL in Action shows you how to write rich, dynamic web pages without programming. From simple loops to tricky XML processing, every feature of JSTL is covered and exercised in numerous useful examples. Whether you are a novice page author or an experienced Java programmer, this book shows you easy ways to create powerful web sites.    To help readers who don't already have a JSP container run the examples in the book, there's a free companion download here. This bundle contains a ready-to-run JSP container, a JSTL implementation, and all the book's examples.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('72c1fbb6-797e-4df6-a839-7cfa96482af4', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('872a24c2-4e11-4a58-a1a2-e931597504cc', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('d80224b8-13d6-472a-b8ab-a8217068e810', '5a3531d5-8e08-4066-a92d-e8d80b3d5546', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('cd695773-5ffd-4fc0-8a80-e4d384f0d564', "iBATIS in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/begin.jpg", "1932394826", 3, 3, 384, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "Gets new users going and gives experienced users in-depth coverage of advanced features.       Jeff Cunningham, The Weather Channel Interactive", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('ed178fa2-c9c8-4a1f-9ce8-a0b59126d5bf', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('7308ebab-d88e-4463-96dc-2b6aa91d6990', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b1f352cc-976d-4712-8201-bf36c537bdf0', 'cd695773-5ffd-4fc0-8a80-e4d384f0d564', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('26c0c82d-0730-4b62-bc8f-36e99c5c68e4', "Designing Hard Software", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/begin.jpg", "133046192", 3, 3, 350, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "'This book is well written ... The author does not fear to be controversial. In doing so, he writes a coherent book.' --Dr. Frank J. van der Linden, Phillips Research Laboratories", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a3ff153e-285b-42ab-b967-c83b32f3ed3c', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b699aa9a-4fae-49c8-aade-e1f9452ef236', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('3607b763-c600-4b84-a15a-8585f262b160', '26c0c82d-0730-4b62-bc8f-36e99c5c68e4', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('b1a5e783-cee6-49a6-8939-cc6e017843f6', "Hibernate Search in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bernard.jpg", "1933988649", 3, 2, 488, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "'A great resource for true database independent full text search.' --Aaron Walker, base2Services", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('268249eb-fe03-4609-889c-54a106b13c01', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('cda8cac2-12b9-4c11-ba33-aaa5986c88ce', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('d51efc65-bcbe-417c-a17a-01139f11a3ae', 'b1a5e783-cee6-49a6-8939-cc6e017843f6', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('52a8e46f-1965-4caa-b4e2-b6db5e9a7174', "jQuery in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bibeault.jpg", "1933988355", 3, 2, 376, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "'The best-thought-out and researched piece of literature on the jQuery library.' --From the forward by John Resig, Creator of jQuery", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('ffac15ed-3e12-489c-9897-b56d51e93ab0', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('7015f61f-c5fc-4182-be54-b8437b706ce0', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('03e297bf-25e4-40ae-a6a3-78066a6062e4', '52a8e46f-1965-4caa-b4e2-b6db5e9a7174', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('0fe7225f-c962-4d6c-8d26-f3c6babcf865', "jQuery in Action, Second Edition", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bibeault2.jpg", 3, 3, 3, 488, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "jQuery in Action, Second Edition is a fast-paced introduction to jQuery that will take your JavaScript programming to the next level. An in-depth rewrite of the bestselling first edition, this edition provides deep and practical coverage of the latest jQuery and jQuery UI releases. The book's unique 'lab pages' anchor the explanation of each new concept in a practical example. You'll learn how to traverse HTML documents, handle events, perform animations, and add Ajax to your web pages. This comprehensive guide also teaches you how jQuery interacts with other tools and frameworks and how to build jQuery plugins.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('e600d23d-f054-47a9-992d-1344ec110af1', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('cd8527bb-55f0-4c3f-803d-10303365c9a8', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a34ad8f1-816e-425e-93c8-746e8ab2e559', '0fe7225f-c962-4d6c-8d26-f3c6babcf865', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('2f8b83c5-991d-4790-98a4-c9f817294c0b', "Building Secure and Reliable Network Applications", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/birman.jpg", "1884777295", 3, 3, 591, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "'... tackles the difficult problem of building reliable distributed computing systems in a way that not only presents the principles but also describes proven practical solutions.' --John Warne, BNR Europe", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('2010d665-ab07-4b69-84ff-6a396b43e626', '2f8b83c5-991d-4790-98a4-c9f817294c0b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('5d543f45-b23d-435b-8f0e-c777936e287b', '2f8b83c5-991d-4790-98a4-c9f817294c0b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('892b6a44-202a-4faf-b07d-e78d51329f57', '2f8b83c5-991d-4790-98a4-c9f817294c0b', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('8f4d6aec-f46e-4db8-92e8-2f6d564801f9', "Ruby for Rails", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/black.jpg", "1932394699", 3, 2, 532, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "The word is out: with Ruby on Rails you can build powerful Web applications easily and quickly! And just like the Rails framework itself, Rails applications are Ruby programs. That means you can   t tap into the full power of Rails unless you master the Ruby language.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('12cd0d59-0452-4ec8-ab93-f8a4f77c20a1', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('e8817a47-8eca-4087-ba39-8f82971127b6', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8a8016dd-ea28-4ec6-b65a-b6bd3641a93a', '8f4d6aec-f46e-4db8-92e8-2f6d564801f9', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('dc8abb43-e500-4969-8b7c-595af1b413e3', "The Well-Grounded Rubyist", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/black2.jpg", "1933988657", 3, 3, 520, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "What would appear to be the most complex topic of the book is in fact surprisingly easy to assimilate, and one realizes that the efforts of the author to gradually lead us to a sufficient knowledge of Ruby in order to tackle without pain the most difficult subjects, bears its fruit.       Eric Grimois, Developpez.com", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('40208090-6963-4f9b-8773-7f8865149a90', 'dc8abb43-e500-4969-8b7c-595af1b413e3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('015abf37-b1e3-49a4-96c5-5151db218450', 'dc8abb43-e500-4969-8b7c-595af1b413e3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('f46937f6-840f-4f18-a383-3b16b403b197', 'dc8abb43-e500-4969-8b7c-595af1b413e3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', "ASP.NET 4.0 in Practice", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/bochicchio.jpg", "1935182463", 3, 2, 504, '65ba33b8-0f10-47c2-bbf0-2c8086ad588d', "ASP.NET 4.0 in Practice contains real world techniques from well-known professionals who have been using ASP.NET since the first previews.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('2aba24ab-aaad-4c1a-bcb0-74cd44cc6971', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('2340ec8d-57b3-415d-8233-74fcbdc9a85d', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('f84cdb59-4435-462d-9d65-dc1521df41b3', '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES (
-    'b42078f9-01d8-4864-888d-dee2d2ae1953',
-    "Hello! Python",
-    "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/briggs.jpg",
-    "1935182080",
-    3,
-    1,
-    350,
-    '3ec974de-8363-43c7-a528-298d9ca7ff37',
-    "Hello! Python fully covers the building blocks of Python programming and gives you a gentle introduction to more advanced topics such as object oriented programming, functional programming, network programming, and program design. New (or nearly new) programmers will learn most of what they need to know to start using Python immediately.",
-    FALSE,
-    '2025-08-05 08:01:08',
-    '2025-08-05 08:01:08'
-);
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c7b0c736-7993-46e0-9f44-f268243a02bc', 'b42078f9-01d8-4864-888d-dee2d2ae1953', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('3c3d3623-8a3f-4379-9c64-137b46e64d9c', 'b42078f9-01d8-4864-888d-dee2d2ae1953', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('5ae303f1-61b3-4efd-a4c0-146580d00c38', 'b42078f9-01d8-4864-888d-dee2d2ae1953', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', "PFC Programmer's Reference Manual", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/brooks.jpg", "1884777554", 3, 5, 368, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "PFC Programmers' Reference Manual provides information that should prove indispensible for the PowerBuilder programmer trying to learn the PowerBuilder Foundation Classes. It lists all of the objects and functions that they might use for a project with notes from the author on each function. Service-based architecture and appropriate object-oriented techniques are stressed throughout.    The more difficult objects and services are given special attention; these are the ones that are sure to enhance your image as an expert in this emerging technology. The text is written with the same easy-to-understand prose that has marked the PowerBuilder Dojo as one of the premier PowerBuilder sites worldwide.    At first, the programmer will find this book a comprehensive guide to the wide scope of these libraries. Later it will serve as a handy memory tool for finding exactly what is needed at implementation time.    The manager will find this book an invaluable source for understanding which tools are available for immediate implementation.    PFC Programmers' Reference Manual covers PowerBuilder version 6 as well as version 5", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c7e6dc5b-79bc-49d0-9707-97a3c4c5cd32', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('31564d98-125c-4f76-8ca8-b78012471038', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('7d3a2f8f-49ea-4a96-9468-ce05d676fcfe', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8e5fe8d8-0b1c-4677-b79f-7f8d36044045', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('5547682a-d796-4475-a2e7-87ad20c627a9', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c8562379-cccf-4aca-bee7-e3f8dcfe1a49', '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('8ebf4566-4743-455e-bbbe-a3f45bc2f268', "Graphics File Formats", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/brown.jpg", "133034054", 3, 6, 484, 'db294c60-9c7b-41f4-a894-d5debf81d8c3', "Graphics File Formats is a comprehensive guide to the file formats used in computer graphics and related areas. It discusses implementation and design of file formats in a readable style focusing on the basic issues important for the evaluation or development of file formats, including  data types  design goals  color  data organization  data encoding  data compression  classification  and conversion  The second part of the book provides summaries of over 50 graphics file formats in commercial use, such as CGM, DDES, FITS, MPEG, PICT, PostScript, TIFF, QuickTime, RIB, SunRaster, and X bitmap. Following a uniform organization, these summaries are handy reference sources for those needing basic information on these formats.    Written by two computer experts, this book is intended for graphics professionals, programmers and all those in commercial, engineering and scientific applications areas who need to make decisions related to file formats from graphical data.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a0ff1b72-353c-414b-824e-78b89e31e66a', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a8366673-6c4e-4e91-9596-0b09ec113200', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('6af59b24-d216-4893-997d-baa86e571482', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8e84573e-bfbf-44bc-bd58-5a497662eb87', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('e8c730f3-d044-4698-b82e-49eda9620d39', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('17e86ebe-a3e8-4e50-aefa-3f192e18ddf1', '8ebf4566-4743-455e-bbbe-a3f45bc2f268', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('1e97f78b-6cc3-4eee-86a3-e79280f64d47', "Visual Object Oriented Programming", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/burnett.jpg", "131723979", 3, 3, 280, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "This first book on the union of two rapidly growing approaches to programming--visual programming and object technology--provides a window on a subject of increasing commercial importance. It is an introduction and reference for cutting-edge developers, and for researchers, students, and enthusiasts interested in the design of visual OOP languages and environments.  Visual Object-Oriented Programming includes chapters on both emerging research and on a few classic systems, that together can help those who design visual object-oriented programming systems avoid some known pitfalls. The book contains an experience report on the use of available visual programming languages in a commercial setting, and chapters, by some of the leaders of this cutting-edge subject, covering systems such as Prograph, VIPR, PURSUIT, ThingLab II, Vampire, Forms/3, Self's environment, Vista, SPE, and Cerno.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('210cccd6-1d82-4e52-878e-17d9a6581f79', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('a15aeccb-92d4-4a4f-a51c-f52334ddc459', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('4e62e084-cae1-443a-9f59-992eb11c7d9c', '1e97f78b-6cc3-4eee-86a3-e79280f64d47', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('99321abd-7d13-4c88-a0ae-9de45a7e42d8', "iOS in Practice", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cahill.jpg", "1617291269", 3, 2, 325, '3ec974de-8363-43c7-a528-298d9ca7ff37', "", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('6375186c-5318-4b1e-bee0-a683c94648e2', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('79a9f64a-2db7-46bc-aa4d-f9765bc28f8a', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9966ff1a-0018-480f-9295-05bf0629a316', '99321abd-7d13-4c88-a0ae-9de45a7e42d8', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('db1e1830-7298-4c16-bbe4-1a63a7d094d3', "iPhone in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/callen.jpg", "193398886X", 3, 3, 472, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "There is not another iPhone title that does such a great coverage of both Web and SDK topics under one roof, thus providing a well-rounded developer education.       Vladimir Pasman, Cocoacast.com", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('73277437-3962-498b-a6d8-cb25530ccfb9', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9cfd2357-820b-460e-aa7d-598cf630cea5', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('228ad6f2-bcba-4777-9986-b21c35c2342c', 'db1e1830-7298-4c16-bbe4-1a63a7d094d3', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('bd76fa55-2232-455f-b2ae-b03ba20afc6c', "Silverlight 2 in Action", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/campbell.jpg", "1933988428", 3, 3, 400, '3ec974de-8363-43c7-a528-298d9ca7ff37', "Silverlight 2 in Action gives you a solid, well-thought out and coherent foundation for building RIA web applications, and provides you with lots of technical details without ever becoming cloudy.       Golo Roden, author, trainer and speaker for .NET technologies", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('bd83d921-ec9e-4ed3-a28f-21105f0680ef', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('fffe5a48-82f3-41c2-bb45-4ad006b6de12', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('8283336e-1b2a-4790-a975-5d75ec260a76', 'bd76fa55-2232-455f-b2ae-b03ba20afc6c', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('841ed039-dc35-4faf-9b57-44709c2b2281', "The Quick Python Book, Second Edition", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/ceder.jpg", 3, 3, 3, 360, '3ec974de-8363-43c7-a528-298d9ca7ff37', "This revision of Manning's popular The Quick Python Book offers a clear, crisp introduction to the elegant Python programming language and its famously easy-to-read syntax. Written for programmers new to Python, this updated edition covers features common to other languages concisely, while introducing Python's comprehensive standard functions library and unique features in detail.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('f9edf2cc-4345-478f-a80a-38843ad4c0e0', '841ed039-dc35-4faf-9b57-44709c2b2281', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('26bafd32-63fd-488d-94d3-67a492173c3f', '841ed039-dc35-4faf-9b57-44709c2b2281', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9c58d47c-6eca-442b-a688-7101f6f4af86', '841ed039-dc35-4faf-9b57-44709c2b2281', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('a24bfe92-349e-4089-96e0-75989f930d28', "Internet and Intranet Applications with PowerBuilder 6", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cervenka.jpg", "1884777600", 3, 3, 390, '3ec974de-8363-43c7-a528-298d9ca7ff37', "If you're a PowerBuilder programmer, Internet and Intranet Applications with PowerBuilder 6 is your ticket to learning Web.PB and related technologies. The book covers everything you need to know to build web browser and server programs with the PowerBuilder 6 Internet Toolkit. Also covered is how to write winsock programs with PB, and Distributed PB is covered to the extent necessary to learn Web.PB.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('be6e5631-43c1-4e7a-9e58-df1899163301', 'a24bfe92-349e-4089-96e0-75989f930d28', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('c6a3af59-88f9-4ace-8c3c-835fd1f11ccc', 'a24bfe92-349e-4089-96e0-75989f930d28', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('b17810bd-fcb3-42ac-abf0-65f1960eb01c', 'a24bfe92-349e-4089-96e0-75989f930d28', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books (id, title, thumbnailUrl, isbn, quantity, availableCopies, pageCount, publisherId, description, isRetired, createdAt, updatedAt) VALUES ('2772b67c-5593-414f-9c3f-ff70668d3f18', "Practical Methods for Your Year 2000 Problem", "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/cervenka.jpg", "188477752X", 3, 2, 236, '607fd6b2-32a0-4572-bd38-b64ee0a61b3b', "Practical Methods for Your Year 2000 Problem gives the Year 2000 project team a step-by-step methodology for addressing the Year 2000 problem.", false, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('d78338a0-8339-458a-8ee1-912a5fcf70c3', '2772b67c-5593-414f-9c3f-ff70668d3f18', TRUE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('9377b3eb-95dd-4291-aa97-b17f5e4c279e', '2772b67c-5593-414f-9c3f-ff70668d3f18', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
-INSERT INTO books_copies (id, bookId, isBorrowed,  createdAt, updatedAt) VALUES ('493a81cb-f620-4a6f-a388-244c843f5a55', '2772b67c-5593-414f-9c3f-ff70668d3f18', FALSE, '2025-08-05 08:01:08', '2025-08-05 08:01:08');
+-- DELIMITER $$
+
+-- CREATE PROCEDURE insert_ten_copies_first22_v004()
+-- BEGIN
+--   DECLARE done INT DEFAULT 0;
+--   DECLARE book_id VARCHAR(36);
+--   DECLARE existing_count INT DEFAULT 0;
+--   DECLARE to_insert INT DEFAULT 0;
+--   DECLARE i INT DEFAULT 0;
+
+--   -- Cursor over the explicit first-22 V004 book ids (preserves list)
+--   DECLARE cur CURSOR FOR
+--     SELECT id FROM (
+--       SELECT '0418ba35-d180-4c9c-8cca-b9b41a46e65e' AS id UNION ALL
+--       SELECT '09d86af8-796d-4fb8-b93f-28f3b0a5745a' UNION ALL
+--       SELECT '0fe7225f-c962-4d6c-8d26-f3c6babcf865' UNION ALL
+--       SELECT '1394174b-5a6e-458a-88c8-4d6656484ff7' UNION ALL
+--       SELECT '1e97f78b-6cc3-4eee-86a3-e79280f64d47' UNION ALL
+--       SELECT '2013d438-5bd7-4bf5-9cc5-735a7495063c' UNION ALL
+--       SELECT '26c0c82d-0730-4b62-bc8f-36e99c5c68e4' UNION ALL
+--       SELECT '2772b67c-5593-414f-9c3f-ff70668d3f18' UNION ALL
+--       SELECT '2e55112a-4c74-4054-8a36-ad970b790092' UNION ALL
+--       SELECT '2f8b83c5-991d-4790-98a4-c9f817294c0b' UNION ALL
+--       SELECT '40671057-2871-4843-b1a3-eb4919d6fb05' UNION ALL
+--       SELECT '4c6887cd-e5c5-4470-8313-9fb48a3ce662' UNION ALL
+--       SELECT '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53' UNION ALL
+--       SELECT '4fce7bc0-36b5-4474-a37a-79e2e9e10acf' UNION ALL
+--       SELECT '52a8e46f-1965-4caa-b4e2-b6db5e9a7174' UNION ALL
+--       SELECT '5a3531d5-8e08-4066-a92d-e8d80b3d5546' UNION ALL
+--       SELECT '5b857ba9-3b52-46d4-a4bb-b2640a39db2b' UNION ALL
+--       SELECT '61d2f03f-55a6-4768-9ca0-fd717629eaff' UNION ALL
+--       SELECT '679d7f9b-86c8-4675-9cef-e745d6ce3bd7' UNION ALL
+--       SELECT '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1' UNION ALL
+--       SELECT '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9' UNION ALL
+--       SELECT '796c3bde-2a06-4290-aa9f-33d478bc61c8'
+--     ) AS ids;
+
+--   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+--   OPEN cur;
+
+--   read_loop: LOOP
+--     FETCH cur INTO book_id;
+--     IF done THEN
+--       LEAVE read_loop;
+--     END IF;
+
+--     -- ensure the book exists (skip if not present)
+--     SELECT COUNT(*) INTO existing_count FROM books WHERE id = book_id;
+--     IF existing_count = 0 THEN
+--       ITERATE read_loop;
+--     END IF;
+
+--     -- count existing copies and calculate how many to insert to reach 10 total
+--     SELECT COUNT(*) INTO existing_count FROM books_copies WHERE bookId = book_id;
+--     SET to_insert = 10 - existing_count;
+
+--     IF to_insert > 0 THEN
+--       SET i = 1;
+--       WHILE i <= to_insert DO
+--         INSERT INTO books_copies (id, bookId, isBorrowed)
+--         VALUES (UUID(), book_id, FALSE);
+--         SET i = i + 1;
+--       END WHILE;
+--     END IF;
+--   END LOOP;
+
+--   CLOSE cur;
+-- END$$
+
+-- DELIMITER ;
+
+-- CALL insert_ten_copies_first22_v004();
+
+-- DELIMITER $$
+
+-- CREATE PROCEDURE insert_three_copies_remaining22_v004()
+-- BEGIN
+--   DECLARE done INT DEFAULT 0;
+--   DECLARE book_id VARCHAR(36);
+--   DECLARE existing_count INT DEFAULT 0;
+--   DECLARE to_insert INT DEFAULT 0;
+--   DECLARE i INT DEFAULT 0;
+
+--   -- Cursor: select up to 22 books that are NOT in the "first 22" list from V004
+--   DECLARE cur CURSOR FOR
+--     SELECT id FROM books
+--     WHERE id NOT IN (
+--       '0418ba35-d180-4c9c-8cca-b9b41a46e65e',
+--       '09d86af8-796d-4fb8-b93f-28f3b0a5745a',
+--       '0fe7225f-c962-4d6c-8d26-f3c6babcf865',
+--       '1394174b-5a6e-458a-88c8-4d6656484ff7',
+--       '1e97f78b-6cc3-4eee-86a3-e79280f64d47',
+--       '2013d438-5bd7-4bf5-9cc5-735a7495063c',
+--       '26c0c82d-0730-4b62-bc8f-36e99c5c68e4',
+--       '2772b67c-5593-414f-9c3f-ff70668d3f18',
+--       '2e55112a-4c74-4054-8a36-ad970b790092',
+--       '2f8b83c5-991d-4790-98a4-c9f817294c0b',
+--       '40671057-2871-4843-b1a3-eb4919d6fb05',
+--       '4c6887cd-e5c5-4470-8313-9fb48a3ce662',
+--       '4c8cf7dd-91b1-4304-a06f-7f6e1d3eda53',
+--       '4fce7bc0-36b5-4474-a37a-79e2e9e10acf',
+--       '52a8e46f-1965-4caa-b4e2-b6db5e9a7174',
+--       '5a3531d5-8e08-4066-a92d-e8d80b3d5546',
+--       '5b857ba9-3b52-46d4-a4bb-b2640a39db2b',
+--       '61d2f03f-55a6-4768-9ca0-fd717629eaff',
+--       '679d7f9b-86c8-4675-9cef-e745d6ce3bd7',
+--       '690a70d4-a89b-4ec3-9e8a-e3fbdffd14d1',
+--       '6d42b5ec-ec57-4c3b-a51f-9f67735d26a9',
+--       '796c3bde-2a06-4290-aa9f-33d478bc61c8'
+--     )
+--     LIMIT 22;
+
+--   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+--   OPEN cur;
+
+--   read_loop: LOOP
+--     FETCH cur INTO book_id;
+--     IF done THEN
+--       LEAVE read_loop;
+--     END IF;
+
+--     -- ensure the book exists (extra safety)
+--     SELECT COUNT(*) INTO existing_count FROM books WHERE id = book_id;
+--     IF existing_count = 0 THEN
+--       ITERATE read_loop;
+--     END IF;
+
+--     -- how many copies already exist for this book
+--     SELECT COUNT(*) INTO existing_count FROM books_copies WHERE bookId = book_id;
+--     SET to_insert = 3 - existing_count;
+
+--     -- insert the delta (so total becomes at least 3; won't exceed 3)
+--     IF to_insert > 0 THEN
+--       SET i = 1;
+--       WHILE i <= to_insert DO
+--         INSERT INTO books_copies (id, bookId, isBorrowed)
+--         VALUES (UUID(), book_id, FALSE);
+--         SET i = i + 1;
+--       END WHILE;
+--     END IF;
+--   END LOOP;
+
+--   CLOSE cur;
+-- END$$
+
+-- DELIMITER ;
+
+-- CALL insert_three_copies_remaining22_v004();

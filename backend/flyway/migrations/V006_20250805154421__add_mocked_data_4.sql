@@ -1,33 +1,89 @@
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "026766aa-71e0-11f0-b7ee-4b6c3be6ce57", "quihuynh", "password123",
-        "Qui", "Huynh", "quihuynh.ftech@gmail.com", "staff"
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "02676c04-71e0-11f0-b7ee-4b6c3be6ce57", "minhhoang", "password123",
-        "Minh", "Hoang", "minhhoang.ftech@gmail.com", "staff"
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "02677014-71e0-11f0-b7ee-4b6c3be6ce57", "tannguyen", "password123",
-        "Tan", "Nguyen", "tannguyen.ftech@gmail.com", "staff"
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "026773f2-71e0-11f0-b7ee-4b6c3be6ce57", "baoho", "password123",
-        "Bao", "Ho", "baoho.ftech@gmail.com", "staff"
-    );
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "02677794-71e0-11f0-b7ee-4b6c3be6ce57", "hungdo", "password123",
-        "Hung", "Do", "hungdo.ftech@gmail.com", "staff"
-    );
-
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "21174981-494a-45e7-a784-f8aa3f29712d", "staff", "$2b$12$0HSYfxhW3Nicl1amVehckewvzxeGebNoMrePDTDrQQ3OiDE/8GEZO",
-        "Library", "Staff", "staff@example.com", "staff"
-    );
-
-
-INSERT INTO users (id, userName, password, firstName, lastName, email, role) VALUES (
-        "a331b5fe-9707-4ac5-ae58-88cc47abe34e", "user", "$2b$12$4GzRRJxRLVDGU25Tt1A4kOLT5yLXIbIUz0mxm5E0rWmaFxAkN6p3e",
-        "Library", "User", "user@example.com", "user"
-    );
-
-
+INSERT INTO users (id, userName, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES
+('026766aa-71e0-11f0-b7ee-4b6c3be6ce57', 'quihuynh', 'password123', 'Qui', 'Huynh', 'quihuynh.ftech@gmail.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('02676c04-71e0-11f0-b7ee-4b6c3be6ce57', 'minhhoang', 'password123', 'Minh', 'Hoang', 'minhhoang.ftech@gmail.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('02677014-71e0-11f0-b7ee-4b6c3be6ce57', 'tannguyen', 'password123', 'Tan', 'Nguyen', 'tannguyen.ftech@gmail.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('026773f2-71e0-11f0-b7ee-4b6c3be6ce57', 'baoho', 'password123', 'Bao', 'Ho', 'baoho.ftech@gmail.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('02677794-71e0-11f0-b7ee-4b6c3be6ce57', 'hungdo', 'password123', 'Hung', 'Do', 'hungdo.ftech@gmail.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('21174981-494a-45e7-a784-f8aa3f29712d', 'staff', '$2b$12$0HSYfxhW3Nicl1amVehckewvzxeGebNoMrePDTDrQQ3OiDE/8GEZO', 'Library', 'Staff', 'staff@example.com', 'staff', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('6b8fe1ec-095b-43e5-8bd6-6760694caccc', 'ckent', 'password123', 'Clark', 'Kent', 'ckent@example.com', 'user', '2025-08-05 08:03:11', '2025-08-05 08:03:11'),
+('70875304-d60a-467f-8cf8-eb446aad7f5f', 'jdoe', 'password123', 'John', 'Doe', 'jdoe@example.com', 'user', '2025-08-05 08:03:11', '2025-08-05 08:03:11'),
+('9cbf94dd-10df-47c8-abc4-c124791dae74', 'bwayne', 'password123', 'Bruce', 'Wayne', 'bwayne@example.com', 'user', '2025-08-05 08:03:11', '2025-08-05 08:03:11'),
+('a331b5fe-9707-4ac5-ae58-88cc47abe34e', 'user', '$2b$12$4GzRRJxRLVDGU25Tt1A4kOLT5yLXIbIUz0mxm5E0rWmaFxAkN6p3e', 'Library', 'User', 'user@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc561d-8903-11f0-a2c7-7604c7108b13', 'user_1', 'password123', 'Elizabeth', 'Garcia', 'user_1@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5781-8903-11f0-a2c7-7604c7108b13', 'user_2', 'password123', 'James', 'Martinez', 'user_2@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5835-8903-11f0-a2c7-7604c7108b13', 'user_3', 'password123', 'Barbara', 'Garcia', 'user_3@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc58d7-8903-11f0-a2c7-7604c7108b13', 'user_4', 'password123', 'Robert', 'Garcia', 'user_4@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc596f-8903-11f0-a2c7-7604c7108b13', 'user_5', 'password123', 'Patricia', 'Smith', 'user_5@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5a01-8903-11f0-a2c7-7604c7108b13', 'user_6', 'password123', 'Jennifer', 'Lopez', 'user_6@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5a8f-8903-11f0-a2c7-7604c7108b13', 'user_7', 'password123', 'Robert', 'Williams', 'user_7@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5b19-8903-11f0-a2c7-7604c7108b13', 'user_8', 'password123', 'Elizabeth', 'Garcia', 'user_8@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5b9c-8903-11f0-a2c7-7604c7108b13', 'user_9', 'password123', 'David', 'Johnson', 'user_9@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5c1b-8903-11f0-a2c7-7604c7108b13', 'user_10', 'password123', 'William', 'Garcia', 'user_10@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5ca6-8903-11f0-a2c7-7604c7108b13', 'user_11', 'password123', 'James', 'Rodriguez', 'user_11@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5d2d-8903-11f0-a2c7-7604c7108b13', 'user_12', 'password123', 'Linda', 'Smith', 'user_12@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5e0e-8903-11f0-a2c7-7604c7108b13', 'user_13', 'password123', 'Robert', 'Martinez', 'user_13@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5ea3-8903-11f0-a2c7-7604c7108b13', 'user_14', 'password123', 'David', 'Lopez', 'user_14@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5f2f-8903-11f0-a2c7-7604c7108b13', 'user_15', 'password123', 'Patricia', 'Miller', 'user_15@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc5fb6-8903-11f0-a2c7-7604c7108b13', 'user_16', 'password123', 'Elizabeth', 'Jones', 'user_16@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6033-8903-11f0-a2c7-7604c7108b13', 'user_17', 'password123', 'Linda', 'Hernandez', 'user_17@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc60b2-8903-11f0-a2c7-7604c7108b13', 'user_18', 'password123', 'Michael', 'Johnson', 'user_18@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc612f-8903-11f0-a2c7-7604c7108b13', 'user_19', 'password123', 'Mary', 'Lopez', 'user_19@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc61ae-8903-11f0-a2c7-7604c7108b13', 'user_20', 'password123', 'William', 'Miller', 'user_20@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc623e-8903-11f0-a2c7-7604c7108b13', 'user_21', 'password123', 'Michael', 'Williams', 'user_21@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc62c3-8903-11f0-a2c7-7604c7108b13', 'user_22', 'password123', 'John', 'Garcia', 'user_22@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc634a-8903-11f0-a2c7-7604c7108b13', 'user_23', 'password123', 'David', 'Martinez', 'user_23@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc63ca-8903-11f0-a2c7-7604c7108b13', 'user_24', 'password123', 'Jennifer', 'Smith', 'user_24@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc644f-8903-11f0-a2c7-7604c7108b13', 'user_25', 'password123', 'Linda', 'Smith', 'user_25@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc64cb-8903-11f0-a2c7-7604c7108b13', 'user_26', 'password123', 'Robert', 'Martinez', 'user_26@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6545-8903-11f0-a2c7-7604c7108b13', 'user_27', 'password123', 'William', 'Johnson', 'user_27@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc65c6-8903-11f0-a2c7-7604c7108b13', 'user_28', 'password123', 'William', 'Johnson', 'user_28@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6645-8903-11f0-a2c7-7604c7108b13', 'user_29', 'password123', 'Michael', 'Garcia', 'user_29@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc66c2-8903-11f0-a2c7-7604c7108b13', 'user_30', 'password123', 'Jennifer', 'Martinez', 'user_30@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6743-8903-11f0-a2c7-7604c7108b13', 'user_31', 'password123', 'Elizabeth', 'Garcia', 'user_31@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc67c7-8903-11f0-a2c7-7604c7108b13', 'user_32', 'password123', 'Barbara', 'Brown', 'user_32@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6882-8903-11f0-a2c7-7604c7108b13', 'user_33', 'password123', 'Michael', 'Lopez', 'user_33@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6904-8903-11f0-a2c7-7604c7108b13', 'user_34', 'password123', 'John', 'Brown', 'user_34@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6990-8903-11f0-a2c7-7604c7108b13', 'user_35', 'password123', 'William', 'Martinez', 'user_35@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6a14-8903-11f0-a2c7-7604c7108b13', 'user_36', 'password123', 'David', 'Martinez', 'user_36@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6ab0-8903-11f0-a2c7-7604c7108b13', 'user_37', 'password123', 'Robert', 'Garcia', 'user_37@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6b2c-8903-11f0-a2c7-7604c7108b13', 'user_38', 'password123', 'Robert', 'Garcia', 'user_38@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6ba7-8903-11f0-a2c7-7604c7108b13', 'user_39', 'password123', 'Mary', 'Jones', 'user_39@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6c26-8903-11f0-a2c7-7604c7108b13', 'user_40', 'password123', 'Jennifer', 'Smith', 'user_40@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6cb2-8903-11f0-a2c7-7604c7108b13', 'user_41', 'password123', 'Elizabeth', 'Hernandez', 'user_41@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6d3d-8903-11f0-a2c7-7604c7108b13', 'user_42', 'password123', 'David', 'Martinez', 'user_42@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6dc3-8903-11f0-a2c7-7604c7108b13', 'user_43', 'password123', 'Robert', 'Garcia', 'user_43@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6e4b-8903-11f0-a2c7-7604c7108b13', 'user_44', 'password123', 'Patricia', 'Lopez', 'user_44@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6ed6-8903-11f0-a2c7-7604c7108b13', 'user_45', 'password123', 'David', 'Garcia', 'user_45@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6f53-8903-11f0-a2c7-7604c7108b13', 'user_46', 'password123', 'William', 'Brown', 'user_46@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc6fd0-8903-11f0-a2c7-7604c7108b13', 'user_47', 'password123', 'Patricia', 'Rodriguez', 'user_47@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc704c-8903-11f0-a2c7-7604c7108b13', 'user_48', 'password123', 'William', 'Williams', 'user_48@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc70cb-8903-11f0-a2c7-7604c7108b13', 'user_49', 'password123', 'David', 'Hernandez', 'user_49@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7148-8903-11f0-a2c7-7604c7108b13', 'user_50', 'password123', 'William', 'Smith', 'user_50@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc71cd-8903-11f0-a2c7-7604c7108b13', 'user_51', 'password123', 'Mary', 'Jones', 'user_51@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc724d-8903-11f0-a2c7-7604c7108b13', 'user_52', 'password123', 'Jennifer', 'Brown', 'user_52@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc72d3-8903-11f0-a2c7-7604c7108b13', 'user_53', 'password123', 'Barbara', 'Smith', 'user_53@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7356-8903-11f0-a2c7-7604c7108b13', 'user_54', 'password123', 'Robert', 'Rodriguez', 'user_54@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc73d6-8903-11f0-a2c7-7604c7108b13', 'user_55', 'password123', 'Michael', 'Brown', 'user_55@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7452-8903-11f0-a2c7-7604c7108b13', 'user_56', 'password123', 'James', 'Jones', 'user_56@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc74d1-8903-11f0-a2c7-7604c7108b13', 'user_57', 'password123', 'David', 'Smith', 'user_57@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7553-8903-11f0-a2c7-7604c7108b13', 'user_58', 'password123', 'Linda', 'Lopez', 'user_58@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc75d0-8903-11f0-a2c7-7604c7108b13', 'user_59', 'password123', 'James', 'Johnson', 'user_59@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc764e-8903-11f0-a2c7-7604c7108b13', 'user_60', 'password123', 'William', 'Johnson', 'user_60@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc76d5-8903-11f0-a2c7-7604c7108b13', 'user_61', 'password123', 'Michael', 'Brown', 'user_61@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7759-8903-11f0-a2c7-7604c7108b13', 'user_62', 'password123', 'Elizabeth', 'Lopez', 'user_62@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc77db-8903-11f0-a2c7-7604c7108b13', 'user_63', 'password123', 'Jennifer', 'Garcia', 'user_63@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc785e-8903-11f0-a2c7-7604c7108b13', 'user_64', 'password123', 'Barbara', 'Jones', 'user_64@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc78e2-8903-11f0-a2c7-7604c7108b13', 'user_65', 'password123', 'Mary', 'Jones', 'user_65@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7960-8903-11f0-a2c7-7604c7108b13', 'user_66', 'password123', 'Linda', 'Martinez', 'user_66@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc79dd-8903-11f0-a2c7-7604c7108b13', 'user_67', 'password123', 'Mary', 'Williams', 'user_67@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7a59-8903-11f0-a2c7-7604c7108b13', 'user_68', 'password123', 'Elizabeth', 'Williams', 'user_68@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7ad7-8903-11f0-a2c7-7604c7108b13', 'user_69', 'password123', 'Linda', 'Davis', 'user_69@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7b57-8903-11f0-a2c7-7604c7108b13', 'user_70', 'password123', 'John', 'Brown', 'user_70@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7bdc-8903-11f0-a2c7-7604c7108b13', 'user_71', 'password123', 'Elizabeth', 'Williams', 'user_71@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7c61-8903-11f0-a2c7-7604c7108b13', 'user_72', 'password123', 'Robert', 'Jones', 'user_72@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7ceb-8903-11f0-a2c7-7604c7108b13', 'user_73', 'password123', 'David', 'Brown', 'user_73@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7d73-8903-11f0-a2c7-7604c7108b13', 'user_74', 'password123', 'William', 'Miller', 'user_74@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7df9-8903-11f0-a2c7-7604c7108b13', 'user_75', 'password123', 'Linda', 'Davis', 'user_75@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('a3dc7e76-8903-11f0-a2c7-7604c7108b13', 'user_76', 'password123', 'Patricia', 'Jones', 'user_76@example.com', 'user', '2025-09-03 20:21:57', '2025-09-03 20:21:57'),
+('e5ed73c9-9e35-4a27-8d8b-cdd00019657b', 'dprince', 'password123', 'Diana', 'Prince', 'dprince@example.com', 'user', '2025-08-05 08:03:11', '2025-08-05 08:03:11'),
+('f7d180d9-dbbe-4bf4-8450-c9141f320826', 'asmith', 'password123', 'Alice', 'Smith', 'asmith@example.com', 'user', '2025-08-05 08:03:11', '2025-08-05 08:03:11');
