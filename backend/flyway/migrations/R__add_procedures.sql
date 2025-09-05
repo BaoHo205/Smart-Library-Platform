@@ -207,8 +207,8 @@ BEGIN
         p_title,
         p_thumbnailUrl,
         p_isbn,
-        p_quantity,
-        p_availableCopies,
+        0,
+        0,
         p_pageCount,
         p_publisherId,
         p_description,
@@ -396,7 +396,7 @@ BEGIN
         -- Also retire all book copies associated with this book
         UPDATE books_copies
         SET
-            isBorrowed = 0, -- Set to 0 to indicate the copies are no longer borrowed
+            isBorrowed = 1, -- Set to 0 to indicate the copies are no longer borrowed
             updatedAt = CURRENT_TIMESTAMP
         WHERE bookId = p_bookId;
 
