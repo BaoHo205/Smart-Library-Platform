@@ -387,10 +387,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 💬 [GitHub Issues](https://github.com/BaoHo205/Smart-Library-Platform/issues)
 - 📧 Email: support@smartlibrary.com
 
-### Project Status
+### Project Video Demo
+https://jackydo2005.github.io/video_player_test/
 
+### Project Status
 This project is actively maintained. For feature requests and bug reports, please use the GitHub Issues page.
 
 ---
+
 
 **Made with ❤️ by FTECH**
