@@ -110,9 +110,9 @@ export function DataTable<TData extends { id: string }, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -132,7 +132,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                       key={cell.id}
                       data-column-id={cell.column.id}
                       className={`flex items-center justify-center whitespace-normal ${getColumnSpanClass(cell.column.id)}`}
-                    // onClick={e => e.stopPropagation()}
+                      // onClick={e => e.stopPropagation()}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

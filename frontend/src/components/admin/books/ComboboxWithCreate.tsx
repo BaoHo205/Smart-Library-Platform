@@ -153,9 +153,10 @@ export const ComboboxWithCreate = ({
                       key={item.id}
                       value={item.label}
                       onSelect={() => {
-                        handleSelect(item.id)
-                        console.log('Selected item:', item)
-                      }}>
+                        handleSelect(item.id);
+                        console.log('Selected item:', item);
+                      }}
+                    >
                       <Check
                         className={cn(
                           'mr-2 h-4 w-4',

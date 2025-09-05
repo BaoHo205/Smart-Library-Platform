@@ -381,8 +381,8 @@ const getBookInfoById = async (bookId: string): Promise<BookDetails | null> => {
       ...book,
       authors: book.authors
         ? book.authors
-          .split(', ')
-          .filter((author: string) => author.trim() !== '')
+            .split(', ')
+            .filter((author: string) => author.trim() !== '')
         : [],
       genres: book.genres
         ? book.genres.split(', ').filter((genre: string) => genre.trim() !== '')

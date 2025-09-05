@@ -150,7 +150,9 @@ export const EditBookDialog = ({ book }: EditBookDialogProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await axiosInstance.get(`/api/v1/books/${book.id}/copies`);
+        const result = await axiosInstance.get(
+          `/api/v1/books/${book.id}/copies`
+        );
         setBookCopies(result.data.result);
       } catch (error) {
         console.error('Error fetching data:', error);

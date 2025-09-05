@@ -104,8 +104,7 @@ export function LowAvailability({
                       {book.availableCopies} of {book.quantity} available
                     </p>
                     <p className="text-xs text-gray-500">
-                      Status:{' '}
-                      {book.availability_status}
+                      Status: {book.availability_status}
                     </p>
                   </div>
                 </div>

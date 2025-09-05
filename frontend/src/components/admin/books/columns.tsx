@@ -98,7 +98,7 @@ export const columns: ColumnDef<BookShow>[] = [
         <div onClick={e => e.stopPropagation()}>
           <EditBookDialog book={book} />
         </div>
-      )
+      );
     },
   },
 ];

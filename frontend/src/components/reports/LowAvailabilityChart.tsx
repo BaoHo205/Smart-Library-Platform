@@ -74,7 +74,7 @@ export function LowAvailabilityChart({
     'Low Availability': allBooksForCategories.filter(
       book => book.availability_status === 'Low Availability'
     ),
-    'Moderate': allBooksForCategories.filter(
+    Moderate: allBooksForCategories.filter(
       book => book.availability_status === 'Moderate'
     ),
     'High Availability': allBooksForCategories.filter(
@@ -97,7 +97,7 @@ export function LowAvailabilityChart({
       textColor: 'text-orange-700',
       borderColor: 'border-orange-200',
     },
-    'Moderate': {
+    Moderate: {
       icon: MinusIcon,
       color: 'bg-yellow-500',
       bgColor: 'bg-yellow-50',
@@ -162,8 +162,7 @@ export function LowAvailabilityChart({
                           {book.availableCopies} of {book.quantity} available
                         </p>
                         <p className="text-xs text-gray-500">
-                          Status:{' '}
-                          {book.availability_status}
+                          Status: {book.availability_status}
                         </p>
                       </div>
                     </div>
