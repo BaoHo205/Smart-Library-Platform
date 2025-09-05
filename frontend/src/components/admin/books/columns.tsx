@@ -94,7 +94,11 @@ export const columns: ColumnDef<BookShow>[] = [
     header: 'Action',
     cell: ({ row }) => {
       const book = row.original;
-      return <EditBookDialog book={book} />;
+      return (
+        <div onClick={e => e.stopPropagation()}>
+          <EditBookDialog book={book} />
+        </div>
+      )
     },
   },
 ];
