@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import UserService from '../services/UserService';
 import JwtService from '../services/JwtServices';
 import { AuthRequest } from '@/middleware/authMiddleware';
+import { IReviewData } from '@/types';
+import { AppError } from '@/types/errors';
 
 const getProfile = async (req: Request, res: Response) => {
   // #swagger.tags = ['Users']
@@ -55,95 +57,6 @@ const getProfile = async (req: Request, res: Response) => {
   }
 };
 
-const addReview = async (req: AuthRequest, res: Response) => {
-  // #swagger.tags = ['Users']
-  // #swagger.summary = 'Add book review'
-  // #swagger.description = 'Add a review for a book. Requires user or staff authentication.'
-  try {
-    // Combine the request body with the userId from the authenticated request
-    const reviewData = {
-      ...req.body,
-      userId: req.userId,
-    };
-
-    console.log('Received review data:', reviewData);
-    if (!reviewData || Object.keys(reviewData).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Review data is required',
-      });
-    }
-    console.log('Adding review with userId:', req.userId);
-
-    const result = await UserService.addReview(reviewData);
-    if (result) {
-      res.status(201).json({
-        success: true,
-        message: result.message,
-        data: result.res,
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Failed to add review',
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-    });
-  }
-};
-
-const updateReview = async (req: AuthRequest, res: Response) => {
-  // #swagger.tags = ['Users']
-  // #swagger.summary = 'Update book review'
-  // #swagger.description = 'Update an existing book review by review ID. Requires user or staff authentication.'
-  // #swagger.parameters['reviewId'] = { description: 'Review ID to update', type: 'string' }
-  try {
-    const reviewId = req.params.reviewId;
-    if (!reviewId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Review ID is required',
-      });
-    }
-
-    const updateData = {
-      ...req.body,
-      userId: req.userId,
-    };
-    if (!updateData || Object.keys(updateData).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Update data is required',
-      });
-    }
-
-    const result = await UserService.updateReview(reviewId, updateData);
-    if (result) {
-      // console.log('Review updated successfully:', result.res);
-      res.status(201).json({
-        success: true,
-        message: result.message,
-        data: result.res,
-      });
-    } else {
-      // console.error('Failed to update review:', result);
-      res.status(400).json({
-        success: false,
-        message: 'Failed to add review',
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-    });
-  }
-};
-
 const getAllUsers = async (req: Request, res: Response) => {
   // #swagger.tags = ['Users']
   // #swagger.summary = 'Get all users for search'
@@ -193,9 +106,57 @@ const searchUsers = async (req: Request, res: Response) => {
   }
 };
 
+const reviewBook = async (req: AuthRequest, res: Response) => {
+  // #swagger.tags = ['Reviews']
+  // #swagger.summary = 'Review book'
+  // #swagger.description = 'Add or Update a review for a book. User must have borrowed and returned the book first.'
+
+  const { bookId, rating, comment } = req.body;
+  const userId = req.userId;
+
+  try {
+    const review: IReviewData = {
+      bookId: bookId,
+      userId: userId!,
+      rating: rating,
+      comment: comment.toString(),
+    };
+
+    console.log('Review Data:', review);
+    const result = await UserService.reviewBook(review);
+
+    return res.status(200).json({
+      success: result.success === 1,
+      message: result.message,
+      data: result.reviewId,
+    });
+  } catch (error) {
+    console.error('Error updating review:', error);
+
+    // Handle custom application errors
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+    }
+
+    // Handle unexpected errors
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred',
+      },
+    });
+  }
+};
+
 export default {
-  addReview,
-  updateReview,
+  reviewBook,
   getProfile,
   getAllUsers,
   searchUsers,

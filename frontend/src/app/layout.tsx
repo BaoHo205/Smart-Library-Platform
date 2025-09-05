@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 import AuthProvider from '@/components/auth/AuthProvider';
-import { Toaster } from 'react-hot-toast';
 import {
   SidebarInset,
   SidebarProvider,

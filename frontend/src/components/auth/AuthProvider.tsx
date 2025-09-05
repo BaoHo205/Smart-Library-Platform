@@ -85,10 +85,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    if (!hasCheckedAuth.current && pathname !== '/login') {
-      checkAuth();
-    }
-  }, []);
+    checkAuth();
+  }, [pathname]);
 
   const contextValue = {
     user,

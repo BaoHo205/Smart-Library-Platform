@@ -1,31 +1,41 @@
-import BookCard, { BookCardProps } from './BookCard';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationLink,
-  PaginationEllipsis,
-} from '../ui/pagination';
+'use client';
+
+import BookCard from './BookCard';
+import { Book } from '@/types/book.type';
+import CustomizedPagination from './CustomizedPagination';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface BookCardListProps {
-  books: BookCardProps[];
+  books: Book[];
   pages?: number;
-  currentPage?: number;
-  onNextPage?: () => void;
-  onPrevPage?: () => void;
-  onPageChange?: (page: number) => void; // Add this for direct page navigation
+  updateParams?: (updates: Record<string, string | number | null>) => void;
 }
 
 const BookCardList: React.FC<BookCardListProps> = ({
   books,
   pages = 1,
-  currentPage = 1,
-  onNextPage,
-  onPrevPage,
-  onPageChange,
+  updateParams,
 }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const internalUpdateParams = (
+    updates: Record<string, string | number | null>
+  ) => {
+    if (updateParams) return updateParams(updates);
+    // fallback: update URL using router
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    Object.entries(updates).forEach(([k, v]) => {
+      if (v === null || v === '') params.delete(k);
+      else params.set(k, String(v));
+    });
+    const q = params.toString();
+    const url = q ? `?${q}` : '/';
+    router.push(url);
+  };
+
+  console.log(books);
+
   // Safety check for books array
   if (!books || !Array.isArray(books)) {
     return (
@@ -36,66 +46,8 @@ const BookCardList: React.FC<BookCardListProps> = ({
   }
 
   // Handle pagination logic
-  const totalPages = Math.ceil(pages);
+  const totalPages = Math.floor(pages);
   const showPagination = totalPages > 1;
-
-  // Generate page numbers to display
-  const getPageNumbers = (): (number | string)[] => {
-    const pageNumbers: (number | string)[] = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      // Show smart pagination with ellipsis
-      if (currentPage <= 3) {
-        // Show first 3 pages + ellipsis + last page
-        pageNumbers.push(1, 2, 3, '...', totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        // Show first page + ellipsis + last 3 pages
-        pageNumbers.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        // Show first + ellipsis + current-1, current, current+1 + ellipsis + last
-        pageNumbers.push(
-          1,
-          '...',
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          '...',
-          totalPages
-        );
-      }
-    }
-
-    return pageNumbers;
-  };
-
-  const handlePageClick = (page: number): void => {
-    if (
-      onPageChange &&
-      page !== currentPage &&
-      page >= 1 &&
-      page <= totalPages
-    ) {
-      onPageChange(page);
-    }
-  };
-
-  const handlePrevious = (): void => {
-    if (onPrevPage && currentPage > 1) {
-      onPrevPage();
-    }
-  };
-
-  const handleNext = (): void => {
-    if (onNextPage && currentPage < totalPages) {
-      onNextPage();
-    }
-  };
 
   return (
     <>
@@ -110,62 +62,10 @@ const BookCardList: React.FC<BookCardListProps> = ({
       </div>
 
       {showPagination && (
-        <Pagination>
-          <PaginationContent>
-            {/* Previous Button */}
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={e => {
-                  e.preventDefault();
-                  handlePrevious();
-                }}
-                className={
-                  currentPage <= 1
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-
-            {/* Page Numbers */}
-            {getPageNumbers().map((pageNum, index) => (
-              <PaginationItem key={index}>
-                {pageNum === '...' ? (
-                  <PaginationEllipsis />
-                ) : (
-                  <PaginationLink
-                    href="#"
-                    onClick={e => {
-                      e.preventDefault();
-                      handlePageClick(pageNum as number);
-                    }}
-                    isActive={pageNum === currentPage}
-                    className="cursor-pointer"
-                  >
-                    {pageNum}
-                  </PaginationLink>
-                )}
-              </PaginationItem>
-            ))}
-
-            {/* Next Button */}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={e => {
-                  e.preventDefault();
-                  handleNext();
-                }}
-                className={
-                  currentPage >= totalPages
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <CustomizedPagination
+          pages={pages}
+          updateParams={internalUpdateParams}
+        />
       )}
     </>
   );

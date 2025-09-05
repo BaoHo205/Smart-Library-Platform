@@ -55,10 +55,20 @@ CREATE TABLE books (
     isbn VARCHAR(20) NOT NULL,
     quantity INT NOT NULL DEFAULT 0,
     availableCopies INT NOT NULL DEFAULT 0,
+    isRetired BOOLEAN NOT NULL DEFAULT FALSE,
     pageCount INT NOT NULL,
     publisherId VARCHAR(36) NOT NULL,
     description TEXT,
-    status ENUM('available', 'unavailable') NOT NULL DEFAULT 'available',
+    avgRating DECIMAL(2, 1) NOT NULL DEFAULT 0,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create BooksCopies table
+CREATE TABLE books_copies (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    bookId VARCHAR(36) NOT NULL,
+    isBorrowed BOOLEAN NOT NULL DEFAULT FALSE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -85,7 +95,7 @@ CREATE TABLE book_genres (
 CREATE TABLE checkouts (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     userId VARCHAR(36) NOT NULL,
-    bookId VARCHAR(36) NOT NULL,
+    copyId VARCHAR(36) NOT NULL,
     checkoutDate DATE NOT NULL,
     dueDate DATE NOT NULL,
     returnDate DATE NULL,

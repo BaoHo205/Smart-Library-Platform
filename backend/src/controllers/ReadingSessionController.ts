@@ -258,9 +258,15 @@ export const getReadingTrends = async (req: Request, res: Response) => {
   // #swagger.parameters['endDate'] = { description: 'End date for custom range (optional)', type: 'string', in: 'query' }
   try {
     const userId = req.query.userId as string;
-    const months = req.query.months ? parseInt(req.query.months as string) : 6;
-    const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
-    const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+    const monthsParam = req.query.months as string;
+    const months =
+      monthsParam === 'all' ? 'all' : monthsParam ? parseInt(monthsParam) : 6;
+    const startDate = req.query.startDate
+      ? new Date(req.query.startDate as string)
+      : undefined;
+    const endDate = req.query.endDate
+      ? new Date(req.query.endDate as string)
+      : undefined;
 
     // Validate date parameters
     if (startDate && endDate) {
@@ -278,7 +284,12 @@ export const getReadingTrends = async (req: Request, res: Response) => {
       }
     }
 
-    const result = await readingSessionService.getReadingTrends(userId, months, startDate, endDate);
+    const result = await readingSessionService.getReadingTrends(
+      userId,
+      months,
+      startDate,
+      endDate
+    );
 
     res.json({
       success: true,
@@ -317,14 +328,18 @@ export const getDeviceAnalytics = async (req: Request, res: Response) => {
 };
 
 // GET /api/reading/most-highlighted-with-details - Get most highlighted books with complete book data
-export const getMostHighlightedBooksWithDetails = async (req: Request, res: Response) => {
+export const getMostHighlightedBooksWithDetails = async (
+  req: Request,
+  res: Response
+) => {
   // #swagger.tags = ['Reading Sessions']
   // #swagger.summary = 'Get most highlighted books with complete details'
   // #swagger.description = 'Retrieve books with the highest number of highlights including book titles, authors, and cover images'
   // #swagger.parameters['limit'] = { description: 'Number of books to return (default: 5)', type: 'integer', in: 'query' }
   try {
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
-    const result = await readingSessionService.getMostHighlightedBooksWithDetails(limit);
+    const result =
+      await readingSessionService.getMostHighlightedBooksWithDetails(limit);
 
     res.json({
       success: true,
@@ -341,14 +356,18 @@ export const getMostHighlightedBooksWithDetails = async (req: Request, res: Resp
 };
 
 // GET /api/reading/top-books-time-with-details - Get top books by reading time with complete book data
-export const getTopBooksByReadTimeWithDetails = async (req: Request, res: Response) => {
+export const getTopBooksByReadTimeWithDetails = async (
+  req: Request,
+  res: Response
+) => {
   // #swagger.tags = ['Reading Sessions']
   // #swagger.summary = 'Get top books by reading time with complete details'
   // #swagger.description = 'Retrieve books ranked by total reading time including book titles, authors, and cover images'
   // #swagger.parameters['limit'] = { description: 'Number of books to return (default: 10)', type: 'integer', in: 'query' }
   try {
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-    const result = await readingSessionService.getTopBooksByReadTimeWithDetails(limit);
+    const result =
+      await readingSessionService.getTopBooksByReadTimeWithDetails(limit);
 
     res.json({
       success: true,
@@ -356,7 +375,10 @@ export const getTopBooksByReadTimeWithDetails = async (req: Request, res: Respon
       message: 'Top books by reading time with details retrieved successfully',
     });
   } catch (error) {
-    console.error('Error getting top books by reading time with details:', error);
+    console.error(
+      'Error getting top books by reading time with details:',
+      error
+    );
     res.status(500).json({
       success: false,
       message: 'Internal server error',

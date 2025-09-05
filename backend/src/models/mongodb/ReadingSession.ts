@@ -5,7 +5,7 @@ export interface ReadingSession {
   userId: string;
   bookId: string;
   startTime: Date;
-  endTime?: Date; // session might be ongoing
+  endTime?: Date;
   device: DeviceType;
   pagesRead: number[];
   highlights: Highlight[];

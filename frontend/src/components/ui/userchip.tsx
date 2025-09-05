@@ -1,21 +1,23 @@
 'use client';
 
 import { Avatar } from '@/components/ui/avatar';
+import { Card } from './card';
+import Image from 'next/image';
 
 interface User {
-    id: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: 'user' | 'staff';
-    name?: string;
-    avatarUrl?: string | null;
+  id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'user' | 'staff';
+  name?: string;
+  avatarUrl?: string | null;
 }
 
 interface UserChipProps {
-    user?: User | null;
-    loading?: boolean;
+  user?: User | null;
+  loading?: boolean;
 }
 
 export function UserChip({ user, loading }: UserChipProps) {
@@ -30,14 +32,14 @@ export function UserChip({ user, loading }: UserChipProps) {
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
+      <Card className="flex flex-row items-center gap-2 rounded-md p-2">
         <Avatar className="h-8 w-8">
           <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-500">
             ?
           </div>
         </Avatar>
-        <span className="text-sm font-medium text-gray-500">Guest</span>
-      </div>
+        <span className="text-sm font-medium text-gray-500">Hacker</span>
+      </Card>
     );
   }
 
@@ -49,13 +51,15 @@ export function UserChip({ user, loading }: UserChipProps) {
       : user.userName.slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex items-center gap-2">
+    <Card className="flex flex-row items-center gap-2 rounded-md p-2">
       <Avatar className="h-8 w-8">
         {user.avatarUrl ? (
-          <img
+          <Image
             src={user.avatarUrl}
             alt={displayName}
             className="h-full w-full rounded-full object-cover"
+            width={32}
+            height={32}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-xs font-medium text-white">
@@ -64,6 +68,6 @@ export function UserChip({ user, loading }: UserChipProps) {
         )}
       </Avatar>
       <span className="text-sm font-medium text-gray-900">{displayName}</span>
-    </div>
+    </Card>
   );
 }

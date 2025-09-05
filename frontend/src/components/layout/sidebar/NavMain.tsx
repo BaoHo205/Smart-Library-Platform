@@ -15,7 +15,14 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '@radix-ui/react-collapsible';
-import { BookOpen, ChevronDown, FileText, Search, User } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronDown,
+  FileText,
+  Search,
+  User,
+  List,
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface NavMainProps {
@@ -41,7 +48,7 @@ const userData = {
         },
         {
           title: 'Reading Analytics',
-          url: '/analytics',
+          url: '/reading-analytics',
         },
       ],
     },
@@ -67,7 +74,7 @@ const staffData = {
         },
         {
           title: 'Reading Analytics',
-          url: '/analytics',
+          url: '/reading-analytics',
         },
       ],
     },
@@ -79,7 +86,12 @@ const staffData = {
     {
       title: 'My Report',
       icon: FileText,
-      url: '/reports',
+      url: '/my-reports',
+    },
+    {
+      title: 'Activity Logs',
+      icon: List,
+      url: '/activity-logs',
     },
   ],
 };

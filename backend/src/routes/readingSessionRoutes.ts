@@ -15,7 +15,7 @@ import {
 
 const router = Router();
 
-// management (route nhe )
+// management
 router.post('/start', startReadingSession);
 router.post('/end/:sessionId', endReadingSession);
 
@@ -31,7 +31,10 @@ router.get('/trends', getReadingTrends);
 router.get('/devices', getDeviceAnalytics);
 
 // enhanced reporting with complete book details
-router.get('/most-highlighted-with-details', getMostHighlightedBooksWithDetails);
+router.get(
+  '/most-highlighted-with-details',
+  getMostHighlightedBooksWithDetails
+);
 router.get('/top-books-time-with-details', getTopBooksByReadTimeWithDetails);
 
 export default router;

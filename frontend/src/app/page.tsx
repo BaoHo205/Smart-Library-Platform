@@ -1,78 +1,80 @@
-'use client';
-import { BookCardProps } from '@/components/home/BookCard';
+import { Book } from '@/types/book.type';
 import BookCardList from '@/components/home/BookCardList';
 import Header from '@/components/home/Header';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import axiosInstance from '@/config/axiosConfig';
+import { headers } from 'next/headers';
 
-export default function Home() {
-  const [currentGenre, setCurrentGenre] = useState<string>('');
-  const [searchParam, setSearchParam] = useState<string>('title');
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [books, setBooks] = useState<BookCardProps[]>([]);
-  const [pages, setPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+const DEFAULT_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
-  const handleCurrentGenreChange = (genre: string): void => {
-    setCurrentGenre(genre);
-  };
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string, string>;
+}) {
+  const {
+    genre = '',
+    page = 1,
+    searchBy = 'title',
+    q = '',
+  } = await searchParams;
 
-  const handleSearchParamChange = (param: string): void => {
-    setSearchParam(param);
-  };
+  const params = new URLSearchParams();
+  if (genre) params.set('genre', genre);
+  if (page) params.set('page', String(page));
+  if (searchBy) params.set('searchBy', searchBy);
+  if (q) params.set('q', q);
 
-  const handleSearchInputChange = (input: string): void => {
-    setSearchInput(input);
-  };
+  const paramsString = params.toString();
 
-  const handleNextPage = (): void => {
-    if (currentPage < pages) {
-      setCurrentPage(prev => prev + 1);
+  const headersList = await headers();
+  const cookie = headersList.get('cookie') ?? '';
+
+  const pageSize = 12;
+  const bookResponse = await fetch(
+    `${DEFAULT_BASE}/api/v1/books?pageSize=${pageSize}&page=${page}&genre=${encodeURIComponent(genre)}&${encodeURIComponent(
+      searchBy
+    )}=${encodeURIComponent(q)}`,
+    {
+      headers: { cookie },
+      next: { tags: [`books:${paramsString}`] },
     }
-  };
+  );
 
-  const handlePrevPage = (): void => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  const handlePageChange = (page: number): void => {
-    setCurrentPage(page);
-  };
-
-  const fetchBooks = async (): Promise<void> => {
+  let bookData = null;
+  if (bookResponse.ok) {
     try {
-      const response = await axiosInstance.get(
-        `api/v1/books?pageSize=12&page=${currentPage}&genre=${currentGenre}&${searchParam}=${searchInput}`
-      );
-      setBooks(response.data.data.data || []);
-      setPages(Math.ceil(response.data.data.total / 9));
-      console.log('Books fetched:', response.data.data.data);
-      console.log('Current genre:', currentGenre);
-    } catch (error) {
-      console.error('Failed to fetch books:', error);
-      setBooks([]);
-      setPages(0);
+      bookData = await bookResponse.json();
+    } catch {
+      bookData = null;
     }
-  };
+  } else {
+    bookData = null;
+  }
 
-  useEffect(() => {
-    fetchBooks();
-  }, [currentGenre, searchParam, searchInput, currentPage]);
+  const books: Book[] = bookData?.result?.data || [];
+  const total = bookData?.result?.total || 0;
+  const pages: number = Math.max(1, Math.ceil(total / pageSize));
+
+  const genreResponse = await fetch(`${DEFAULT_BASE}/api/v1/genres`, {
+    headers: { cookie },
+    next: { tags: [`books:${paramsString}`] },
+  });
+
+  let genreData = null;
+  if (genreResponse.ok) {
+    try {
+      genreData = await genreResponse.json();
+    } catch {
+      genreData = null;
+    }
+  } else {
+    genreData = null;
+  }
 
   return (
     <div className="flex">
       <div className="flex w-full flex-col justify-center gap-6 p-6">
-        <Header
-          onCurrentGenreChange={handleCurrentGenreChange}
-          onSearchParamChange={handleSearchParamChange}
-          onSearchInputChange={handleSearchInputChange}
-          searchParam={searchParam}
-          searchInput={searchInput}
-          currentGenre={currentGenre}
-        />
+        <Header genres={genreData?.data || []} />
         <Image
           src="/default-image.png"
           alt="Banner Image"
@@ -80,14 +82,7 @@ export default function Home() {
           height={100}
           className="h-full w-full"
         />
-        <BookCardList
-          books={books}
-          pages={pages}
-          currentPage={currentPage}
-          onNextPage={handleNextPage}
-          onPrevPage={handlePrevPage}
-          onPageChange={handlePageChange}
-        />
+        <BookCardList books={books} pages={pages} />
       </div>
     </div>
   );

@@ -1,23 +1,18 @@
+'use client';
+
 import Image from 'next/image';
 import { Card, CardFooter, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Star } from 'lucide-react';
 import { Button } from '../ui/button';
-import axiosInstance from '@/config/axiosConfig';
 import useUserProfile from '@/hooks/useUserProfile';
 import { useRouter } from 'next/navigation';
+import { CheckoutItem } from '../../types/checkout.type';
+import { Book } from '@/types/book.type';
+import { borrowBook } from '@/api/checkout.api';
+import { toast } from 'sonner';
 
-export interface BookCardProps {
-  id: string;
-  title: string;
-  thumbnailUrl: string;
-  authors: string;
-  genres: string;
-  avgRating: number | 4.5;
-  availableCopies: number;
-}
-
-const BookCard: React.FC<BookCardProps> = ({
+const BookCard: React.FC<Book> = ({
   id,
   title,
   authors,
@@ -31,30 +26,36 @@ const BookCard: React.FC<BookCardProps> = ({
 
   const handleBorrow = async () => {
     try {
-      const response = await axiosInstance.post(`/api/v1/books/borrow/${id}`, {
-        dueDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
-      });
-      setCheckouts(prevCheckouts => [
-        ...prevCheckouts,
-        {
-          bookId: id,
-          bookName: title,
-          checkoutDate: new Date(),
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          returnDate: null,
-          isReturned: false,
-          isLate: false,
-        },
-      ]);
-      console.log('Book borrowed successfully:', response.data);
+      await borrowBook(id);
+      const newCheckout: CheckoutItem = {
+        bookId: id,
+        bookName: title,
+        bookAuthors: authors,
+        bookGenres: genres,
+        checkoutDate: new Date().toISOString(),
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        returnDate: null,
+        isReturned: 0,
+        isLate: 0,
+      };
+      setCheckouts(prevCheckouts => [...prevCheckouts, newCheckout]);
+      router.refresh();
+      toast.success('Book borrowed successfully!');
     } catch (error) {
       console.error('Error borrowing book:', error);
+      toast.error('Failed to borrow book');
     }
   };
 
   const directToBookDetail = () => {
     router.push(`/books/${id}`);
   };
+
+  const isAlreadyBorrowed = checkouts.some(
+    checkout => checkout.bookId === id && !checkout.isReturned
+  );
+
+  const isOutOfStock = availableCopies === 0;
 
   return (
     <Card
@@ -102,12 +103,18 @@ const BookCard: React.FC<BookCardProps> = ({
             e.stopPropagation();
             handleBorrow();
           }}
-          disabled={checkouts.some(checkout => checkout.bookId === id)}
+          disabled={
+            checkouts.some(
+              checkout => checkout.bookId === id && !checkout.isReturned
+            ) || availableCopies === 0
+          }
           className="w-full"
         >
-          {checkouts.some(checkout => checkout.bookId === id)
+          {isAlreadyBorrowed
             ? 'Borrowed'
-            : 'Borrow'}
+            : isOutOfStock
+              ? 'Unavailable'
+              : 'Borrow'}
         </Button>
       </CardFooter>
     </Card>
