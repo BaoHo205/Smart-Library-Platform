@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MostBorrowedBook } from '@/types/reports.type';
 import { CalendarIcon, BookOpenIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface MostBorrowedBooksProps {
   books: MostBorrowedBook[];
@@ -105,7 +106,9 @@ export function MostBorrowedBooks({
                 <div className="relative">
                   <div className="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
                     {book.coverUrl ? (
-                      <img
+                      <Image
+                        width={150}
+                        height={200}
                         src={book.coverUrl}
                         alt={book.title}
                         className="h-full w-full object-cover object-center transition-transform duration-200 group-hover:scale-105"

@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MostHighlightedBook } from '@/types/reading-session.type';
+import Image from 'next/image';
 
 interface BooksModalProps {
   books: MostHighlightedBook[];
@@ -81,7 +82,9 @@ export function BooksModal({
 
                       <div className="flex h-full w-full items-center justify-center border-b border-gray-100 p-2">
                         {book.coverUrl ? (
-                          <img
+                          <Image
+                            width={150}
+                            height={200}
                             src={book.coverUrl}
                             alt={book.title}
                             className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"

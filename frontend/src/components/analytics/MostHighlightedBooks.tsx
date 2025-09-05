@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MostHighlightedBook } from '@/types/reading-session.type';
+import Image from 'next/image';
 
 interface MostHighlightedBooksProps {
   books: MostHighlightedBook[];
@@ -97,7 +98,9 @@ export function MostHighlightedBooks({
 
               <div className="mt-8 mb-3 flex aspect-[3/4] w-full items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-purple-100">
                 {book.coverUrl ? (
-                  <img
+                  <Image
+                    width={150}
+                    height={200}
                     src={book.coverUrl}
                     alt={book.title}
                     className="h-full w-full rounded-lg object-cover"

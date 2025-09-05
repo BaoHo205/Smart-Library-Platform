@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { MostBorrowedBook } from '@/types/reports.type';
 import { BookOpenIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface StaffBooksModalProps {
   books: MostBorrowedBook[];
@@ -82,7 +83,9 @@ export function StaffBooksModal({
 
                       <div className="flex h-full w-full items-center justify-center border-b border-gray-100 p-2">
                         {book.coverUrl ? (
-                          <img
+                          <Image
+                            width={150}
+                            height={200}
                             src={book.coverUrl}
                             alt={book.title}
                             className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
